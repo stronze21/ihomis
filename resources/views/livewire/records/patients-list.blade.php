@@ -14,29 +14,29 @@
 
 <div class="flex flex-col py-5 mx-auto max-w-7xl">
     <div class="flex flex-col justify-between">
-        <div class="px-3 py-3 mt-3">
-            <div class="flex justify-center">
-                <div class="ml-3 form-control">
+        <div class="py-3 mt-3">
+            <div class="flex">
+                <div class="form-control">
                     <label class="input-group input-group-sm">
-                        <span class="text-sm">Hospital #</span>
+                        <span class="text-sm whitespace-nowrap">Hospital #</span>
                         <input type="text" placeholder="Search" class="input input-bordered input-sm" wire:model.lazy="searchhpercode" />
                     </label>
                 </div>
                 <div class="ml-3 form-control">
                     <label class="input-group input-group-sm">
-                        <span class="text-sm">First Name</span>
+                        <span class="text-sm whitespace-nowrap">First Name</span>
                         <input type="text" placeholder="Search" class="input input-bordered input-sm" wire:model.lazy="searchpatfirst" />
                     </label>
                 </div>
                 <div class="ml-3 form-control">
                     <label class="input-group input-group-sm">
-                        <span class="text-sm">Middle Name</span>
+                        <span class="text-sm whitespace-nowrap">Middle Name</span>
                         <input type="text" placeholder="Search" class="input input-bordered input-sm" wire:model.lazy="searchpatmiddle" />
                     </label>
                 </div>
                 <div class="ml-3 form-control">
                     <label class="input-group input-group-sm">
-                        <span class="text-sm">Last Name</span>
+                        <span class="text-sm whitespace-nowrap">Last Name</span>
                         <input type="text" placeholder="Search" class="input input-bordered input-sm" wire:model.lazy="searchpatlast" />
                     </label>
                 </div>
