@@ -1,0 +1,92 @@
+<?php
+
+namespace App\Models\Pharmacy\Dispensing;
+
+use App\Models\Pharmacy\Drug;
+use App\Models\Hospital\Employee;
+use Awobaz\Compoships\Compoships;
+use App\Models\References\ChargeCode;
+use App\Models\Record\Patients\Patient;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Models\Record\Prescriptions\Prescription;
+use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class DrugOrder extends Model
+{
+    use Compoships;
+    use HasFactory;
+
+    protected $connection = 'hospital';
+    protected $table = 'hospital.dbo.hrxo', $primaryKey = 'docointkey', $keyType = 'string';
+    public $timestamps = false, $incrementing = false;
+
+    protected $fillable = [
+        'docointkey', 'enccode', 'hpercode', 'rxooccid', 'rxoref', 'dmdcomb', 'repdayno1', 'rxostatus', 'rxolock', 'rxoupsw', 'rxoconfd', 'dmdctr',
+        'pcchrgcod', 'pchrgqty', 'pchrgup', 'pcchrgamt', 'estatus', 'entryby', 'dodate', 'dotime', 'ordcon', 'orderupd',
+        'dodtepost', 'dotmepost', 'qtyissued', 'qtybal', 'dmdprdte', 'locacode', 'orderfrom', 'issuetype',
+        'exp_date',//added
+        'loc_code',//added
+        'item_id',//added
+        'has_tag',//added
+        'tx_type',//added
+    ];
+
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class, 'hpercode', 'hpercode');
+    }
+
+    public function dm()
+    {
+        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
+                    ->with('generic')
+                    ->with('strength')
+                    ->with('form')
+                    ->with('route');
+    }
+
+    public function prescriptions()
+    {
+        return $this->hasMany(Prescription::class, 'enccode', 'enccode');
+    }
+
+    public function prescription_header()
+    {
+        return $this->hasMany(Prescription::class, 'enccode', 'enccode')->with('employee');
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(DrugStock::class, 'item_id');
+    }
+
+    public function charge()
+    {
+        return $this->belongsTo(ChargeCode::class, 'orderfrom', 'chrgcode');
+    }
+
+    public function status()
+    {
+        if($this->estatus == 'U'){
+            $badge = '<span class="badge badge-sm badge-warning">Pending</span>';
+        }elseif($this->estatus == 'P'){
+            $badge = '<span class="badge badge-sm badge-primary">Charged</span>';
+        }elseif($this->estatus == 'S'){
+            $badge = '<span class="badge badge-sm badge-success">Issued</span>';
+        }
+
+        return $badge;
+    }
+
+    public function returns()
+    {
+        return $this->hasMany(DrugOrderReturn::class, 'docointkey', 'docointkey');
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'entryby', 'employeeid');
+    }
+}

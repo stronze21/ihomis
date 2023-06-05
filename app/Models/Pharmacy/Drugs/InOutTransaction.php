@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Models\Pharmacy\Drugs;
+
+use App\Models\User;
+use App\Models\Pharmacy\Drug;
+use Awobaz\Compoships\Compoships;
+use App\Models\References\ChargeCode;
+use App\Models\Pharmacy\PharmLocation;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
+
+class InOutTransaction extends Model
+{
+    use HasFactory;
+    use Compoships;
+
+    protected $connection = 'hospital';
+    protected $table = 'hospital.dbo.pharm_io_trans';
+
+    protected $fillable = [
+        'trans_no',
+        'dmdcomb',
+        'dmdctr',
+        'loc_code',
+        'chrgcode',
+        'requested_qty',
+        'issued_qty',
+        'received_qty',
+        'requested_by',
+        'issued_by',
+        'received_by',
+        'trans_stat',
+        'markup_price',
+    ];
+
+
+    public function drug()
+    {
+        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
+                    ->with('strength')->with('form')->with('route')->with('generic');
+    }
+
+    public function warehouse_stocks()
+    {
+        return $this->hasMany(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
+                    ->with('charge')->with('drug')
+                    ->where('loc_code', '1')->where('stock_bal', '>', '0')
+                    ->where('exp_date', '>', now());
+    }
+
+    public function warehouse_stock_charges()
+    {
+        return $this->hasMany(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
+                    ->with('charge')->with('drug')
+                    ->select('chrgcode', DB::raw('SUM(stock_bal) as "avail"'))
+                    ->where('loc_code', '1')->where('stock_bal', '>', '0')
+                    ->where('exp_date', '>', now())
+                    ->groupBy('chrgcode');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(PharmLocation::class, 'loc_code', 'id');
+    }
+
+    public function charge()
+    {
+        return $this->belongsTo(ChargeCode::class, 'chrgcode', 'chrgcode');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function created_at()
+    {
+        return Carbon::parse($this->created_at)->format('M d, Y G:i A');
+    }
+
+    public function updated_at()
+    {
+        if($this->trans_stat == 'Requested'){
+            $status = '<span class="mr-2 badge bg-slate-500 hover">'.$this->trans_stat.'</span>';
+        }elseif($this->trans_stat == 'Cancelled'){
+            $status = '<span class="mr-2 bg-red-500 badge hover">'.$this->trans_stat.'</span>';
+        }elseif($this->trans_stat == 'Issued'){
+            $status = '<span class="mr-2 bg-blue-500 badge hover">'.$this->trans_stat.'</span>';
+        }elseif($this->trans_stat == 'Received'){
+            $status = '<span class="mr-2 bg-green-500 badge hover">'.$this->trans_stat.'</span>';
+        }
+
+        return '<div class="flex justify-between">'.$status." ".Carbon::parse($this->updated_at)->diffForHumans().'</div>';
+    }
+}
