@@ -25,7 +25,7 @@
               </div>
         </div>
     </div>
-    <div class="flex justify-center w-full mt-2 overflow-x-auto">
+    <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
         <table class="table w-full table-compact">
             <thead>
                 <tr>
@@ -140,5 +140,9 @@
         $('#issueModal').click();
     })
 
+    Echo.private(`ioTrans.{{auth()->user()->pharm_location_id}}`)
+        .listen('IoTransNewRequest', (e) => {
+            Livewire.emit('refreshComponent');
+        });
 </script>
 @endpush

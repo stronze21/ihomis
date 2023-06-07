@@ -49,6 +49,7 @@
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ml-6">
+                @can('view-reports')
                 <!-- Reports Dropdown -->
                 <div class="relative ml-3">
                     <x-jet-dropdown align="right" width="48">
@@ -89,7 +90,7 @@
                         </x-slot>
                     </x-jet-dropdown>
                 </div>
-                @can('view-reports')
+                @endcan
                 <!-- Settings Dropdown -->
                 <div class="relative ml-3">
                     <x-jet-dropdown align="right" width="48">
@@ -132,8 +133,7 @@
                         </x-slot>
                     </x-jet-dropdown>
                 </div>
-                @endcan
-                <!-- Settings Dropdown -->
+                <!-- Account Dropdown -->
                 <div class="relative ml-3">
                     <x-jet-dropdown align="right" width="48">
                         <x-slot name="trigger">

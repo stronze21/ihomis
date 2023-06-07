@@ -1,27 +1,28 @@
 <?php
 
-use App\Http\Livewire\Pharmacy\Deliveries\DeliveryList;
-use App\Http\Livewire\Pharmacy\Deliveries\DeliveryView;
-use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
-use App\Http\Livewire\Pharmacy\Dispensing\RxoChargeSlip;
-use App\Http\Livewire\Pharmacy\Drugs\IoTransList;
-use App\Http\Livewire\Pharmacy\Drugs\IoTransListRequestor;
-use App\Http\Livewire\Pharmacy\Drugs\StockList;
-use App\Http\Livewire\Pharmacy\References\ListDrugHomis;
-use App\Http\Livewire\Pharmacy\References\ListLocation;
-use App\Http\Livewire\Pharmacy\Reports\ConssumptionReport;
-use App\Http\Livewire\Pharmacy\Reports\DrugsChargeSlips;
-use App\Http\Livewire\Pharmacy\Reports\DrugsIssued;
-use App\Http\Livewire\Pharmacy\Reports\DrugsReturned;
-use App\Http\Livewire\Pharmacy\Reports\DrugsTransactionLog;
+use App\Http\Livewire\Pusher;
+use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Records\PatientsList;
 use App\Http\Livewire\Records\PrescriptionEr;
-use App\Http\Livewire\Records\PrescriptionList;
 use App\Http\Livewire\Records\PrescriptionOpd;
+use App\Http\Livewire\Pharmacy\Drugs\StockList;
+use App\Http\Livewire\Records\PrescriptionList;
 use App\Http\Livewire\Records\PrescriptionWard;
-use App\Http\Livewire\References\Security\ListPermissions;
+use App\Http\Livewire\Pharmacy\Drugs\IoTransList;
+use App\Http\Livewire\Pharmacy\Reports\DrugsIssued;
+use App\Http\Livewire\Pharmacy\Reports\DrugsReturned;
 use App\Http\Livewire\References\Users\UserManagement;
-use Illuminate\Support\Facades\Route;
+use App\Http\Livewire\Pharmacy\Deliveries\DeliveryList;
+use App\Http\Livewire\Pharmacy\Deliveries\DeliveryView;
+use App\Http\Livewire\Pharmacy\References\ListLocation;
+use App\Http\Livewire\Pharmacy\Dispensing\RxoChargeSlip;
+use App\Http\Livewire\Pharmacy\References\ListDrugHomis;
+use App\Http\Livewire\Pharmacy\Reports\DrugsChargeSlips;
+use App\Http\Livewire\Pharmacy\Drugs\IoTransListRequestor;
+use App\Http\Livewire\Pharmacy\Reports\ConssumptionReport;
+use App\Http\Livewire\References\Security\ListPermissions;
+use App\Http\Livewire\Pharmacy\Reports\DrugsTransactionLog;
+use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,5 +90,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'
         Route::get('/issuance/chargeslips', DrugsChargeSlips::class)->name('issuance.charges');
         Route::get('/consumption', ConssumptionReport::class)->name('consumption');
     });
+
+    Route::get('/pusher', Pusher::class)->name('pusher');
 
 });

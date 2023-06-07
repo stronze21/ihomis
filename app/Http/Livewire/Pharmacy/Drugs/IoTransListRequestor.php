@@ -3,12 +3,18 @@
 namespace App\Http\Livewire\Pharmacy\Drugs;
 
 use Carbon\Carbon;
+use App\Models\User;
 use Livewire\Component;
+use App\Events\UserUpdated;
+use App\Events\IoTransEvent;
+use App\Events\IoTransNewRequest;
 use Livewire\WithPagination;
 use App\Models\Pharmacy\DrugPrice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Pharmacy\PharmLocation;
 use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Notifications\IoTranNotification;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Models\Pharmacy\Drugs\InOutTransaction;
@@ -63,7 +69,7 @@ class IoTransListRequestor extends Component
 
         $reference_no = Carbon::now()->format('y-m-').(sprintf("%04d", InOutTransaction::count()+1));
 
-        InOutTransaction::create([
+        $io_tx = InOutTransaction::create([
             'trans_no' => $reference_no,
             'dmdcomb' => $dmdcomb,
             'dmdctr' => $dmdctr,
@@ -72,7 +78,26 @@ class IoTransListRequestor extends Component
             'loc_code' => auth()->user()->pharm_location_id,
         ]);
 
+        $warehouse = PharmLocation::find('1');
+        IoTransNewRequest::dispatch($warehouse, $io_tx);
+        $warehouse->notify(new IoTranNotification($io_tx, auth()->user()->id));
+
         $this->alert('success', 'Request added!');
+    }
+
+    public function notify_request()
+    {
+        $io_tx = InOutTransaction::latest()->first();
+        $warehouse = PharmLocation::find('1');
+        IoTransNewRequest::dispatch($warehouse);
+        $warehouse->notify(new IoTranNotification($io_tx, auth()->user()->id));
+        $this->alert('success', 'Dispatched');
+    }
+
+    public function notify_user()
+    {
+        $user = User::find(Auth::user()->id);
+        UserUpdated::dispatch($user);
     }
 
     public function select_request(InOutTransaction $txn)

@@ -18,6 +18,12 @@
             <button class="btn btn-sm btn-primary" onclick="add_request()">Add Request</button>
         </div>
         @endcan
+        {{-- <div>
+            <button class="btn btn-sm btn-primary" wire:click="notify_request()">notify_request</button>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-primary" wire:click="notify_user()">notify_user</button>
+        </div> --}}
         <div>
             <div class="form-control">
                 <label class="input-group input-group-sm">
@@ -27,7 +33,7 @@
               </div>
         </div>
     </div>
-    <div class="flex justify-center w-full mt-2 overflow-x-auto">
+    <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
         <table class="table w-full table-compact">
             <thead>
                 <tr>
