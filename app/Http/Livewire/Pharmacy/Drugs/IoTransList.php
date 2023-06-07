@@ -8,7 +8,9 @@ use Livewire\WithPagination;
 use App\Models\Pharmacy\Drug;
 use App\Models\Pharmacy\DrugPrice;
 use Illuminate\Support\Facades\DB;
+use App\Events\IoTransRequestIssued;
 use Illuminate\Support\Facades\Auth;
+use App\Events\IoTransRequestUpdated;
 use App\Models\Pharmacy\PharmLocation;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
@@ -172,6 +174,7 @@ class IoTransList extends Component
 
             $this->selected_request->save();
 
+            IoTransRequestUpdated::dispatch($this->selected_request, 'A requested drugs/medicine has been issued from the warehouse.');
             $this->dispatchBrowserEvent('toggleIssue');
             $this->alert('success', 'Request issued successfully!');
             $this->reset();

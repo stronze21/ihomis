@@ -176,5 +176,10 @@
         $('#issueModal').click();
     })
 
+    Echo.private(`ioTrans.{{auth()->user()->pharm_location_id}}`)
+        .listen('IoTransRequestUpdated', (e) => {
+            Livewire.emit('refreshComponent');
+        });
+
 </script>
 @endpush

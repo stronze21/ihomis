@@ -25,7 +25,7 @@ class IoTransListRequestor extends Component
     use WithPagination;
     use LivewireAlert;
 
-    protected $listeners = ['add_request', 'cancel_tx', 'receive_issued'];
+    protected $listeners = ['add_request', 'cancel_tx', 'receive_issued', 'refreshComponent' => '$refresh'];
 
     public $stock_id, $requested_qty, $remarks;
     public $selected_request, $chrgcode, $issue_qty = 0;

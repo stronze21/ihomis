@@ -62,6 +62,15 @@
                     title: 'New Request from '+e.requestor,
                 })
             });
+
+            Echo.private(`ioTrans.{{auth()->user()->pharm_location_id}}`)
+            .listen('IoTransRequestUpdated', (e) => {
+                // console.log(e.requestor);
+                Swal.fire({
+                    icon: 'info',
+                    title: e.message,
+                })
+            });
         </script>
     </body>
 </html>
