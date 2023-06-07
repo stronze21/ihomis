@@ -18,7 +18,7 @@ class ListPermissions extends Component
 
     public function render()
     {
-        $roles = Role::all();
+        $roles = Role::where('name', '<>', 'Super Admin')->get();
 
         if($this->selected_role){
             $permissions = Permission::whereDoesntHave('roles', function (Builder $query) {

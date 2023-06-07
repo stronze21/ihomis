@@ -21,7 +21,7 @@ class UserManagement extends Component
     public function render()
     {
         $users = User::with('location');
-        $roles = Role::all();
+        $roles = Role::where('name', '<>', 'Super Admin')->get();
 
         return view('livewire.references.users.user-management', [
             'users' => $users->paginate(20),
