@@ -21,7 +21,7 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input)
     {
         Validator::make($input, [
-            'employeeid' => ['required', 'unique:pharm_users,employeeid', 'string', 'max:255', 'exists:hpersonal,employeeid'],
+            'employeeid' => ['required', 'unique:pharm_users,employeeid', 'string', 'max:255'],
             'pharm_location_id' => ['required'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:pharm_users'],
