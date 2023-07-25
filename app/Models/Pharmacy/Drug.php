@@ -43,10 +43,11 @@ class Drug extends Model
     {
         $generic = $this->generic->gendesc;
         $dmdnost = $this->dmdnost;
+        $brandname = $this->brandname;
         $strength = $this->strength->stredesc ?? $this->strecode;
         $form = $this->form->fomdesc ?? $this->formcode;
 
-        $drug = $generic." ".$dmdnost.$strength." ".$form;
+        $drug = $generic . ", " . $this->brandname . " " . $dmdnost . $strength . " " . $form;
 
         return $drug;
     }
