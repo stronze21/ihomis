@@ -20,7 +20,7 @@ class CreatePharmDrugStocksTable extends Migration
             $table->integer('loc_code'); //stocks location
             $table->string('chrgcode',30); //charge code
             $table->date('exp_date'); //expiry date
-            $table->dateTime('dmdprdte'); //price date
+            $table->dateTime('dmdprdte')->nullable(); //price date
             $table->decimal('markup_price', 12, 2)->nullable(true); //selling price
             $table->decimal('stock_bal', 12, 2)->nullable()->default(0); //remaining stocks
             $table->decimal('beg_bal', 12, 2)->nullable()->default(0); //remaining stocks
