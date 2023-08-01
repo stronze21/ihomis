@@ -118,7 +118,7 @@
                         <select class="select select-bordered select2" id="dmdcomb">
                             <option disabled selected>Choose drug/medicine</option>
                             @foreach ($drugs as $drug)
-                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ $drug->generic->gendesc }} {{ $drug->dmdnost }} {{ $drug->strength->stredesc ?? $drug->strecode }} {{ $drug->form->formdesc ?? $drug->formcode }} {{ $drug->route->rtedesc }}</option>
+                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ $drug->generic->gendesc }}, {{ $drug->brandname }} {{ $drug->dmdnost }} {{ $drug->strength->stredesc ?? $drug->strecode }} {{ $drug->form->formdesc ?? $drug->formcode }} {{ $drug->route->rtedesc ?? $drug->rtecode }}</option>
                             @endforeach
                         </select>
                     </div>
