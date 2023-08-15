@@ -20,31 +20,49 @@ class PatientsList extends Component
     public $search = '', $searchpatfirst = '', $searchpatmiddle = '', $searchpatlast = '', $searchhpercode = '', $searchpatdob = '';
     public $hpercode;
 
-    public function updatingSearch() { $this->resetPage(); }
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
 
-    public function updatingSearchpatfirst() { $this->resetPage(); }
+    public function updatingSearchpatfirst()
+    {
+        $this->resetPage();
+    }
 
-    public function updatingSearchpatmiddle() { $this->resetPage(); }
+    public function updatingSearchpatmiddle()
+    {
+        $this->resetPage();
+    }
 
-    public function updatingSearchpatlast() { $this->resetPage(); }
+    public function updatingSearchpatlast()
+    {
+        $this->resetPage();
+    }
 
-    public function updatingSearchhpercode() { $this->resetPage(); }
+    public function updatingSearchhpercode()
+    {
+        $this->resetPage();
+    }
 
-    public function updatingSearchpatdob() { $this->resetPage(); }
+    public function updatingSearchpatdob()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
         $patients = Patient::query()->selectRaw('hpercode, patlast, patfirst, patmiddle, patsex, patbdate, patbplace, patcstat');
 
-        if($this->searchpatlast || $this->searchpatlast != '')
-            $patients->where('patlast', 'LIKE', '%'.$this->searchpatlast.'%');
-        if($this->searchpatmiddle || $this->searchpatmiddle != '')
-            $patients->where('patmiddle', 'LIKE', '%'.$this->searchpatmiddle.'%');
-        if($this->searchpatfirst || $this->searchpatfirst != '')
-            $patients->where('patfirst', 'LIKE', '%'.$this->searchpatfirst.'%');
-        if($this->searchhpercode || $this->searchhpercode != '')
-            $patients->where('hpercode', 'LIKE', '%'.$this->searchhpercode.'%');
-        if($this->searchpatdob || $this->searchpatdob != '')
+        if ($this->searchpatlast || $this->searchpatlast != '')
+            $patients->where('patlast', 'LIKE', '%' . $this->searchpatlast . '%');
+        if ($this->searchpatmiddle || $this->searchpatmiddle != '')
+            $patients->where('patmiddle', 'LIKE', '%' . $this->searchpatmiddle . '%');
+        if ($this->searchpatfirst || $this->searchpatfirst != '')
+            $patients->where('patfirst', 'LIKE', '%' . $this->searchpatfirst . '%');
+        if ($this->searchhpercode || $this->searchhpercode != '')
+            $patients->where('hpercode', 'LIKE', '%' . $this->searchhpercode . '%');
+        if ($this->searchpatdob || $this->searchpatdob != '')
             $patients->where(DB::raw('CONVERT(date, patbdate)'), '=', $this->searchpatdob);
 
         $patients = $patients->orderBy('patlast');
@@ -58,20 +76,23 @@ class PatientsList extends Component
     {
         $patient = Patient::find($hpercode);
         $encounter = $patient->latest_encounter->first();
-        if($encounter){
+        $this->hpercode = $hpercode;
+        if ($encounter) {
             $this->enccode = $encounter->enccode;
-            $this->alert('info', 'Active '.$encounter->enctr_type().' encounter dated '.date('F j, Y G:i A',strtotime($encounter->encdate)).' found!', [
+            $this->alert('info', 'Active ' . $encounter->enctr_type() . ' encounter dated ' . date('F j, Y G:i A', strtotime($encounter->encdate)) . ' found!', [
                 'toast' => false,
                 'position' => 'center',
                 'showConfirmButton' => true,
-                'confirmButtonText' => 'Continue',
+                'confirmButtonText' => $encounter->enctr_type(),
                 'onConfirmed' => 'view_enctr',
+                'showDenyButton' => true,
+                'denyButtonText' => 'Walk-in',
+                'onDenied' => 'walk_in',
                 'showCancelButton' => true,
                 'reverseButtons' => true,
                 'timer' => false,
             ]);
-        }else{
-            $this->hpercode = $hpercode;
+        } else {
             $this->alert('error', 'No active encounter found! Continue as walk in?', [
                 'toast' => false,
                 'position' => 'center',
@@ -95,26 +116,26 @@ class PatientsList extends Component
     public function walk_in()
     {
         $check_walkn = EncounterLog::where('encstat', 'W')
-                                ->where('toecode', 'WALKN')
-                                ->where('hpercode', $this->hpercode)
-                                ->latest('encdate')
-                                ->first();
+            ->where('toecode', 'WALKN')
+            ->where('hpercode', $this->hpercode)
+            ->latest('encdate')
+            ->first();
 
-        if($check_walkn){
+        if ($check_walkn) {
             $enccode = Crypt::encrypt(str_replace(' ', '-', $check_walkn->enccode));
-        }else{
-            $new_enccode = '0000040'.$this->hpercode.date('m/d/Yh:i:s', strtotime(now()));
+        } else {
+            $new_enccode = '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now()));
             $new_encounter = EncounterLog::create([
-                            'enccode' => $new_enccode,
-                            'fhud' => '0000040',
-                            'hpercode' => $this->hpercode,
-                            'encdate' => now(),
-                            'enctime' => now(),
-                            'toecode' => 'WALKN',
-                            'sopcode1' => 'SELPA',
-                            'encstat' => 'W',
-                            'confdl' => 'N',
-                        ]);
+                'enccode' => $new_enccode,
+                'fhud' => '0000040',
+                'hpercode' => $this->hpercode,
+                'encdate' => now(),
+                'enctime' => now(),
+                'toecode' => 'WALKN',
+                'sopcode1' => 'SELPA',
+                'encstat' => 'W',
+                'confdl' => 'N',
+            ]);
 
             $enccode = Crypt::encrypt(str_replace(' ', '-', $new_encounter->enccode));
         }

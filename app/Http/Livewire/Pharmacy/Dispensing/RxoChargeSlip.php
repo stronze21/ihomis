@@ -9,18 +9,21 @@ class RxoChargeSlip extends Component
 {
     public $pcchrgcod, $view_returns = false, $returned_qty = 0;
 
-    public function updatedViewReturns(){ $this->reset('returned_qty'); }
+    public function updatedViewReturns()
+    {
+        $this->reset('returned_qty');
+    }
 
     public function render()
     {
         $pcchrgcod = $this->pcchrgcod;
 
         $rxo = DrugOrder::where('pcchrgcod', $pcchrgcod)
-                        ->with('dm')->with('charge')->with('patient')
-                        ->with('prescriptions')
-                        ->latest('dodate');
+            ->with('dm')->with('charge')->with('patient')
+            ->with('prescriptions')
+            ->latest('dodate');
 
-        if(!$this->view_returns){
+        if ($this->view_returns and $rxo->sum('qtyissued') > 0) {
             $rxo = $rxo->where('qtyissued', '>', '0');
         }
         $rxo = $rxo->get();
