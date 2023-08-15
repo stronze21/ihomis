@@ -25,22 +25,22 @@ class StockList extends Component
     public function render()
     {
         $drugs = Drug::with('generic')->with('route')->with('form')->with('strength')
-                    ->has('generic')->has('route')->has('form')->has('strength')
-                    ->where('dmdstat', 'A')
-                    ->whereRelation('sub', 'dmhdrsub', 'DRUME');
+            ->has('generic')->has('route')->has('form')->has('strength')
+            ->where('dmdstat', 'A')
+            ->whereRelation('sub', 'dmhdrsub', 'DRUME');
 
         $stocks = DrugStock::with('charge')->with('location')->with('drug')->with('current_price')->has('current_price')
-                            ->where('loc_code', $this->location_id)
-                            ->whereHas('drug', function ($query) {
-                                return $query->whereRelation('generic', 'gendesc','LIKE', '%'.$this->search.'%');
-                            })->paginate(20);
+            ->where('loc_code', $this->location_id)
+            ->whereHas('drug', function ($query) {
+                return $query->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
+            })->paginate(20);
 
         $locations = PharmLocation::all();
 
-        $charge_codes = ChargeCode::where('bentypcod','DRUME')
-                            ->where('chrgstat','A')
-                            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK'))
-                            ->get();
+        $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
+            ->where('chrgstat', 'A')
+            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK'))
+            ->get();
 
         return view('livewire.pharmacy.drugs.stock-list', [
             'stocks' => $stocks,
@@ -57,16 +57,17 @@ class StockList extends Component
 
     public function add_item()
     {
-        $this->validate(['dmdcomb' => 'required',
-                        'unit_cost' => 'required',
-                        'qty' => 'required',
-                        'expiry_date' => 'required',
-                        'chrgcode' => 'required',
-                    ]);
+        $this->validate([
+            'dmdcomb' => 'required',
+            'unit_cost' => 'required',
+            'qty' => 'required',
+            'expiry_date' => 'required',
+            'chrgcode' => 'required',
+        ]);
 
         $markup_price = $this->unit_cost + ((float)$this->unit_cost * 0.30);
         $total_amount = $this->unit_cost * $this->qty;
-        $dm = explode(',',$this->dmdcomb);
+        $dm = explode(',', $this->dmdcomb);
 
         $stock = DrugStock::firstOrCreate([
             'dmdcomb' => $dm[0],
@@ -80,16 +81,16 @@ class StockList extends Component
         $stock->beg_bal = $stock->beg_bal + $this->qty;
 
         $current_price = DrugPrice::where('dmdcomb', $dm[0])
-                                ->where('dmdctr', $dm[1])
-                                ->where('dmhdrsub', $this->chrgcode)
-                                ->latest('dmdprdte')
-                                ->first();
+            ->where('dmdctr', $dm[1])
+            ->where('dmhdrsub', $this->chrgcode)
+            ->latest('dmdprdte')
+            ->first();
 
-        if($current_price->dmduprice == $this->unit_cost AND $current_price->dmselprice){
+        if ($current_price and $current_price->dmduprice == $this->unit_cost and $current_price->dmselprice) {
             $dmdprdte = $current_price->dmdprdte;
             $dmduprice = $current_price->dmduprice;
             $dmselprice = $current_price->dmselprice;
-        }else{
+        } else {
             $new_price = new DrugPrice;
             $new_price->dmdcomb = $stock->dmdcomb;
             $new_price->dmdctr = $stock->dmdctr;
