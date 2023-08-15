@@ -26,11 +26,11 @@ class DrugOrder extends Model
         'docointkey', 'enccode', 'hpercode', 'rxooccid', 'rxoref', 'dmdcomb', 'repdayno1', 'rxostatus', 'rxolock', 'rxoupsw', 'rxoconfd', 'dmdctr',
         'pcchrgcod', 'pchrgqty', 'pchrgup', 'pcchrgamt', 'estatus', 'entryby', 'dodate', 'dotime', 'ordcon', 'orderupd',
         'dodtepost', 'dotmepost', 'qtyissued', 'qtybal', 'dmdprdte', 'locacode', 'orderfrom', 'issuetype',
-        'exp_date',//added
-        'loc_code',//added
-        'item_id',//added
-        'has_tag',//added
-        'tx_type',//added
+        'exp_date', //added
+        'loc_code', //added
+        'item_id', //added
+        'has_tag', //added
+        'tx_type', //added
     ];
 
     public function patient()
@@ -41,10 +41,10 @@ class DrugOrder extends Model
     public function dm()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                    ->with('generic')
-                    ->with('strength')
-                    ->with('form')
-                    ->with('route');
+            ->with('generic')
+            ->with('strength')
+            ->with('form')
+            ->with('route');
     }
 
     public function prescriptions()
@@ -59,7 +59,7 @@ class DrugOrder extends Model
 
     public function item()
     {
-        return $this->belongsTo(DrugStock::class, 'item_id');
+        return $this->hasMany(DrugStock::class, ['dmdcomb', 'dmdctr', 'loc_code'], ['dmdcomb', 'dmdctr', 'loc_code'])->orderBy('exp_date', 'ASC');
     }
 
     public function charge()
@@ -69,11 +69,11 @@ class DrugOrder extends Model
 
     public function status()
     {
-        if($this->estatus == 'U'){
+        if ($this->estatus == 'U') {
             $badge = '<span class="badge badge-sm badge-warning">Pending</span>';
-        }elseif($this->estatus == 'P'){
+        } elseif ($this->estatus == 'P') {
             $badge = '<span class="badge badge-sm badge-primary">Charged</span>';
-        }elseif($this->estatus == 'S'){
+        } elseif ($this->estatus == 'S') {
             $badge = '<span class="badge badge-sm badge-success">Issued</span>';
         }
 

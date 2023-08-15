@@ -14,6 +14,14 @@ module.exports = {
         'bg-blue-500',
         'bg-green-500',
         'toggle',
+        'h-96',
+        'box-border',
+        'h-32',
+        'w-32',
+        'p-4',
+        'border-4',
+        'flex-none',
+        'flex-1',
     ],
 
     theme: {
