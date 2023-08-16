@@ -63,7 +63,7 @@ class DrugStockLog extends Model
     public function drug()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                                    ->with('strength')->with('form')->with('route')->with('generic');
+            ->with('strength')->with('form')->with('route')->with('generic');
     }
 
     public function date_logged()
@@ -83,13 +83,13 @@ class DrugStockLog extends Model
 
     public function available_amount()
     {
-        $unit_cost = $this->current_price->dmduprice;
+        $unit_cost = $this->current_price->acquisition_cost;
         return ($this->beg_bal + $this->purchased) * $unit_cost;
     }
 
     public function total_cost()
     {
-        $unit_cost = $this->current_price->dmduprice;
+        $unit_cost = $this->current_price->acquisition_cost;
         return $this->purchased * $unit_cost;
     }
 
@@ -100,15 +100,14 @@ class DrugStockLog extends Model
 
     public function total_cogs()
     {
-        $unit_cost = $this->current_price->dmduprice;
-        $unit_cost = $unit_cost;
+        $unit_cost = $this->current_price->acquisition_cost;
         $total_qty_issued = $this->issue_qty - $this->return_qty;
         return $total_qty_issued * $unit_cost;
     }
 
     public function total_profit()
     {
-        $unit_cost = $this->current_price->dmduprice;
+        $unit_cost = $this->current_price->acquisition_cost;
         $total_qty_issued = ($this->issue_qty - $this->return_qty);
         $unit_sales_cost = $total_qty_issued * $unit_cost;
         $unit_sales = $total_qty_issued * $this->current_price->dmselprice;

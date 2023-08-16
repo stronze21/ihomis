@@ -103,7 +103,7 @@ class EncounterTransactionView extends Component
                         'chrgcode' => $item->chrgcode,
                         'date_logged' => date('Y-m-d'),
                         'dmdprdte' => $item->dmdprdte,
-                        'unit_price' => $item->markup_price,
+                        'unit_price' => $item->retail_price,
                     ]);
                     $log->time_logged = now();
                     $log->charged_qty += $rx->pchrgqty;
@@ -261,7 +261,7 @@ class EncounterTransactionView extends Component
                     'chrgcode' => $stock->chrgcode,
                     'date_logged' => date('Y-m-d'),
                     'dmdprdte' => $stock->dmdprdte,
-                    'unit_price' => $stock->markup_price,
+                    'unit_price' => $stock->retail_price,
                 ]);
                 $log->time_logged = now();
                 $log->issue_qty += $trans_qty;
@@ -445,7 +445,7 @@ class EncounterTransactionView extends Component
                 'chrgcode' =>  $stock_issued->stock->chrgcode,
                 'date_logged' => date('Y-m-d'),
                 'dmdprdte' =>  $stock_issued->stock->dmdprdte,
-                'unit_price' =>  $stock_issued->stock->markup_price,
+                'unit_price' =>  $stock_issued->stock->retail_price,
             ]);
             $log->time_logged = now();
             $log->return_qty += $returned_qty;

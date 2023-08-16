@@ -18,17 +18,18 @@ class DeliveryView extends Component
 
     protected $listeners = ['add_item', 'refresh' => '$refresh', 'edit_item', 'delete_item', 'save_lock'];
     public $delivery_id, $details, $search, $dmdcomb, $expiry_date, $qty, $unit_price, $lot_no;
+    public $has_compounding = false, $compounding_fee = 0;
 
     public function render()
     {
         $drugs = Drug::with('generic')->with('route')->with('form')->with('strength')
-                    ->has('generic')
-                    ->where('dmdstat', 'A')
-                    ->whereHas('sub', function ($query) {
-                        return $query->whereIn('dmhdrsub', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'));
-                    })
-                    // ->whereRelation('sub', 'dmhdrsub', 'DRUME')
-                    ->whereRelation('generic', 'gendesc', 'LIKE', '%'.$this->search.'%');
+            ->has('generic')
+            ->where('dmdstat', 'A')
+            ->whereHas('sub', function ($query) {
+                return $query->whereIn('dmhdrsub', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'));
+            })
+            // ->whereRelation('sub', 'dmhdrsub', 'DRUME')
+            ->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
 
         return view('livewire.pharmacy.deliveries.delivery-view', [
             'drugs' => $drugs->get(),
@@ -38,31 +39,90 @@ class DeliveryView extends Component
     public function mount($delivery_id)
     {
         $this->delivery_id = $delivery_id;
-        $this->details = DeliveryDetail::where('id',$delivery_id)
-                                        ->with('items')->with('supplier')
-                                        ->with('charge')->first();
+        $this->details = DeliveryDetail::where('id', $delivery_id)
+            ->with('items')->with('supplier')
+            ->with('charge')->first();
     }
 
     public function add_item()
     {
-        $this->validate(['dmdcomb' => 'required', 'unit_price' => 'required', 'qty' => 'required', 'expiry_date' => 'required']);
+        $this->validate([
+            'dmdcomb' => 'required',
+            'unit_price' => 'required',
+            'qty' => 'required', 'expiry_date' => 'required'
+        ]);
 
-        $markup_price = $this->unit_price + ((float)$this->unit_price * 0.30);
-        $total_amount = $this->unit_price * $this->qty;
-        $dm = explode(',',$this->dmdcomb);
+        $unit_cost = $this->unit_price;
+        $excess = 0;
+
+        if ($unit_cost >= 10000.01) {
+            $excess = $unit_cost - 10000;
+            $markup_price = 1115 + ($excess * 0.05);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 1000.01 and $unit_cost <= 10000.00) {
+            $excess = $unit_cost - 1000;
+            $markup_price = 215 + ($excess * 0.10);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 100.01 and $unit_cost <= 1000.00) {
+            $excess = $unit_cost - 100;
+            $markup_price = 35 + ($excess * 0.20);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 50.01 and $unit_cost <= 100.00) {
+            $excess = $unit_cost - 50;
+            $markup_price = 20 + ($excess * 0.30);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 0.01 and $unit_cost <= 50.00) {
+            $markup_price = $unit_cost * 0.40;
+            $retail_price = $unit_cost + $markup_price;
+        }
+
+        if ($this->has_compounding) {
+
+            $this->validate([
+                'compounding_fee' => ['required', 'numeric', 'min:0'],
+            ]);
+
+            $retail_price = $retail_price + $this->compounding_fee;
+        }
+
+        $total_amount = $unit_cost * $this->qty;
+        $dm = explode(',', $this->dmdcomb);
 
         $new_item = new DeliveryItems;
         $new_item->delivery_id = $this->details->id;
         $new_item->dmdcomb = $dm[0];
         $new_item->dmdctr = $dm[1];
         $new_item->qty = $this->qty;
-        $new_item->unit_price = $this->unit_price;
+        $new_item->unit_price = $unit_cost;
         $new_item->total_amount = $total_amount;
-        $new_item->markup_price = $markup_price;
+        $new_item->retail_price = $retail_price;
         $new_item->lot_no = $this->lot_no;
         $new_item->expiry_date = $this->expiry_date;
         $new_item->pharm_location_id = $this->details->pharm_location_id;
         $new_item->charge_code = $this->details->charge_code;
+        $new_item->save();
+
+        $new_price = new DrugPrice;
+        $new_price->dmdcomb = $new_item->dmdcomb;
+        $new_price->dmdctr = $new_item->dmdctr;
+        $new_price->dmhdrsub = $this->details->charge_code;
+        $new_price->dmduprice = $unit_cost;
+        $new_price->dmselprice = $new_item->retail_price;
+        $new_price->dmdprdte = now();
+        $new_price->expdate = $new_item->exp_date;
+        $new_price->stock_id = $new_item->id;
+        $new_price->mark_up = $markup_price;
+        $new_price->acquisition_cost = $unit_cost;
+        $new_price->has_compounding = $this->has_compounding;
+        if ($this->has_compounding) {
+            $new_price->compounding_fee = $this->compounding_fee;
+        }
+        $new_price->retail_price = $retail_price;
+        $new_price->save();
+
+        $dmdprdte = $new_price->dmdprdte;
+
+        $new_item->dmdprdte = $dmdprdte;
         $new_item->save();
 
         $this->emit('refresh');
@@ -72,18 +132,77 @@ class DeliveryView extends Component
 
     public function edit_item($item_id)
     {
-        $this->validate(['unit_price' => 'required', 'qty' => 'required', 'expiry_date' => 'required']);
+        $this->validate([
+            'unit_price' => 'required',
+            'qty' => 'required',
+            'expiry_date' => 'required'
+        ]);
 
-        $markup_price = $this->unit_price + ((float)$this->unit_price * 0.30);
-        $total_amount = $this->unit_price * $this->qty;
+        $unit_cost = $this->unit_cost;
+        $excess = 0;
+
+        if ($unit_cost >= 10000.01) {
+            $excess = $unit_cost - 10000;
+            $markup_price = 1115 + ($excess * 0.05);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 1000.01 and $unit_cost <= 10000.00) {
+            $excess = $unit_cost - 1000;
+            $markup_price = 215 + ($excess * 0.10);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 100.01 and $unit_cost <= 1000.00) {
+            $excess = $unit_cost - 100;
+            $markup_price = 35 + ($excess * 0.20);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 50.01 and $unit_cost <= 100.00) {
+            $excess = $unit_cost - 50;
+            $markup_price = 20 + ($excess * 0.30);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 0.01 and $unit_cost <= 50.00) {
+            $markup_price = $unit_cost * 0.40;
+            $retail_price = $unit_cost + $markup_price;
+        }
+
+        if ($this->has_compounding) {
+
+            $this->validate([
+                'compounding_fee' => ['required', 'numeric', 'min:0'],
+            ]);
+
+            $retail_price = $retail_price + $this->compounding_fee;
+        }
+
+        $total_amount = $unit_cost * $this->qty;
 
         $update_item = DeliveryItems::find($item_id);
         $update_item->qty = $this->qty;
-        $update_item->unit_price = $this->unit_price;
+        $update_item->unit_price = $unit_cost;
         $update_item->total_amount = $total_amount;
-        $update_item->markup_price = $markup_price;
+        $update_item->retail_price = $retail_price;
         $update_item->lot_no = $this->lot_no;
         $update_item->expiry_date = $this->expiry_date;
+        $update_item->save();
+
+        $new_price = new DrugPrice;
+        $new_price->dmdcomb = $update_item->dmdcomb;
+        $new_price->dmdctr = $update_item->dmdctr;
+        $new_price->dmhdrsub = $this->details->charge_code;
+        $new_price->dmduprice = $unit_cost;
+        $new_price->dmselprice = $update_item->retail_price;
+        $new_price->dmdprdte = now();
+        $new_price->expdate = $update_item->exp_date;
+        $new_price->stock_id = $update_item->id;
+        $new_price->mark_up = $markup_price;
+        $new_price->acquisition_cost = $unit_cost;
+        $new_price->has_compounding = $this->has_compounding;
+        if ($this->has_compounding) {
+            $new_price->compounding_fee = $this->compounding_fee;
+        }
+        $new_price->retail_price = $retail_price;
+        $new_price->save();
+
+        $dmdprdte = $new_price->dmdprdte;
+
+        $update_item->dmdprdte = $dmdprdte;
         $update_item->save();
 
         $this->emit('refresh');
@@ -105,45 +224,17 @@ class DeliveryView extends Component
     {
         $updated = false;
 
-        foreach($this->details->items->all() as $item)
-        {
+        foreach ($this->details->items->all() as $item) {
             $add_to = DrugStock::firstOrCreate([
                 'dmdcomb' => $item->dmdcomb,
                 'dmdctr' => $item->dmdctr,
                 'loc_code' => $item->pharm_location_id,
                 'chrgcode' => $item->charge_code,
                 'exp_date' => $item->expiry_date,
-                'markup_price' => $item->markup_price,
+                'retail_price' => $item->retail_price,
             ]);
             $add_to->stock_bal = $add_to->stock_bal + $item->qty;
             $add_to->beg_bal = $add_to->beg_bal + $item->qty;
-
-            $current_price = DrugPrice::where('dmdcomb', $item->dmdcomb)
-                                    ->where('dmdctr', $item->dmdctr)
-                                    ->where('dmhdrsub', $item->chrgcode)
-                                    ->latest('dmdprdte')
-                                    ->first();
-
-            if($current_price AND $current_price->dmduprice == $item->unit_price AND $current_price->dmselprice){
-                $dmdprdte = $current_price->dmdprdte;
-                $dmduprice = $current_price->dmduprice;
-                $dmselprice = $current_price->dmselprice;
-            }else{
-                $new_price = new DrugPrice;
-                $new_price->dmdcomb = $add_to->dmdcomb;
-                $new_price->dmdctr = $add_to->dmdctr;
-                $new_price->dmhdrsub = $add_to->chrgcode;
-                $new_price->dmduprice = (100 / 130) * $add_to->markup_price;
-                $new_price->dmselprice = $add_to->markup_price;
-                $new_price->dmdprdte = now();
-                $new_price->expdate = $add_to->exp_date;
-                $new_price->stock_id = $add_to->id;
-                $new_price->save();
-
-                $dmdprdte = $new_price->dmdprdte;
-                $dmduprice = $new_price->dmduprice;
-                $dmselprice = $new_price->dmselprice;
-            }
 
             $log = DrugStockLog::firstOrNew([
                 'loc_code' => $item->pharm_location_id,
@@ -151,25 +242,25 @@ class DeliveryView extends Component
                 'dmdctr' => $add_to->dmdctr,
                 'chrgcode' => $add_to->chrgcode,
                 'date_logged' => date('Y-m-d'),
-                'dmdprdte' => $dmdprdte,
-                'unit_cost' => $dmduprice,
-                'unit_price' => $dmselprice,
+                'dmdprdte' => $item->dmdprdte,
+                'unit_cost' => $item->unit_price,
+                'unit_price' => $item->retail_price,
             ]);
             $log->time_logged = now();
             $log->purchased += $item->qty;
-            $add_to->dmdprdte = $dmdprdte;
+            $add_to->dmdprdte = $item->dmdprdte;
 
             $log->save();
             $add_to->save();
 
             $updated = true;
         }
-        if($updated){
+        if ($updated) {
             $this->details->status = 'locked';
             $this->details->save();
             $this->emit('refresh');
             $this->alert('success', 'Successfully updated stocks inventory!');
-        }else{
+        } else {
             return $this->alert('error', 'Error! There are no drug or medicine that can be added to stock inventory.');
         }
     }

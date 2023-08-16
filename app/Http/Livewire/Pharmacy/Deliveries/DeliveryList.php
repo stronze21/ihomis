@@ -21,16 +21,19 @@ class DeliveryList extends Component
 
     public $search;
 
-    public function updatingSearch(){ $this->resetPage(); }
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
         $deliveries = DeliveryDetail::with('supplier')->with('items')->with('charge')->latest()->paginate(15);
         $suppliers = Supplier::all();
-        $charges = ChargeCode::where('bentypcod','DRUME')
-                            ->where('chrgstat','A')
-                            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS'))
-                            ->get();
+        $charges = ChargeCode::where('bentypcod', 'DRUME')
+            ->where('chrgstat', 'A')
+            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'))
+            ->get();
 
         return view('livewire.pharmacy.deliveries.delivery-list', [
             'deliveries' => $deliveries,
@@ -55,6 +58,5 @@ class DeliveryList extends Component
 
         $this->redirect(route('delivery.view', [$delivery->id, true]));
         $this->alert('success', 'Delivery details saved!');
-
     }
 }

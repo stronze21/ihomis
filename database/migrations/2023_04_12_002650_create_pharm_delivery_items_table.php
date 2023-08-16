@@ -21,7 +21,7 @@ class CreatePharmDeliveryItemsTable extends Migration
             $table->decimal('qty', 10, 2);
             $table->decimal('unit_price', 18, 2);
             $table->decimal('total_amount', 18, 2);
-            $table->decimal('markup_price', 18, 2);
+            $table->decimal('retail_price', 18, 2);
             $table->string('lot_no');
             $table->date('expiry_date');
             $table->string('pharm_location_id');

@@ -22,6 +22,7 @@ module.exports = {
         'border-4',
         'flex-none',
         'flex-1',
+        'justify-self-start',
     ],
 
     theme: {

@@ -90,7 +90,7 @@
                     <th>Description</th>
                     <th class="text-right">QTY</th>
                     <th class="text-right">Unit Cost</th>
-                    <th class="text-right">Marked-up Price</th>
+                    <th class="text-right">Retail Price</th>
                     <th class="text-right">Total Amount</th>
                 </tr>
             </thead>
@@ -98,14 +98,23 @@
                 @forelse ($details->items->all() as $item)
                     @php
                         $dm = $item->drug;
+                        $total_qty += $item->qty;
+                        $total_amount += $item->total_amount;
                     @endphp
                     <tr
-                        @if ($details->status == 'pending') class="cursor-pointer hover" onclick="edit_item('{{ $item->id }}', '{{ $item->lot_no }}', '{{ $item->qty }}', '{{ $item->unit_price }}', '{{ $item->markup_price }}', '{{ $item->total_amount }}', '{{ $item->expiry_date }}', '{{ $dm->drug_name() }}')" @endif>
+                        @if ($details->status == 'pending') class="cursor-pointer hover" onclick="edit_item('{{ $item->id }}', '{{ $item->lot_no }}', '{{ $item->qty }}', '{{ $item->unit_price }}', '{{ $item->retail_price }}', '{{ $item->total_amount }}', '{{ $item->expiry_date }}', '{{ $dm->drug_name() }}')" @endif>
                         <td>{{ $item->lot_no }}</td>
                         <td>{{ $dm->drug_name() }} (exp: {{ $item->expiry_date }})</td>
                         <td class="text-right">{{ $item->qty }}</td>
                         <td class="text-right">{{ $item->unit_price }}</td>
-                        <td class="text-right">{{ $item->markup_price }}</td>
+                        <td class="text-right">
+                            @if ($item->current_price->has_compounding)
+                                <span class="font-bold tooltip"
+                                    data-tip="Includes {{ $item->current_price->compounding_fee }} compounding fee.">
+                                    <i class="las la-question-circle"></i></span>
+                            @endif
+                            {{ $item->retail_price }}
+                        </td>
                         <td class="text-right">{{ $item->total_amount }}</td>
                     </tr>
                 @empty
@@ -121,7 +130,7 @@
                     <td class="text-right">{{ $total_qty }} Items</td>
                     <td class="text-right"></td>
                     <td class="text-right">Total</td>
-                    <td class="text-right">{{ $total_amount }}</td>
+                    <td class="text-right">{{ number_format($total_amount, 2) }}</td>
                 </tr>
             </tfoot>
         </table>
@@ -169,6 +178,18 @@
                             <span class="label-text">Lot No</span>
                         </label>
                         <input id="lot_no" type="text" class="w-full input input-bordered" />
+                    </div>
+                    <div class="px-2 form-control">
+                        <label class="flex mt-3 space-x-3 cursor-pointer">
+                            <input type="checkbox" id="has_compounding" class="checkbox" />
+                            <span class="mr-auto label-text !justify-self-start">Highly Specialised Drugs</span>
+                        </label>
+                    </div>
+                    <div class="w-full px-2 form-control" hidden id="compounding_div">
+                        <label class="label" for="compounding_fee">
+                            <span class="label-text">Compounding fee</span>
+                        </label>
+                        <input id="compounding_fee" type="number" step="0.01" class="w-full input input-bordered" />
                     </div>`,
                 showCancelButton: true,
                 confirmButtonText: `Save`,
@@ -178,6 +199,19 @@
                     const qty = Swal.getHtmlContainer().querySelector('#qty');
                     const unit_price = Swal.getHtmlContainer().querySelector('#unit_price');
                     const lot_no = Swal.getHtmlContainer().querySelector('#lot_no');
+                    const has_compounding = Swal.getHtmlContainer().querySelector('#has_compounding');
+                    const compounding_div = Swal.getHtmlContainer().querySelector('#compounding_div');
+                    const compounding_fee = Swal.getHtmlContainer().querySelector('#compounding_fee');
+
+                    compounding_div.style.display = 'none';
+
+                    has_compounding.addEventListener('click', function handleClick() {
+                        if (has_compounding.checked) {
+                            compounding_div.style.display = 'block';
+                        } else {
+                            compounding_div.style.display = 'none';
+                        }
+                    });
 
                     $('.select2').select2({
                         dropdownParent: $('.swal2-container'),
@@ -192,13 +226,15 @@
                     @this.set('qty', qty.value);
                     @this.set('unit_price', unit_price.value);
                     @this.set('lot_no', lot_no.value);
+                    @this.set('has_compounding', has_compounding.checked);
+                    @this.set('compounding_fee', compounding_fee.value);
 
                     Livewire.emit('add_item');
                 }
             });
         }
 
-        function edit_item(item_id, item_lot_no, item_qty, item_unit_price, item_markup_price, item_total_amount,
+        function edit_item(item_id, item_lot_no, item_qty, item_unit_price, item_retail_price, item_total_amount,
             item_expiry_date, drug_name) {
             Swal.fire({
                 html: `

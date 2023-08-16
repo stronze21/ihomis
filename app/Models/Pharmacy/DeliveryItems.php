@@ -17,8 +17,12 @@ class DeliveryItems extends Model
     public function drug()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                    ->with('generic')->with('strength')
-                    ->with('form')->with('route');
+            ->with('generic')->with('strength')
+            ->with('form')->with('route');
     }
 
+    public function current_price()
+    {
+        return $this->belongsTo(DrugPrice::class, 'dmdprdte', 'dmdprdte');
+    }
 }

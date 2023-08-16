@@ -14,7 +14,7 @@ class DrugPrice extends Model
     protected $connection = 'hospital';
     protected $table = 'hospital.dbo.hdmhdrprice';
     public $incrementing = false;
-    public $timestamps = false ;
+    public $timestamps = false;
 
 
     protected $fillables = [
@@ -30,6 +30,20 @@ class DrugPrice extends Model
         'expdate',
         'brandname',
         'stock_id',
+        'mark_up',
+        'acquisition_cost',
+        'has_compounding',
+        'compounding_fee',
+        'retail_price',
     ];
 
+    public function acquisition_cost()
+    {
+        return number_format($this->acquisition_cost, 2);
+    }
+
+    public function dmselprice()
+    {
+        return number_format($this->dmselprice, 2);
+    }
 }

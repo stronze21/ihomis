@@ -18,8 +18,14 @@ class DrugsReturned extends Component
     public $filter_charge = 'DRUMB,*Drugs and Meds (Revolving) Satellite';
     public $date_from, $date_to, $location_id;
 
-    public function updatingFilterCharge(){ $this->resetPage(); }
-    public function updatingMonth(){ $this->resetPage(); }
+    public function updatingFilterCharge()
+    {
+        $this->resetPage();
+    }
+    public function updatingMonth()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -27,17 +33,18 @@ class DrugsReturned extends Component
         $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
-                            ->where('chrgstat', 'A')
-                            ->get();
+            ->where('chrgstat', 'A')
+            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'))
+            ->get();
 
         $filter_charge = explode(',', $this->filter_charge);
 
         $drugs_returned = DrugOrderReturn::with('dm')->with('patient')->with('receiver')->with('adm_pat_room')->with('encounter')
-                                    ->where('returnfrom', $filter_charge[0])
-                                    ->whereRelation('main_order', 'loc_code', $this->location_id)
-                                    ->whereBetween('returndate', [$this->date_from, $this->date_to])
-                                    ->latest('returndate')
-                                    ->paginate(15);
+            ->where('returnfrom', $filter_charge[0])
+            ->whereRelation('main_order', 'loc_code', $this->location_id)
+            ->whereBetween('returndate', [$this->date_from, $this->date_to])
+            ->latest('returndate')
+            ->paginate(15);
 
         $locations = PharmLocation::all();
 

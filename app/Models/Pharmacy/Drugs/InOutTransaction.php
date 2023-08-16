@@ -33,32 +33,32 @@ class InOutTransaction extends Model
         'issued_by',
         'received_by',
         'trans_stat',
-        'markup_price',
+        'retail_price',
     ];
 
 
     public function drug()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                    ->with('strength')->with('form')->with('route')->with('generic');
+            ->with('strength')->with('form')->with('route')->with('generic');
     }
 
     public function warehouse_stocks()
     {
         return $this->hasMany(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                    ->with('charge')->with('drug')
-                    ->where('loc_code', '1')->where('stock_bal', '>', '0')
-                    ->where('exp_date', '>', now());
+            ->with('charge')->with('drug')
+            ->where('loc_code', '1')->where('stock_bal', '>', '0')
+            ->where('exp_date', '>', now());
     }
 
     public function warehouse_stock_charges()
     {
         return $this->hasMany(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                    ->with('charge')->with('drug')
-                    ->select('chrgcode', DB::raw('SUM(stock_bal) as "avail"'))
-                    ->where('loc_code', '1')->where('stock_bal', '>', '0')
-                    ->where('exp_date', '>', now())
-                    ->groupBy('chrgcode');
+            ->with('charge')->with('drug')
+            ->select('chrgcode', DB::raw('SUM(stock_bal) as "avail"'))
+            ->where('loc_code', '1')->where('stock_bal', '>', '0')
+            ->where('exp_date', '>', now())
+            ->groupBy('chrgcode');
     }
 
     public function location()
@@ -83,16 +83,16 @@ class InOutTransaction extends Model
 
     public function updated_at()
     {
-        if($this->trans_stat == 'Requested'){
-            $status = '<span class="mr-2 badge bg-slate-500 hover">'.$this->trans_stat.'</span>';
-        }elseif($this->trans_stat == 'Cancelled'){
-            $status = '<span class="mr-2 bg-red-500 badge hover">'.$this->trans_stat.'</span>';
-        }elseif($this->trans_stat == 'Issued'){
-            $status = '<span class="mr-2 bg-blue-500 badge hover">'.$this->trans_stat.'</span>';
-        }elseif($this->trans_stat == 'Received'){
-            $status = '<span class="mr-2 bg-green-500 badge hover">'.$this->trans_stat.'</span>';
+        if ($this->trans_stat == 'Requested') {
+            $status = '<span class="mr-2 badge bg-slate-500 hover">' . $this->trans_stat . '</span>';
+        } elseif ($this->trans_stat == 'Cancelled') {
+            $status = '<span class="mr-2 bg-red-500 badge hover">' . $this->trans_stat . '</span>';
+        } elseif ($this->trans_stat == 'Issued') {
+            $status = '<span class="mr-2 bg-blue-500 badge hover">' . $this->trans_stat . '</span>';
+        } elseif ($this->trans_stat == 'Received') {
+            $status = '<span class="mr-2 bg-green-500 badge hover">' . $this->trans_stat . '</span>';
         }
 
-        return '<div class="flex justify-between">'.$status." ".Carbon::parse($this->updated_at)->diffForHumans().'</div>';
+        return '<div class="flex justify-between">' . $status . " " . Carbon::parse($this->updated_at)->diffForHumans() . '</div>';
     }
 }

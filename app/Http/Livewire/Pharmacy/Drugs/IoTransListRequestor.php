@@ -36,13 +36,13 @@ class IoTransListRequestor extends Component
     public function render()
     {
         $trans = InOutTransaction::with('drug')->with('location')
-                                ->with('charge')
-                                ->where('loc_code', Auth::user()->pharm_location_id);
+            ->with('charge')
+            ->where('loc_code', Auth::user()->pharm_location_id);
 
         $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', DB::raw('SUM(stock_bal) as "avail"'))
-                        ->whereRelation('location', 'description', 'LIKE', '%Warehouse%')
-                        ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
-                        ->groupBy('dmdcomb', 'dmdctr');
+            ->whereRelation('location', 'description', 'LIKE', '%Warehouse%')
+            ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
+            ->groupBy('dmdcomb', 'dmdctr');
 
         return view('livewire.pharmacy.drugs.io-trans-list-requestor', [
             'trans' => $trans->latest()->paginate(20),
@@ -58,16 +58,16 @@ class IoTransListRequestor extends Component
         $dmdctr = $stock->dmdctr;
 
         $current_qty = DrugStock::whereRelation('location', 'description', 'LIKE', '%Warehouse%')
-                                ->where('dmdcomb', $dmdcomb)->where('dmdctr', $dmdctr)
-                                ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
-                                ->groupBy('dmdcomb', 'dmdctr')->sum('stock_bal');
+            ->where('dmdcomb', $dmdcomb)->where('dmdctr', $dmdctr)
+            ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
+            ->groupBy('dmdcomb', 'dmdctr')->sum('stock_bal');
 
         $this->validate([
-            'requested_qty' => ['required', 'numeric', 'min:1', 'max:'.$current_qty],
+            'requested_qty' => ['required', 'numeric', 'min:1', 'max:' . $current_qty],
             'remarks' => ['nullable', 'string'],
         ]);
 
-        $reference_no = Carbon::now()->format('y-m-').(sprintf("%04d", InOutTransaction::count()+1));
+        $reference_no = Carbon::now()->format('y-m-') . (sprintf("%04d", InOutTransaction::count() + 1));
 
         $io_tx = InOutTransaction::create([
             'trans_no' => $reference_no,
@@ -113,12 +113,12 @@ class IoTransListRequestor extends Component
         $trans_id = $txn->id;
 
         $issued_items = InOutTransactionItem::where('iotrans_id', $trans_id)
-                                            ->where('status', 'Pending')
-                                            ->latest('exp_date')
-                                            ->get();
+            ->where('status', 'Pending')
+            ->latest('exp_date')
+            ->get();
 
-        if($issued_items){
-            foreach($issued_items as $item){
+        if ($issued_items) {
+            foreach ($issued_items as $item) {
                 $from_stock = $item->from_stock;
                 $from_stock->stock_bal += $item->qty;
                 $from_stock->save();
@@ -141,12 +141,12 @@ class IoTransListRequestor extends Component
         $trans_id = $txn->id;
 
         $issued_items = InOutTransactionItem::where('iotrans_id', $trans_id)
-                                            ->where('status', 'Pending')
-                                            ->latest('exp_date')
-                                            ->get();
+            ->where('status', 'Pending')
+            ->latest('exp_date')
+            ->get();
 
-        if($issued_items){
-            foreach($issued_items as $item){
+        if ($issued_items) {
+            foreach ($issued_items as $item) {
 
                 $stock = DrugStock::firstOrCreate([
                     'dmdcomb' => $item->dmdcomb,
@@ -154,7 +154,7 @@ class IoTransListRequestor extends Component
                     'loc_code' => $item->to,
                     'chrgcode' => $item->chrgcode,
                     'exp_date' => $item->exp_date,
-                    'markup_price' => $item->markup_price,
+                    'retail_price' => $item->retail_price,
                     'dmdprdte' => $item->dmdprdte,
                 ]);
                 $stock->stock_bal += $item->qty;
@@ -168,7 +168,7 @@ class IoTransListRequestor extends Component
                     'chrgcode' => $item->chrgcode,
                     'date_logged' => date('Y-m-d'),
                     'dmdprdte' => $item->dmdprdte,
-                    'unit_price' => $item->markup_price,
+                    'unit_price' => $item->retail_price,
                 ]);
                 $log->time_logged = now();
                 $log->received += $item->qty;

@@ -77,9 +77,9 @@
                         <td>{{ $stk->updated_at }}</td>
                         <td class="font-bold">{{ $stk->drug->drug_name() }}</td>
                         @role('warehouse')
-                            <th>{{ $stk->current_price->dmduprice }}</th>
+                            <th>{{ $stk->current_price->acquisition_cost() }}</th>
                         @endrole
-                        <td>{{ $stk->current_price->dmselprice }}</td>
+                        <td>{{ $stk->current_price->dmselprice() }}</td>
                         <td>{{ $stk->balance() }}</td>
                         <td>{!! $stk->expiry() !!}</td>
                     </tr>
@@ -139,6 +139,18 @@
                             <span class="label-text">Unit Cost</span>
                         </label>
                         <input id="unit_cost" type="number" step="0.01" class="w-full input input-bordered" />
+                    </div>
+                    <div class="px-2 form-control">
+                        <label class="flex mt-3 space-x-3 cursor-pointer">
+                            <input type="checkbox" id="has_compounding" class="checkbox" />
+                            <span class="mr-auto label-text !justify-self-start">Highly Specialised Drugs</span>
+                        </label>
+                    </div>
+                    <div class="w-full px-2 form-control" hidden id="compounding_div">
+                        <label class="label" for="compounding_fee">
+                            <span class="label-text">Compounding fee</span>
+                        </label>
+                        <input id="compounding_fee" type="number" step="0.01" class="w-full input input-bordered" />
                     </div>`,
                 showCancelButton: true,
                 confirmButtonText: `Save`,
@@ -148,6 +160,19 @@
                     const qty = Swal.getHtmlContainer().querySelector('#qty');
                     const unit_cost = Swal.getHtmlContainer().querySelector('#unit_cost');
                     const chrgcode = Swal.getHtmlContainer().querySelector('#chrgcode');
+                    const has_compounding = Swal.getHtmlContainer().querySelector('#has_compounding');
+                    const compounding_div = Swal.getHtmlContainer().querySelector('#compounding_div');
+                    const compounding_fee = Swal.getHtmlContainer().querySelector('#compounding_fee');
+
+                    compounding_div.style.display = 'none';
+
+                    has_compounding.addEventListener('click', function handleClick() {
+                        if (has_compounding.checked) {
+                            compounding_div.style.display = 'block';
+                        } else {
+                            compounding_div.style.display = 'none';
+                        }
+                    });
 
                     $('.select2').select2({
                         dropdownParent: $('.swal2-container'),
@@ -162,8 +187,10 @@
                     @this.set('qty', qty.value);
                     @this.set('unit_cost', unit_cost.value);
                     @this.set('chrgcode', chrgcode.value);
+                    @this.set('has_compounding', has_compounding.checked);
+                    @this.set('compounding_fee', compounding_fee.value);
 
-                    Livewire.emit('add_item');
+                    Livewire.emit('add_item_new');
                 }
             });
         }

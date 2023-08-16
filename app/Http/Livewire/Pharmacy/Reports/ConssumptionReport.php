@@ -23,15 +23,16 @@ class ConssumptionReport extends Component
         $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
-                            ->where('chrgstat', 'A')
-                            ->get();
+            ->where('chrgstat', 'A')
+            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'))
+            ->get();
 
         $filter_charge = explode(',', $this->filter_charge);
 
         // $drugs_issued = DrugStockIssue::from('pharm_drug_stock_issues as pdsi')
         //                             ->join('hcharge as hc', 'hc.chrgcode', 'pdsi.chrgcode')
-        //                             ->join('pharm_drug_stocks as pds', 'pdsi.stock_id', 'pds.id', 'pds.markup_price')
-        //                             ->selectRaw("MAX(hc.chrgdesc) chrgdesc, pdsi.dmdcomb, pdsi.dmdctr, MAX(pdsi.stock_id), SUM(pds.beg_bal) as beg_bal, SUM(pds.stock_bal) as stock_bal, pds.markup_price")
+        //                             ->join('pharm_drug_stocks as pds', 'pdsi.stock_id', 'pds.id', 'pds.retail_price')
+        //                             ->selectRaw("MAX(hc.chrgdesc) chrgdesc, pdsi.dmdcomb, pdsi.dmdctr, MAX(pdsi.stock_id), SUM(pds.beg_bal) as beg_bal, SUM(pds.stock_bal) as stock_bal, pds.retail_price")
         //                             ->selectRaw("SUM(pdsi.sc_pwd) as sc_pwd, SUM(pdsi.ems) as ems, SUM(pdsi.maip) as maip, SUM(pdsi.wholesale) as wholesale, SUM(pdsi.pay) as pay")
         //                             ->selectRaw("SUM(pdsi.medicare) as medicare, SUM(pdsi.service) as service, SUM(pdsi.govt_emp) as govt_emp, SUM(pdsi.caf) as caf")
         //                             ->selectRaw("SUM(pdsi.qty) as qty, SUM(pdsi.pcchrgamt) as pcchrgamt")
@@ -39,11 +40,11 @@ class ConssumptionReport extends Component
         //                             ->where('pdsi.loc_code', $this->location_id)
         //                             ->whereBetween('pdsi.created_at', [$this->date_from, $this->date_to])
         //                             ->groupBy('pdsi.dmdcomb', 'pdsi.dmdctr', 'pdsi.chrgcode')
-        //                             ->groupBy('pds.dmdcomb', 'pds.dmdctr', 'pds.chrgcode', 'pds.markup_price')
+        //                             ->groupBy('pds.dmdcomb', 'pds.dmdctr', 'pds.chrgcode', 'pds.retail_price')
         //                             ->get();
 
         $drugs_issued = DrugStockLog::from('pharm_drug_stock_logs as pdsl')
-                            ->selectRaw("chrgcode, pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
+            ->selectRaw("chrgcode, pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
                                         SUM(pdsl.purchased) as purchased,
                                         SUM(pdsl.beg_bal) as beg_bal,
                                         SUM(pdsl.sc_pwd) as sc_pwd,
@@ -58,12 +59,12 @@ class ConssumptionReport extends Component
                                         SUM(pdsl.issue_qty) as issue_qty,
                                         SUM(pdsl.return_qty) as return_qty
                                         ")
-                            ->where('chrgcode', $filter_charge[0])
-                            ->whereBetween('time_logged', [$this->date_from, $this->date_to])
-                            ->with('charge')->with('drug')
-                            ->groupBy('pdsl.dmdcomb', 'pdsl.dmdctr', 'pdsl.chrgcode')
-                            ->groupBy('pdsl.dmdprdte')
-                            ->get();
+            ->where('chrgcode', $filter_charge[0])
+            ->whereBetween('time_logged', [$this->date_from, $this->date_to])
+            ->with('charge')->with('drug')
+            ->groupBy('pdsl.dmdcomb', 'pdsl.dmdctr', 'pdsl.chrgcode')
+            ->groupBy('pdsl.dmdprdte')
+            ->get();
 
         $locations = PharmLocation::all();
 

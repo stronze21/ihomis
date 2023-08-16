@@ -28,14 +28,14 @@ class InOutTransactionItem extends Model
         'qty',
         'status',
         'user_id',
-        'markup_price',
+        'retail_price',
         'dmdprdte',
     ];
 
     public function drug()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                    ->with('strength')->with('form')->with('route')->with('generic');
+            ->with('strength')->with('form')->with('route')->with('generic');
     }
 
     public function from()

@@ -54,6 +54,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view-prescriptions',
                 'view-stocks',
                 'view-iotrans-limited',
+                'request-drugs',
             ]);
 
 

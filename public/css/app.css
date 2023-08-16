@@ -4237,6 +4237,9 @@ html {
 .mr-3 {
   margin-right: 0.75rem;
 }
+.mr-auto {
+  margin-right: auto;
+}
 .mt-1 {
   margin-top: 0.25rem;
 }
@@ -4263,9 +4266,6 @@ html {
 }
 .mt-auto {
   margin-top: auto;
-}
-.mb-1 {
-  margin-bottom: 0.25rem;
 }
 .box-border {
   box-sizing: border-box;
@@ -4323,9 +4323,6 @@ html {
 }
 .h-96 {
   height: 24rem;
-}
-.h-64 {
-  height: 16rem;
 }
 .max-h-96 {
   max-height: 24rem;
@@ -4393,6 +4390,9 @@ html {
 .w-60 {
   width: 15rem;
 }
+.w-64 {
+  width: 16rem;
+}
 .w-8 {
   width: 2rem;
 }
@@ -4415,9 +4415,6 @@ html {
 .w-min {
   width: -moz-min-content;
   width: min-content;
-}
-.w-64 {
-  width: 16rem;
 }
 .min-w-0 {
   min-width: 0px;
@@ -4582,6 +4579,12 @@ html {
   --tw-space-y-reverse: 0;
   margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
+}
+.\!justify-self-start {
+  justify-self: start !important;
+}
+.justify-self-start {
+  justify-self: start;
 }
 .overflow-auto {
   overflow: auto;
@@ -4967,10 +4970,6 @@ html {
 .text-xs\/4 {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
 }
 .font-bold {
   font-weight: 700;
