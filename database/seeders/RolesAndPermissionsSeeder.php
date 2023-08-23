@@ -26,6 +26,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view-iotrans',
             'view-iotrans-limited',
             'view-deliveries',
+            'view-eps',
             'view-references',
 
             'view-reports',

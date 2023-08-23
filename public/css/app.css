@@ -2938,6 +2938,13 @@ html {
   outline: 2px solid hsla(var(--bc) / 0.2);
   outline-offset: 2px;
 }
+.input-error {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--er) / var(--tw-border-opacity));
+}
+.input-error:focus {
+  outline: 2px solid hsl(var(--er));
+}
 .input-disabled,
   .input[disabled] {
   cursor: not-allowed;
@@ -3340,6 +3347,9 @@ html {
 :where(.table *:last-child) :where(*:last-child) :where(th, td):last-child {
   border-bottom-right-radius: 0.5rem;
 }
+.textarea-bordered {
+  --tw-border-opacity: 0.2;
+}
 .textarea:focus {
   outline: 2px solid hsla(var(--bc) / 0.2);
   outline-offset: 2px;
@@ -3508,12 +3518,24 @@ html {
 .btm-nav-lg>*:where(.active) {
   border-top-width: 4px;
 }
+.btn-xs {
+  height: 1.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  min-height: 1.5rem;
+  font-size: 0.75rem;
+}
 .btn-sm {
   height: 2rem;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
   min-height: 2rem;
   font-size: 0.875rem;
+}
+.btn-square:where(.btn-xs) {
+  height: 1.5rem;
+  width: 1.5rem;
+  padding: 0px;
 }
 .btn-square:where(.btn-sm) {
   height: 2rem;
@@ -4560,6 +4582,11 @@ html {
 .gap-y-2 {
   row-gap: 0.5rem;
 }
+.space-x-2 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
 .space-x-3 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-x-reverse: 0;
   margin-right: calc(0.75rem * var(--tw-space-x-reverse));
@@ -4614,6 +4641,9 @@ html {
 }
 .break-words {
   overflow-wrap: break-word;
+}
+.break-all {
+  word-break: break-all;
 }
 .rounded {
   border-radius: 0.25rem;

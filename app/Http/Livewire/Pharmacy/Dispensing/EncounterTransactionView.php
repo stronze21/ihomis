@@ -15,6 +15,7 @@ use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Models\Record\Encounters\EncounterLog;
 use App\Models\Record\Prescriptions\Prescription;
+use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
 use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
 use App\Models\Pharmacy\Dispensing\OrderChargeCode;
 use App\Models\Record\Prescriptions\PrescriptionDataIssued;
@@ -31,6 +32,7 @@ class EncounterTransactionView extends Component
     public $order_qty, $unit_price, $return_qty, $docointkey;
     public $item_id;
     public $sc, $ems, $maip, $wholesale, $pay, $medicare, $service, $caf, $govt, $type;
+
 
     public $selected_items = [];
 
@@ -75,16 +77,8 @@ class EncounterTransactionView extends Component
             'charge_desc' => 'a',
         ]);
 
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-
         $pcchrgcod = 'P' . date('y') . '-' . $charge_code->id;
         $cnt = 0;
-
-        // dd($this->selected_items);
-
-        // $rxo = DrugOrder::where('enccode', $enccode)
-        //     ->where('estatus', 'U')
-        //     ->get();
 
         $rxo = DrugOrder::whereIn('docointkey', $this->selected_items)
             ->where('estatus', 'U')->get();
@@ -135,9 +129,6 @@ class EncounterTransactionView extends Component
 
         $rxo = DrugOrder::whereIn('docointkey', $this->selected_items)
             ->where('estatus', 'P')->get();
-        // $rxo = DrugOrder::where('enccode', $enccode)
-        //     ->where('estatus', 'P')
-        //     ->get();
 
         foreach ($rxo as $row) {
             if ($row->item) {
@@ -152,14 +143,167 @@ class EncounterTransactionView extends Component
 
         if ($cnt == 1) {
             foreach ($rxo as $row) {
-                $this->update_prescription($row->dmdctr, $row->dmdcomb, $row->docointkey, $row->pchrgqty);
-                $this->deduct_stocks($row->dmdctr, $row->dmdcomb, $row->orderfrom, $row->pchrgqty, $row->loc_code, $row->docointkey, $row->pcchrgcod, $row->tx_type, $row->pcchrgamt, $row->pchrgup, $enccode);
+                // $this->update_prescription($row->dmdctr, $row->dmdcomb, $row->docointkey, $row->pchrgqty);
+                // $this->deduct_stocks($row->dmdctr, $row->dmdcomb, $row->orderfrom, $row->pchrgqty, $row->loc_code, $row->docointkey, $row->pcchrgcod, $row->tx_type, $row->pcchrgamt, $row->pchrgup, $enccode);
+
+                //START UPDATE PRESCRIPTION
+                $rx_header = Prescription::where('enccode', $enccode)
+                    ->with('data_active')
+                    ->get();
+                if ($rx_header) {
+                    foreach ($rx_header as $rxh) {
+                        $rx_data = $rxh->data_active()
+                            ->where('dmdcomb', $row->dmdcomb)
+                            ->where('dmdctr', $row->dmdctr)
+                            ->get();
+                        if ($rx_data) {
+                            PrescriptionDataIssued::create([
+                                'presc_data_id' => $rx_data->id,
+                                'docointkey' => $row->docointkey,
+                                'qtyissued' => $row->pchrgqty,
+                            ]);
+
+                            if ($rx_data->issued()->sum('qtyissued') >= $rx_data->qty) {
+                                $rx_data->stat = 'I';
+                                $rx_data->save();
+                            }
+
+                            $row->order_by = $rx_header->empid;
+                            $row->deptcode = $rx_header->employee->deptcode;
+                        }
+                    }
+                }
+                //END UPDATE PRESCRIPTION
+
+                //START DEDUCT STOCK
+                $total_deduct = $row->pchrgqty;
+                $dmdcomb = $row->dmdcomb;
+                $dmdctr = $row->dmdctr;
+                $docointkey = $row->docointkey;
+                $loc_code = $row->loc_code;
+                $chrgcode = $row->orderfrom;
+                $unit_price = $row->pchrgup;
+                $pcchrgamt = $row->pcchrgamt;
+                $pcchrgcod = $row->pcchrgcod;
+                $tag = $row->tx_type;
+
+                $stocks = DrugStock::where('dmdcomb', $dmdcomb)
+                    ->where('dmdctr', $dmdctr)
+                    ->where('chrgcode', $chrgcode)
+                    ->where('loc_code', $loc_code)
+                    ->where('exp_date', '>', date('Y-m-d'))
+                    ->where('stock_bal', '>', '0')
+                    ->oldest('exp_date')
+                    ->get();
+
+                foreach ($stocks as $stock) {
+                    $trans_qty = 0;
+                    if ($total_deduct) {
+                        if ($total_deduct > $stock->stock_bal) {
+                            $trans_qty = $stock->stock_bal;
+                            $total_deduct -= $stock->stock_bal;
+                            $stock->stock_bal = 0;
+                        } else {
+                            $trans_qty = $total_deduct;
+                            $stock->stock_bal -= $total_deduct;
+                            $total_deduct = 0;
+                        }
+                        $stock->save();
+
+                        $issued_drug = DrugStockIssue::create([
+                            'stock_id' => $stock->id,
+                            'docointkey' => $docointkey,
+                            'dmdcomb' => $dmdcomb,
+                            'dmdctr' => $dmdctr,
+                            'loc_code' => $loc_code,
+                            'chrgcode' => $chrgcode,
+                            'exp_date' => $stock->exp_date,
+                            'qty' =>  $trans_qty,
+                            'pchrgup' =>  $unit_price,
+                            'pcchrgamt' =>  $pcchrgamt,
+                            'status' => 'Issued',
+                            'user_id' => auth()->user()->id,
+                            'hpercode' => $this->hpercode,
+                            'enccode' => $enccode,
+                            'toecode' => $this->toecode,
+                            'pcchrgcod' => $pcchrgcod,
+
+                            'sc_pwd' => $tag == 'sc_pwd' ? $trans_qty : false,
+                            'ems' => $tag == 'ems' ? $trans_qty : false,
+                            'maip' => $tag == 'maip' ? $trans_qty : false,
+                            'wholesale' => $tag == 'wholesale' ? $trans_qty : false,
+                            'pay' => $tag == 'pay' ? $trans_qty : false,
+                            'medicare' => $tag == 'medicare' ? $trans_qty : false,
+                            'service' => $tag == 'service' ? $trans_qty : false,
+                            'govt_emp' => $tag == 'govt_emp' ? $trans_qty : false,
+                            'caf' => $tag == 'caf' ? $trans_qty : false,
+
+                            'dmdprdte' => $stock->dmdprdte,
+                        ]);
+
+                        $log = DrugStockLog::firstOrNew([
+                            'loc_code' => $stock->loc_code,
+                            'dmdcomb' => $stock->dmdcomb,
+                            'dmdctr' => $stock->dmdctr,
+                            'chrgcode' => $stock->chrgcode,
+                            'date_logged' => date('Y-m-d'),
+                            'dmdprdte' => $stock->dmdprdte,
+                            'unit_price' => $stock->retail_price,
+                        ]);
+                        $log->time_logged = now();
+                        $log->issue_qty += $trans_qty;
+
+                        $log->sc_pwd += $issued_drug->sc_pwd;
+                        $log->ems += $issued_drug->ems;
+                        $log->maip += $issued_drug->maip;
+                        $log->wholesale += $issued_drug->wholesale;
+                        $log->pay += $issued_drug->pay;
+                        $log->medicare += $issued_drug->medicare;
+                        $log->service += $issued_drug->service;
+                        $log->govt_emp += $issued_drug->govt_emp;
+                        $log->caf += $issued_drug->caf;
+
+                        $log->save();
+
+                        // $this->add_to_inventory($dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty);
+
+                    } else {
+                        break;
+                    }
+                }
+                //END DEDUCT TO STOCKS
 
                 $row->estatus = 'S';
                 $row->qtyissued = $row->pchrgqty;
                 $row->save();
 
-                SharedController::record_hrxoissue($row->docointkey, $row->pchrgqty);
+                //START RECORD ISSUED DRUG
+                DrugOrderIssue::updateOrCreate([
+                    'docointkey' => $docointkey,
+                    'enccode' => $rxo->enccode,
+                    'hpercode' => $rxo->hpercode,
+                    'dmdcomb' => $rxo->dmdcomb,
+                    'dmdctr' => $rxo->dmdctr,
+                ], [
+                    'issuedte' => now(),
+                    'issuetme' => now(),
+                    'qty' => $row->pchrgqty,
+                    'issuedby' => auth()->user()->employeeid,
+                    'status' => 'A', //A
+                    'rxolock' => 'N', //N
+                    'updsw' => 'N', //N
+                    'confdl' => 'N', //N
+                    'entryby' => auth()->user()->employeeid,
+                    'locacode' => 'PHARM', //PHARM
+                    'dmdprdte' => now(),
+                    'issuedfrom' => $rxo->orderfrom,
+                    'pcchrgcod' => $rxo->pcchrgcod,
+                    'chrgcode' => $rxo->orderfrom,
+                    'pchrgup' => $rxo->pchrgup,
+                    'issuetype' => 'c', //c
+                ]);
+                //END RECORD ISSUED DRUG
+
             }
             $this->alert('success', 'Order issued successfully.');
         } elseif ($cnt == 2) {
@@ -327,7 +471,15 @@ class EncounterTransactionView extends Component
             $this->type = 'govt';
         }
 
-        $available = SharedController::available_stock($dmdcomb, $dmdctr, $chrgcode, $loc_code);
+        // $available = SharedController::available_stock($dmdcomb, $dmdctr, $chrgcode, $loc_code);
+
+        $available = DrugStock::where('dmdcomb', $dmdcomb)
+            ->where('dmdctr', $dmdctr)
+            ->where('chrgcode', $chrgcode)
+            ->where('loc_code', $loc_code)
+            ->where('stock_bal', '>', '0')
+            ->where('exp_date', '>', now())
+            ->sum('stock_bal');
 
         if ($available >= $total_deduct) {
             $this->add_hrxo($dm);

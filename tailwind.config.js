@@ -23,6 +23,8 @@ module.exports = {
         'flex-none',
         'flex-1',
         'justify-self-start',
+        'textarea',
+        'textarea-bordered',
     ],
 
     theme: {

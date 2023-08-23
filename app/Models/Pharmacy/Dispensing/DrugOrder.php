@@ -31,6 +31,7 @@ class DrugOrder extends Model
         'item_id', //added
         'has_tag', //added
         'tx_type', //added
+        'order_by',
     ];
 
     public function patient()
@@ -88,5 +89,10 @@ class DrugOrder extends Model
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'entryby', 'employeeid');
+    }
+
+    public function order_by()
+    {
+        return $this->belongsTo(Employee::class, 'order_by', 'employeeid');
     }
 }

@@ -23,6 +23,7 @@ use App\Http\Livewire\Pharmacy\Reports\ConssumptionReport;
 use App\Http\Livewire\References\Security\ListPermissions;
 use App\Http\Livewire\Pharmacy\Reports\DrugsTransactionLog;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
+use App\Http\Livewire\Pharmacy\Reports\EmergencyPurchases;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +37,8 @@ use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 */
 
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'
+Route::middleware([
+    'auth:sanctum', config('jetstream.auth_session'), 'verified'
 ])->group(function () {
 
     Route::get('/', function () {
@@ -68,11 +70,11 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'
     Route::name('dispensing.')->prefix('dispensing')->group(function () {
         Route::get('/encounter/trans/{enccode}', EncounterTransactionView::class)->name('view.enctr');
         Route::get('/encounter/charge/{pcchrgcod}', RxoChargeSlip::class)->name('rxo.chargeslip');
-
     });
 
     Route::name('delivery.')->prefix('delivery')->group(function () {
         Route::get('/list', DeliveryList::class)->name('list');
+        Route::get('/emergency-purchase', EmergencyPurchases::class)->name('ep');
         Route::get('/view/{delivery_id}', DeliveryView::class)->name('view');
     });
 
@@ -92,5 +94,4 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'
     });
 
     Route::get('/pusher', Pusher::class)->name('pusher');
-
 });

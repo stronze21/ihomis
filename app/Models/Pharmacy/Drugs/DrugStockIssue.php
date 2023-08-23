@@ -67,7 +67,7 @@ class DrugStockIssue extends Model
     public function drug()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                                    ->with('strength')->with('form')->with('route')->with('generic');
+            ->with('strength')->with('form')->with('route')->with('generic');
     }
 
     public function current_price()
