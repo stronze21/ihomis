@@ -34,7 +34,7 @@ class DrugsReturned extends Component
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
-            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'))
+            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'))
             ->get();
 
         $filter_charge = explode(',', $this->filter_charge);

@@ -74,7 +74,7 @@
                 <tbody>
                     @forelse ($prescriptions as $rx)
                         <tr wire:key="view-enctr-{{ $rx->enccode }}-{{ $loop->iteration }}"
-                            wire:click="view_enctr('{{ $rx->enccode }}')" class="cursor-pointer hover">
+                            wire:click.prefetch="view_enctr('{{ $rx->enccode }}')" class="cursor-pointer hover">
                             <td>
                                 <div class="flex-col">
                                     <div>{{ $rx->active_adm->disdate_format1() }}</div>

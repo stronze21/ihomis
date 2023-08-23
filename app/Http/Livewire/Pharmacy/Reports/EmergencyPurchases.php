@@ -28,13 +28,13 @@ class EmergencyPurchases extends Component
             ->has('generic')
             ->where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
-                return $query->whereIn('dmhdrsub', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'));
+                return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'));
             })
             ->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
 
         $charges = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
-            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'))
+            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'))
             ->get();
 
         $purchases = DrugEmergencyPurchase::with('drug')

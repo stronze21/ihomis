@@ -29,7 +29,7 @@ class StockList extends Component
             ->has('generic')->has('route')->has('form')->has('strength')
             ->where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
-                return $query->whereIn('dmhdrsub', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'));
+                return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'));
             });
 
         $stocks = DrugStock::with('charge')->with('location')->with('drug')->with('current_price')->has('current_price')
@@ -42,7 +42,7 @@ class StockList extends Component
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
-            ->whereIn('chrgcode', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'))
+            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'))
             ->get();
 
         return view('livewire.pharmacy.drugs.stock-list', [

@@ -26,7 +26,7 @@ class DeliveryView extends Component
             ->has('generic')
             ->where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
-                return $query->whereIn('dmhdrsub', array('DRUMB', 'DRUME', 'DRUMK', 'DRUMA', 'DRUMC', 'DRUMR', 'DRUMS', 'DRUMO'));
+                return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'));
             })
             // ->whereRelation('sub', 'dmhdrsub', 'DRUME')
             ->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
