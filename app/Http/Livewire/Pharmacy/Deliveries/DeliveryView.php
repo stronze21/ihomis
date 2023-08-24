@@ -26,10 +26,9 @@ class DeliveryView extends Component
             ->has('generic')
             ->where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
-                return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
-            })
-            // ->whereRelation('sub', 'dmhdrsub', 'DRUME')
-            ->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
+                // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
+                return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
+            });
 
         return view('livewire.pharmacy.deliveries.delivery-view', [
             'drugs' => $drugs->get(),
