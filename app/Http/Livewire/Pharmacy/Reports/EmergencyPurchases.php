@@ -19,7 +19,7 @@ class EmergencyPurchases extends Component
     protected $listeners = ['new_ep', 'refresh' => 'reset_page', 'push', 'cancel_purchase'];
 
     public $search;
-    public $purchase_date, $or_no, $pharmacy_name, $charge_code, $dmdcomb, $expiry_date,
+    public $purchase_date, $or_no, $pharmacy_name, $charge_code = 'DRUMC', $dmdcomb, $expiry_date,
         $qty, $unit_price, $lot_no, $has_compounding = false, $compounding_fee = 0, $remarks;
 
     public function render()
@@ -28,13 +28,13 @@ class EmergencyPurchases extends Component
             ->has('generic')
             ->where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
-                return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'));
+                return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
             })
             ->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
 
         $charges = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
-            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'))
+            ->whereIn('chrgcode', array('DRUMC'))
             ->get();
 
         $purchases = DrugEmergencyPurchase::with('drug')

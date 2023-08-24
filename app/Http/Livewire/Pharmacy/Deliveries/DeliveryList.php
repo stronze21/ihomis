@@ -32,7 +32,7 @@ class DeliveryList extends Component
         $suppliers = Supplier::all();
         $charges = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
-            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMO', 'DRUMR', 'DRUMS', 'DRUMAA'))
+            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'))
             ->get();
 
         return view('livewire.pharmacy.deliveries.delivery-list', [
