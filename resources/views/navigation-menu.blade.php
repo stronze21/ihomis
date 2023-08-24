@@ -41,7 +41,7 @@
                         </x-jet-nav-link>
                     @endcan
                     @can('view-deliveries')
-                        <x-jet-nav-link class="ml-2" href="{{ route('delivery.list') }}" :active="request()->routeIs('delivery.*')">
+                        <x-jet-nav-link class="ml-2" href="{{ route('delivery.list') }}" :active="request()->routeIs('delivery.list')">
                             <i class="mr-1 las la-lg la-truck-loading"></i> {{ __('Deliveries') }}
                         </x-jet-nav-link>
                     @endcan
