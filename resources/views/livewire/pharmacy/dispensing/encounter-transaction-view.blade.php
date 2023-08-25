@@ -92,7 +92,7 @@
                             </td>
                             <td class="text-right w-min">Price</td>
                             <td class="text-right w-min">Total</td>
-                            {{-- <td>Remarks</td> --}}
+                            <td>Remarks</td>
                             <td class="text-center w-min">Status</td>
                         </tr>
                     </thead>
@@ -140,7 +140,7 @@
                                 </td>
                                 <td class="text-right w-min">{{ number_format($rxo->pchrgup, 2) }}</td>
                                 <td class="text-right w-min">{{ number_format($rxo->pcchrgamt, 2) }}</td>
-                                {{-- <td>{{$rxo->remarks}}</td> --}}
+                                <td>{{ $rxo->remarks }}</td>
                                 <td class="text-center w-min">{!! $rxo->status() !!}</td>
                             </tr>
                         @empty
@@ -154,16 +154,16 @@
         </div>
         <div class="col-span-4 xl:col-span-1">
             <div class="overflow-auto max-h-96">
-                <div class="flex justify-between">
-                    <div class="w-1/2 p-2">
-                        <select class="w-full select select-bordered select-sm" wire:model="charge_code">
-                            <option></option>
+                <div class="flex flex-col space-y-1">
+                    <div class="w-full" wire:ignore>
+                        <select id="filter_charge_code" class="w-full select select-bordered select-sm select2"
+                            multiple wire:model="charge_code">
                             @foreach ($charges as $charge)
-                                <option value="{{ $charge->chrgcode }}">{{ $charge->charge->chrgdesc }}</option>
+                                <option value="{{ $charge->chrgcode }}">{{ $charge->chrgdesc }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="w-1/2 p-2">
+                    <div class="w-full">
                         <input type="text" placeholder="Type here" class="w-full input input-sm input-bordered"
                             wire:model.lazy="generic" />
                     </div>
@@ -184,7 +184,7 @@
                                         <div class="text-xs text-slate-600">{{ $stock->charge->chrgdesc }}</div>
                                         <div class="font-bold">{{ $stock->drug->generic->gendesc }}</div>
                                         <div class="text-xs text-center text-slate-800">
-                                            {{ $stock->drug->dmdnost }}{{ $stock->drug->strength->stredesc }}
+                                            {{ $stock->drug->dmdnost }}{{ $stock->drug->strength->stredesc ?? '' }}
                                             {{ $stock->drug->form->formdesc }}</div>
                                     </div>
                                 </td>
@@ -243,21 +243,17 @@
         </div>
     </div>
 
-    <!-- Put this part before </body> tag -->
-    <input type="checkbox" id="my-modal" class="modal-toggle" wire:loading.attr="checked" />
-    <div class="modal">
-        <div class="modal-box">
-            <div>
-                <span>
-                    <i class="las la-spinner la-lg animate-spin"></i>
-                    Processing...
-                </span>
-            </div>
-        </div>
-    </div>
-
     @push('scripts')
         <script>
+            $('.select2').select2({
+                width: 'resolve',
+                placeholder: 'Fund Source',
+            });
+
+            $('#filter_charge_code').on('change', function() {
+                @this.set('charge_code', $('#filter_charge_code').select2('val'));
+            });
+
             function charge_items() {
                 Swal.fire({
                     title: 'Are you sure?',
