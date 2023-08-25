@@ -162,7 +162,7 @@ class EncounterTransactionView extends Component
                         $rx_data = $rxh->data_active()
                             ->where('dmdcomb', $row->dmdcomb)
                             ->where('dmdctr', $row->dmdctr)
-                            ->get();
+                            ->first();
                         if ($rx_data) {
                             PrescriptionDataIssued::create([
                                 'presc_data_id' => $rx_data->id,
