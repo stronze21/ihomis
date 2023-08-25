@@ -17,7 +17,6 @@ class PrescriptionDataIssued extends Model
     public $fillable = [
         'presc_data_id',
         'docointkey',
-        'qtyissued',
     ];
 
     public function rxo()

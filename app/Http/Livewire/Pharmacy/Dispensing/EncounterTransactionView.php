@@ -167,7 +167,6 @@ class EncounterTransactionView extends Component
                             PrescriptionDataIssued::create([
                                 'presc_data_id' => $rx_data->id,
                                 'docointkey' => $row->docointkey,
-                                'qtyissued' => $row->pchrgqty,
                             ]);
 
                             if ($rx_data->issued()->sum('qtyissued') >= $rx_data->qty) {
