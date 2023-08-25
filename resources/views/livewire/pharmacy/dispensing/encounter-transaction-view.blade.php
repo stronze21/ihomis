@@ -141,7 +141,9 @@
                                 </td>
                                 <td class="text-right w-min">{{ number_format($rxo->pchrgup, 2) }}</td>
                                 <td class="text-right w-min">{{ number_format($rxo->pcchrgamt, 2) }}</td>
-                                <td>{{ $rxo->remarks }}</td>
+                                <td>
+                                    {{ $rxo->remarks }}
+                                </td>
                                 <td class="text-center w-min">{!! $rxo->status() !!}</td>
                             </tr>
                         @empty
