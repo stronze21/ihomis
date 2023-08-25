@@ -23,6 +23,8 @@ class StockList extends Component
     public $dmdcomb, $chrgcode, $expiry_date, $qty, $unit_cost, $lot_no;
     public $has_compounding = false, $compounding_fee = 0;
 
+    public $item_id;
+
     public function render()
     {
         $drugs = Drug::with('generic')->with('route')->with('form')->with('strength')
@@ -64,13 +66,15 @@ class StockList extends Component
         $this->validate([
             'dmdcomb' => 'required',
             'unit_cost' => 'required',
-            'qty' => 'required',
+            'qty' => ['required', 'numeric', 'min:0'],
             'expiry_date' => 'required',
             'chrgcode' => 'required',
         ]);
 
         $unit_cost = $this->unit_cost;
         $excess = 0;
+        $markup_price = 0;
+        $retail_price = 0;
 
         if ($unit_cost >= 10000.01) {
             $excess = $unit_cost - 10000;
@@ -151,6 +155,90 @@ class StockList extends Component
         $log->beg_bal += $this->qty;
 
         $log->save();
+        $stock->save();
+
+        $this->resetExcept('location_id');
+        $this->alert('success', 'Item beginning balance has been saved!');
+    }
+
+    public function update_item_new(DrugStock $stock)
+    {
+        dd($stock);
+        $this->validate([
+            'unit_cost' => 'required',
+            'qty' => ['required', 'numeric', 'min:0'],
+            'expiry_date' => 'required',
+            'chrgcode' => 'required',
+        ]);
+
+        $old_stock = $stock;
+
+        $unit_cost = $this->unit_cost;
+        $excess = 0;
+        $markup_price = 0;
+        $retail_price = 0;
+
+        if ($unit_cost >= 10000.01) {
+            $excess = $unit_cost - 10000;
+            $markup_price = 1115 + ($excess * 0.05);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 1000.01 and $unit_cost <= 10000.00) {
+            $excess = $unit_cost - 1000;
+            $markup_price = 215 + ($excess * 0.10);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 100.01 and $unit_cost <= 1000.00) {
+            $excess = $unit_cost - 100;
+            $markup_price = 35 + ($excess * 0.20);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 50.01 and $unit_cost <= 100.00) {
+            $excess = $unit_cost - 50;
+            $markup_price = 20 + ($excess * 0.30);
+            $retail_price = $unit_cost + $markup_price;
+        } elseif ($unit_cost >= 0.01 and $unit_cost <= 50.00) {
+            $markup_price = $unit_cost * 0.40;
+            $retail_price = $unit_cost + $markup_price;
+        }
+
+        if ($this->has_compounding) {
+
+            $this->validate([
+                'compounding_fee' => ['required', 'numeric', 'min:0'],
+            ]);
+
+            $retail_price = $retail_price + $this->compounding_fee;
+        }
+        $stock->beg_bal = 0;
+        $stock->stock_bal = 0;
+
+        $stock->chrgcode = $this->chrgcode;
+        $stock->exp_date = $this->exp_date;
+        $stock->retail_price = $this->retail_price;
+        $stock->stock_bal = $stock->stock_bal + $this->qty;
+        $stock->beg_bal = $stock->beg_bal + $this->qty;
+
+        $price = $stock->current_price;
+        $price->dmduprice = $unit_cost;
+        $price->dmselprice = $retail_price;
+        $price->mark_up = $markup_price;
+        $price->acquisition_cost = $unit_cost;
+        $price->has_compounding = $this->has_compounding;
+        $price->compounding_fee = $this->compounding_fee;
+        $price->retail_price = $retail_price;
+
+        $log = DrugStockLog::where('loc_code', Auth::user()->pharm_location_id)
+            ->where('dmdcomb', $stock->dmdcomb)
+            ->where('dmdctr', $stock->dmdctr)
+            ->where('chrgcode', $stock->chrgcode)
+            ->where('date_logged', date('Y-m-d', strtotime($stock->created_at)))
+            ->where('dmdprdte', $stock->dmdprdte)
+            ->first();
+
+        $log->time_logged = now();
+        $log->beg_bal -= $old_stock->qty;
+        $log->beg_bal += $this->qty;
+
+        $log->save();
+        $price->save();
         $stock->save();
 
         $this->resetExcept('location_id');

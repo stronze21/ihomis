@@ -71,7 +71,8 @@
             </thead>
             <tbody>
                 @forelse ($stocks as $stk)
-                    <tr class="hover">
+                    <tr class="hover"
+                        onclick="update_item({{ $stk->id }}, '{{ $stk->drug->drug_name() }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->balance() }}', '{{ $stk->current_price->acquisition_cost() }}', '{{ $stk->curret_price->has_compounding ?? false }}', '{{ $stk->curret_price->compounding_fee ?? false }}')">
                         <th>{{ $stk->charge->chrgdesc }}</th>
                         <td>{{ $stk->location->description }}</td>
                         <td>{{ $stk->updated_at }}</td>
@@ -138,7 +139,7 @@
                         <label class="label" for="unit_cost">
                             <span class="label-text">Unit Cost</span>
                         </label>
-                        <input id="unit_cost" type="number" step="0.01" class="w-full input input-bordered" />
+                        <input id="unit_cost" type="number" step="0.00" class="w-full input input-bordered" />
                     </div>
                     <div class="px-2 form-control">
                         <label class="flex mt-3 space-x-3 cursor-pointer">
@@ -191,6 +192,101 @@
                     @this.set('compounding_fee', compounding_fee.value);
 
                     Livewire.emit('add_item_new');
+                }
+            });
+        }
+
+        function update_item(stk_id, stk_drug_name, stk_chrgcode, stk_expiry_date, stk_balance, stk_cost,
+            stk_has_compounding, stk_compounding_fee) {
+            Swal.fire({
+                html: `
+                    <span class="text-xl font-bold"> Update Item ` + stk_drug_name + `</span>
+                    <div class="w-full px-2 form-control">
+                        <label class="label" for="update_chrgcode">
+                            <span class="label-text">Fund Source</span>
+                        </label>
+                        <select class="text-sm select select-bordered select-sm" id="update_chrgcode">
+                            @foreach ($charge_codes as $charge)
+                                <option value="{{ $charge->chrgcode }}">{{ $charge->chrgdesc }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="w-full px-2 form-control">
+                        <label class="label" for="update_expiry_date">
+                            <span class="label-text">Expiry Date</span>
+                        </label>
+                        <input id="update_expiry_date" type="date" value="` + stk_expiry_date + `" class="w-full input input-bordered" />
+                    </div>
+                    <div class="w-full px-2 form-control">
+                        <label class="label" for="update_qty">
+                            <span class="label-text">Beginning Balance</span>
+                        </label>
+                        <input id="update_qty" type="number" value="1" class="w-full input input-bordered" />
+                    </div>
+                    <div class="w-full px-2 form-control">
+                        <label class="label" for="update_unit_cost">
+                            <span class="label-text">Unit Cost</span>
+                        </label>
+                        <input id="update_unit_cost" type="number" step="0.01" class="w-full input input-bordered" />
+                    </div>
+                    <div class="px-2 form-control">
+                        <label class="flex mt-3 space-x-3 cursor-pointer">
+                            <input type="checkbox" id="update_has_compounding" class="checkbox" />
+                            <span class="mr-auto label-text !justify-self-start">Highly Specialised Drugs</span>
+                        </label>
+                    </div>
+                    <div class="w-full px-2 form-control" hidden id="update_compounding_div">
+                        <label class="label" for="update_compounding_fee">
+                            <span class="label-text">Compounding fee</span>
+                        </label>
+                        <input id="update_compounding_fee" type="number" step="0.01" class="w-full input input-bordered" />
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: `Save`,
+                didOpen: () => {
+                    const update_expiry_date = Swal.getHtmlContainer().querySelector('#update_expiry_date');
+                    const update_qty = Swal.getHtmlContainer().querySelector('#update_qty');
+                    const update_unit_cost = Swal.getHtmlContainer().querySelector('#update_unit_cost');
+                    const update_chrgcode = Swal.getHtmlContainer().querySelector('#update_chrgcode');
+                    const update_has_compounding = Swal.getHtmlContainer().querySelector(
+                        '#update_has_compounding');
+                    const update_compounding_div = Swal.getHtmlContainer().querySelector(
+                        '#update_compounding_div');
+                    const update_compounding_fee = Swal.getHtmlContainer().querySelector(
+                        '#update_compounding_fee');
+
+                    update_qty = stk_balance;
+                    update_unit_cost = stk_cost;
+                    update_chrgcode = stk_chrgcode;
+                    update_has_compounding = stk_has_compounding;
+                    update_compounding_fee = stk_compounding_fee;
+
+                    update_compounding_div.style.display = 'none';
+
+                    update_has_compounding.addEventListener('click', function handleClick() {
+                        if (update_has_compounding.checked) {
+                            update_compounding_div.style.display = 'block';
+                        } else {
+                            update_compounding_div.style.display = 'none';
+                        }
+                    });
+
+                    $('.select2').select2({
+                        dropdownParent: $('.swal2-container'),
+                        width: 'resolve',
+                    });
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    @this.set('expiry_date', update_expiry_date.value);
+                    @this.set('qty', update_qty.value);
+                    @this.set('unit_cost', update_unit_cost.value);
+                    @this.set('chrgcode', update_chrgcode.value);
+                    @this.set('has_compounding', update_has_compounding.checked);
+                    @this.set('compounding_fee', update_compounding_fee.value);
+
+                    Livewire.emit('update_item_new', stk_id);
                 }
             });
         }
