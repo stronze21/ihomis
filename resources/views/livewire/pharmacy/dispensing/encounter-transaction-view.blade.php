@@ -41,7 +41,7 @@
                         <tr>
                             <td colspan="4" class="w-1/3 border border-black"><span>Hospital #: </span> <span
                                     class="fw-bold">{{ $encounter->patient->hpercode }}</span></td>
-                            <td colspan="6" class="w-2/3 border border-black">
+                            <td colspan="7" class="w-2/3 border border-black">
                                 <span>Diagnosis: </span>
                                 <div class="text-xs font-light">
                                     <p class="break-words">{{ $encounter->diag->diagtext ?? 'N/A' }}</p>
@@ -51,13 +51,13 @@
                         <tr>
                             <td colspan="3" class="w-1/3 border border-black"><span>Last Name: </span> <span
                                     class="fw-bold">{{ $encounter->patient->patlast }}</span></td>
-                            <td colspan="4" class="w-1/3 border border-black"><span>First Name: </span> <span
+                            <td colspan="5" class="w-1/3 border border-black"><span>First Name: </span> <span
                                     class="fw-bold">{{ $encounter->patient->patfirst }}</span></td>
                             <td colspan="3" class="w-1/3 border border-black"><span>Middle Name: </span> <span
                                     class="fw-bold">{{ $encounter->patient->patmiddle }}</span></td>
                         </tr>
                         <tr>
-                            <td colspan="4" class="w-1/3 border border-black"><span>Room/Encounter Type: </span>
+                            <td colspan="5" class="w-1/3 border border-black"><span>Room/Encounter Type: </span>
                                 <span class="fw-bold">{{ $encounter->toecode }}</span>
                             </td>
                             <td colspan="6" class="border border-black"><span>Encounter Date/Time: </span> <span
@@ -65,6 +65,7 @@
                             </td>
                         </tr>
                         <tr class="border border-black">
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -145,7 +146,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="11">EMPTY</td>
+                                <td colspan="12">EMPTY</td>
                             </tr>
                         @endforelse
                     </tbody>

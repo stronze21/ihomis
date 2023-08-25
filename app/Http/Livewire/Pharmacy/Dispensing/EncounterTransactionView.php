@@ -26,42 +26,38 @@ class EncounterTransactionView extends Component
 
     protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued'];
 
-    public $generic, $charge_code = "";
+    public $generic, $charge_code = [];
     public $enccode, $location_id, $hpercode, $toecode;
 
     public $order_qty, $unit_price, $return_qty, $docointkey;
     public $item_id;
     public $sc, $ems, $maip, $wholesale, $pay, $medicare, $service, $caf, $govt, $type;
 
+    public $charges;
+    public $encounter;
 
     public $selected_items = [];
 
     public function render()
     {
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-        $encounter = EncounterLog::where('enccode', $enccode)
-            ->with('patient')->with('rxo')->with('active_prescription')->first();
-
 
         if (!$this->hpercode) {
-            $this->hpercode = $encounter->hpercode;
-            $this->toecode = $encounter->toecode;
+            $this->hpercode = $this->encounter->hpercode;
+            $this->toecode = $this->encounter->toecode;
         }
-
-        $charges = DrugStock::select('chrgcode')->with('charge')->where('loc_code', $this->location_id)->groupBy('chrgcode')->get();
 
         $stocks = DrugStock::with('charge')->with('drug')->with('current_price')->has('current_price')
             ->where('loc_code', $this->location_id)
-            ->where('chrgcode', 'LIKE', '%' . $this->charge_code . '%')
             ->whereHas('drug', function ($query) {
                 return $query->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->generic . '%');
-            })
-            ->groupBy('dmdcomb', 'dmdctr', 'chrgcode', 'dmdprdte')->select('dmdcomb', 'dmdctr', 'chrgcode', 'dmdprdte')->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id');
+            });
+        if ($this->charge_code) {
+            $stocks->whereIn('chrgcode', $this->charge_code);
+        }
+        $stocks->groupBy('dmdcomb', 'dmdctr', 'chrgcode', 'dmdprdte')->select('dmdcomb', 'dmdctr', 'chrgcode', 'dmdprdte')->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id');
 
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', [
-            'encounter' => $encounter,
             'stocks' => $stocks->get(),
-            'charges' => $charges,
         ]);
     }
 
@@ -69,6 +65,15 @@ class EncounterTransactionView extends Component
     {
         $this->enccode = $enccode;
         $this->location_id = Auth::user()->pharm_location_id;
+        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+
+        $this->encounter = EncounterLog::where('enccode', $enccode)
+            ->with('patient')->with('rxo')->with('active_prescription')->first();
+
+        $this->charges = ChargeCode::where('bentypcod', 'DRUME')
+            ->where('chrgstat', 'A')
+            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'))
+            ->get();
     }
 
     public function charge_items()
