@@ -34,16 +34,25 @@ class EncounterTransactionView extends Component
     public $sc, $ems, $maip, $wholesale, $pay, $medicare, $service, $caf, $govt, $type;
 
     public $charges;
-    public $encounter;
 
     public $selected_items = [];
 
     public function render()
     {
+        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+
+        $encounter = EncounterLog::where('enccode', $enccode)
+            ->with('patient')->with('rxo')->with('active_prescription')->first();
 
         if (!$this->hpercode) {
-            $this->hpercode = $this->encounter->hpercode;
-            $this->toecode = $this->encounter->toecode;
+            $this->hpercode = $encounter->hpercode;
+            $this->toecode = $encounter->toecode;
+        }
+        if (!$this->charges) {
+            $this->charges = ChargeCode::where('bentypcod', 'DRUME')
+                ->where('chrgstat', 'A')
+                ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'))
+                ->get();
         }
 
         $stocks = DrugStock::with('charge')->with('drug')->with('current_price')->has('current_price')
@@ -58,22 +67,15 @@ class EncounterTransactionView extends Component
 
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', [
             'stocks' => $stocks->get(),
+            'encounter' => $encounter,
         ]);
     }
 
     public function mount($enccode)
     {
         $this->enccode = $enccode;
+
         $this->location_id = Auth::user()->pharm_location_id;
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-
-        $this->encounter = EncounterLog::where('enccode', $enccode)
-            ->with('patient')->with('rxo')->with('active_prescription')->first();
-
-        $this->charges = ChargeCode::where('bentypcod', 'DRUME')
-            ->where('chrgstat', 'A')
-            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'))
-            ->get();
     }
 
     public function charge_items()
@@ -132,10 +134,10 @@ class EncounterTransactionView extends Component
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
         $cnt = 0;
 
-        $rxo = DrugOrder::whereIn('docointkey', $this->selected_items)
+        $rxos = DrugOrder::whereIn('docointkey', $this->selected_items)
             ->where('estatus', 'P')->get();
 
-        foreach ($rxo as $row) {
+        foreach ($rxos as $row) {
             if ($row->item) {
                 if ($row->item->sum('stock_bal') >= $row->pchrgqty) {
                     $cnt = 1;
@@ -147,7 +149,7 @@ class EncounterTransactionView extends Component
         }
 
         if ($cnt == 1) {
-            foreach ($rxo as $row) {
+            foreach ($rxos as $rxo) {
                 // $this->update_prescription($row->dmdctr, $row->dmdcomb, $row->docointkey, $row->pchrgqty);
                 // $this->deduct_stocks($row->dmdctr, $row->dmdcomb, $row->orderfrom, $row->pchrgqty, $row->loc_code, $row->docointkey, $row->pcchrgcod, $row->tx_type, $row->pcchrgamt, $row->pchrgup, $enccode);
 
@@ -487,6 +489,7 @@ class EncounterTransactionView extends Component
             ->sum('stock_bal');
 
         if ($available >= $total_deduct) {
+
             $this->add_hrxo($dm);
             $this->resetExcept('enccode', 'location_id');
             $this->alert('success', 'Item added.');
@@ -498,7 +501,7 @@ class EncounterTransactionView extends Component
     public function add_hrxo($dm)
     {
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-        DrugOrder::updateOrCreate([
+        $order = DrugOrder::updateOrCreate([
             'docointkey' => '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $dm->chrgcode . $dm->dmdcomb . $dm->dmdctr,
             'enccode' => $enccode,
             'hpercode' => $this->hpercode,
@@ -533,6 +536,7 @@ class EncounterTransactionView extends Component
             'loc_code' => $dm->loc_code, //added
             'item_id' => $dm->id, //added
         ]);
+        return $order;
     }
 
     public function return_issued(DrugOrder $item)
