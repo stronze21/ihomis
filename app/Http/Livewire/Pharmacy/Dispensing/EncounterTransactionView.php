@@ -82,7 +82,7 @@ class EncounterTransactionView extends Component
             'charge_desc' => 'a',
         ]);
 
-        $pcchrgcod = 'P' . date('y') . '-' . sprintf('%06d', $charge_code->id);
+        $pcchrgcod = 'P' . date('y') . '-' . sprintf('%07d', $charge_code->id);
         $cnt = 0;
 
         $rxo = DrugOrder::whereIn('docointkey', $this->selected_items)
