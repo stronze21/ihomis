@@ -220,7 +220,9 @@
                     <tbody class="bg-white">
                         @forelse($encounter->active_prescription->all() as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
-                                <tr class="hover" wire:key="select-rx-item-{{ $loop->iteration }}">
+                                <tr class="cursor-pointer hover"
+                                    wire:click="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')"
+                                    wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->created_at)) }}
                                         {{ date('h:i A', strtotime($presc_data->created_at)) }}
@@ -375,6 +377,12 @@
                                     <span class="label-text">Gov't Emp</span>
                                 </label>
                             </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="checkbox" id="is_ris" name="is_ris">
+                                <label class="cursor-pointer" for="is_ris">
+                                    <span class="label-text">RIS</span>
+                                </label>
+                            </div>
                         </div>
                             `,
                     showCancelButton: true,
@@ -392,6 +400,7 @@
                         const service = Swal.getHtmlContainer().querySelector('#service')
                         const caf = Swal.getHtmlContainer().querySelector('#caf')
                         const govt = Swal.getHtmlContainer().querySelector('#govt')
+                        const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
 
                         order_qty.focus();
                         unit_price.value = up;
@@ -469,6 +478,7 @@
                         @this.set('service', service.checked);
                         @this.set('caf', caf.checked);
                         @this.set('govt', govt.checked);
+                        @this.set('is_ris', is_ris.checked);
 
                         Livewire.emit('add_item', dm_id)
                     }

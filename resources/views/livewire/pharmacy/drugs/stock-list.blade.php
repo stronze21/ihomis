@@ -72,7 +72,7 @@
             <tbody>
                 @forelse ($stocks as $stk)
                     <tr class="hover"
-                        onclick="update_item({{ $stk->id }}, '{{ $stk->drug->drug_name() }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->balance() }}', '{{ $stk->current_price->acquisition_cost() }}', '{{ $stk->curret_price->has_compounding ?? false }}', '{{ $stk->curret_price->compounding_fee ?? false }}')">
+                        onclick="update_item({{ $stk->id }}, '{{ $stk->drug->drug_name() }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->balance() }}', '{{ $stk->current_price->acquisition_cost() }}', '{{ $stk->current_price->has_compounding }}', '{{ $stk->current_price->compounding_fee }}')">
                         <th>{{ $stk->charge->chrgdesc }}</th>
                         <td>{{ $stk->location->description }}</td>
                         <td>{{ $stk->updated_at }}</td>
@@ -255,11 +255,11 @@
                     const update_compounding_fee = Swal.getHtmlContainer().querySelector(
                         '#update_compounding_fee');
 
-                    update_qty = stk_balance;
-                    update_unit_cost = stk_cost;
-                    update_chrgcode = stk_chrgcode;
-                    update_has_compounding = stk_has_compounding;
-                    update_compounding_fee = stk_compounding_fee;
+                    update_qty.value = stk_balance;
+                    update_unit_cost.value = stk_cost;
+                    update_chrgcode.value = stk_chrgcode;
+                    update_has_compounding.value = stk_has_compounding;
+                    update_compounding_fee.value = stk_compounding_fee;
 
                     update_compounding_div.style.display = 'none';
 

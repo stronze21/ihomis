@@ -26,6 +26,11 @@ Broadcast::channel('user.{user_id}', function ($user, $user_id) {
     return (int) $user->id === (int) $user_id;
 });
 
+Broadcast::channel('encounter-view.{pharm_location_id}', function ($user, $pharm_location_id) {
+    // return (int) $user->pharm_location_id === (int) $pharm_location_id;
+    return true;
+});
+
 Broadcast::channel('ioTrans.{pharm_location_id}', function ($user, $pharm_location_id) {
     // return (int) $user->pharm_location_id === (int) $pharm_location_id;
     return true;

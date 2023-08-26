@@ -13,6 +13,8 @@ class Drug extends Model
 
     protected $connection = 'hospital';
     protected $table = 'hospital.dbo.hdmhdr';
+    protected $primaryKey = 'dmdcomb';
+    protected $keyType = 'string';
 
     public function generic()
     {

@@ -32,6 +32,7 @@ class DrugOrder extends Model
         'has_tag', //added
         'tx_type', //added
         'order_by',
+        'ris',
     ];
 
     public function patient()

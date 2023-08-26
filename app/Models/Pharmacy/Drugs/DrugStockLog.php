@@ -48,6 +48,7 @@ class DrugStockLog extends Model
         'govt_emp', //nullable()->default(0);
         'caf', //nullable()->default(0);
         'dmdprdte',
+        'ris',
     ];
 
     public function charge()

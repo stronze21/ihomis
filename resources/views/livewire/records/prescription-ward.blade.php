@@ -74,7 +74,8 @@
                 <tbody>
                     @forelse ($prescriptions as $rx)
                         <tr wire:key="view-enctr-{{ $rx->enccode }}-{{ $loop->iteration }}"
-                            wire:click.prefetch="view_enctr('{{ $rx->enccode }}')" class="cursor-pointer hover">
+                            class="cursor-pointer hover clickable-row"
+                            data-href="{{ route('dispensing.view.enctr', ['enccode' => Crypt::encrypt(str_replace(' ', '-', $rx->enccode))]) }}">
                             <td>
                                 <div class="flex-col">
                                     <div>{{ $rx->active_adm->disdate_format1() }}</div>
@@ -142,3 +143,14 @@
         </div>
     </div>
 </div>
+
+
+@push('scripts')
+    <script>
+        jQuery(document).ready(function($) {
+            $(".clickable-row").click(function() {
+                window.location = $(this).data("href");
+            });
+        });
+    </script>
+@endpush

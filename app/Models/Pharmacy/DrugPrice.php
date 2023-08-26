@@ -37,6 +37,9 @@ class DrugPrice extends Model
         'retail_price',
     ];
 
+    protected $primaryKey = 'dmdcomb';
+    protected $keyType = 'string';
+
     public function acquisition_cost()
     {
         return number_format($this->acquisition_cost, 2);
