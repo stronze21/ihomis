@@ -27,7 +27,7 @@ class AddDetailsToPharmDrugStocksTable extends Migration
         });
         $drugs = DrugStock::all();
         foreach ($drugs as $drug) {
-            $drug->drug_concat = $drug->drug->drug_name;
+            $drug->drug_concat = $drug->drug->drug_name();
             $drug->dmdnost = $drug->drug->dmdnost;
             $drug->strecode = $drug->drug->strecode;
             $drug->formcode = $drug->drug->formcode;
