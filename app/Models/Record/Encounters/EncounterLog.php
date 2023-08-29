@@ -20,7 +20,7 @@ class EncounterLog extends Model
     protected $connection = 'hospital';
     protected $table = 'hospital.dbo.henctr', $primaryKey = 'enccode', $keyType = 'string';
     public $incrementing = false;
-    public $timestamps = false ;
+    public $timestamps = false;
 
     protected $fillable = [
         'enccode',
@@ -56,22 +56,22 @@ class EncounterLog extends Model
 
     public function enctr_type()
     {
-        if($this->toecode == 'OPD'){
+        if ($this->toecode == 'OPD') {
             return 'OPD';
-        }elseif($this->toecode == 'ER'){
+        } elseif ($this->toecode == 'ER') {
             return 'ER';
-        }elseif($this->toecode == 'ADM' OR $this->toecode == 'ERADM' OR $this->toecode == 'OPDAD'){
+        } elseif ($this->toecode == 'ADM' or $this->toecode == 'ERADM' or $this->toecode == 'OPDAD') {
             return 'ADMITTED';
         }
     }
 
     public function active_encounter()
     {
-        if($this->toecode == 'OPD'){
+        if ($this->toecode == 'OPD') {
             $enctr = $this->opd()->whereRelation('opd', 'opdstat', 'A');
-        }elseif($this->toecode == 'ER'){
+        } elseif ($this->toecode == 'ER') {
             $enctr = $this->opd()->whereRelation('er', 'erstat', 'A');
-        }elseif($this->toecode == 'ADM'){
+        } elseif ($this->toecode == 'ADM') {
             $enctr = $this->opd()->whereRelation('adm', 'admstat', 'A');
         }
 
@@ -85,7 +85,7 @@ class EncounterLog extends Model
 
     public function rxo()
     {
-        return $this->hasMany(DrugOrder::class, 'enccode', 'enccode')->with('returns')->with('charge')->with('dm')->latest('dodate');
+        return $this->hasMany(DrugOrder::class, 'enccode', 'enccode')->with('charge')->with('dm')->latest('dodate');
     }
 
     public function active_prescription()

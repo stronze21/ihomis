@@ -42,11 +42,7 @@ class DrugOrder extends Model
 
     public function dm()
     {
-        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-            ->with('generic')
-            ->with('strength')
-            ->with('form')
-            ->with('route');
+        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr']);
     }
 
     public function prescriptions()
@@ -61,7 +57,7 @@ class DrugOrder extends Model
 
     public function item()
     {
-        return $this->hasMany(DrugStock::class, ['dmdcomb', 'dmdctr', 'loc_code'], ['dmdcomb', 'dmdctr', 'loc_code'])->orderBy('exp_date', 'ASC');
+        return $this->belongsTo(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])->where('stock_bal', '>', '0')->orderBy('exp_date', 'ASC');
     }
 
     public function charge()

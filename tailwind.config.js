@@ -26,6 +26,7 @@ module.exports = {
         'textarea',
         'textarea-bordered',
     ],
+    important: true,
 
     theme: {
         extend: {

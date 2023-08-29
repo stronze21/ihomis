@@ -15,6 +15,11 @@ class Drug extends Model
     protected $table = 'hospital.dbo.hdmhdr';
     protected $primaryKey = 'dmdcomb';
     protected $keyType = 'string';
+    public $timestamps = false, $incrementing = false;
+
+    protected $fillable = [
+        'drug_concat',
+    ];
 
     public function generic()
     {
@@ -43,13 +48,13 @@ class Drug extends Model
 
     public function drug_name()
     {
-        $generic = $this->generic->gendesc;
+        $generic = $this->generic ? $this->generic->gendesc : '';
         $dmdnost = $this->dmdnost;
         $brandname = $this->brandname;
         $strength = $this->strength->stredesc ?? $this->strecode;
         $form = $this->form->fomdesc ?? $this->formcode;
 
-        $drug = $generic . ", " . $this->brandname . " " . $dmdnost . $strength . " " . $form;
+        $drug = $generic . "_, " . $this->brandname . " " . $dmdnost . $strength . " " . $form;
 
         return $drug;
     }

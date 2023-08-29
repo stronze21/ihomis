@@ -16,8 +16,8 @@
 
 <div class="p-3">
 
-    <div class="grid grid-cols-4 gap-4">
-        <div class="col-span-4 xl:col-span-3">
+    <div class="grid grid-cols-12 gap-4">
+        <div class="col-span-12 xl:col-span-8">
             <div class="flex flex-col max-h-screen p-1 overflow-scroll">
                 <div class="flex justify-between my-3">
                     @if ($errors->first())
@@ -86,9 +86,6 @@
                                 <div class="tooltip" data-tip="Quantity Ordered">Q.O.</div>
                             </td>
                             <td class="w-20 text-right">
-                                <div class="tooltip" data-tip="Quantity Returned">Q.R.</div>
-                            </td>
-                            <td class="w-20 text-right">
                                 <div class="tooltip" data-tip="Quantity Issued">Q.I.</div>
                             </td>
                             <td class="text-right w-min">Price</td>
@@ -99,6 +96,9 @@
                     </thead>
                     <tbody class="bg-white">
                         @forelse ($encounter->rxo->all() as $rxo)
+                            @php
+                                $concat = explode('_,', $rxo->dm->drug_concat);
+                            @endphp
                             <tr class="border">
                                 <td class="w-10 text-center">
                                     <input type="checkbox" class="checkbox" wire:model.defer="selected_items"
@@ -120,19 +120,17 @@
                                 <td class="w-max">
                                     <div class="flex flex-col">
                                         <div class="text-xs text-slate-600">{{ $rxo->charge->chrgdesc ?? '' }}</div>
-                                        <div class="font-bold">{{ $rxo->dm->generic->gendesc }}</div>
+                                        <div class="font-bold">{{ $concat[0] }}</div>
                                         <div class="text-xs text-center text-slate-800">
-                                            {{ $rxo->dm->dmdnost }}{{ $rxo->dm->strength->stredesc ?? '' }}
-                                            {{ $rxo->dm->form->formdesc ?? '' }}</div>
+                                            {{ $concat[1] }}</div>
                                     </div>
                                 </td>
                                 <td class="w-20 text-right">{{ number_format($rxo->pchrgqty) }}</td>
-                                <td class="w-20 text-right">{{ number_format($rxo->returns->sum('qty')) }}</td>
-                                <td class="w-20 text-right" title="Return Issued">
+                                <td class="w-20 text-right whitespace-nowrap">
                                     @if ($rxo->estatus == 'S' and $rxo->qtyissued > 0)
-                                        <span class="cursor-pointer"
-                                            onclick="return_issued('{{ $rxo->docointkey }}', '{{ $rxo->dm->generic->gendesc }} <br>{{ $rxo->dmdnost }} {{ $rxo->dm->strecode }}, {{ $rxo->dm->form->formdesc }}', {{ $rxo->pchrgup }}, {{ $rxo->qtyissued }})">
-                                            <i class="text-red-600 las la-lg la-undo"></i>
+                                        <span class="cursor-pointer tooltip" data-tip="Return"
+                                            onclick="return_issued('{{ $rxo->docointkey }}', '{{ $concat[0] }} <br>{{ $concat[1] }}', {{ $rxo->pchrgup }}, {{ $rxo->qtyissued }})">
+                                            <i class="text-red-600 las la-lg la-undo-alt"></i>
                                             {{ number_format($rxo->qtyissued) }}
                                         </span>
                                     @else
@@ -155,40 +153,44 @@
                 </table>
             </div>
         </div>
-        <div class="col-span-4 xl:col-span-1">
-            <div class="overflow-auto max-h-96">
+        <div class="col-span-12 xl:col-span-4">
+            <div class="overflow-x-hidden overflow-y-auto max-h-96">
                 <div class="flex flex-col space-y-1">
                     <div class="w-full" wire:ignore>
-                        <select id="filter_charge_code" class="w-full select select-bordered select-sm select2"
-                            multiple wire:model="charge_code">
+                        <select id="filter_charge_code" class="w-full select select-bordered select-sm select2" multiple
+                            wire:model="charge_code">
                             @foreach ($charges as $charge)
                                 <option value="{{ $charge->chrgcode }}">{{ $charge->chrgdesc }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div class="w-full">
-                        <input type="text" placeholder="Type here" class="w-full input input-sm input-bordered"
-                            wire:model.lazy="generic" />
+                        <input type="text" placeholder="Type here"
+                            class="hidden w-full input input-sm input-bordered" wire:model.lazy="generic" />
                     </div>
                 </div>
-                <table class="table w-full table-compact">
+                <table class="table w-full table-fixed datatable">
                     <thead class="sticky top-0 border-b ">
                         <tr>
                             <td>Description</td>
-                            <td class="text-right">Stock And Price</td>
+                            <td class="!text-right">Stock And Price</td>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($stocks as $stock)
+                            @php
+                                $concat = explode('_,', $stock->drug_concat);
+                            @endphp
                             <tr class="cursor-pointer hover"
-                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug->generic->gendesc }}', '{{ $stock->current_price->dmselprice }}')">
-                                <td>
-                                    <div class="flex flex-col">
-                                        <div class="text-xs text-slate-600">{{ $stock->charge->chrgdesc }}</div>
-                                        <div class="font-bold">{{ $stock->drug->generic->gendesc }}</div>
+                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat }}', '{{ $stock->current_price->dmselprice }}')">
+                                <td class="break-words">
+                                    <div>
+                                        <span class="text-xs text-slate-600">{{ $stock->charge->chrgdesc }}</span>
+                                        {{-- <span class="font-bold">{{ $stock->drug->generic->gendesc }}</span> --}}
+                                        <div class="text-sm font-bold text-slate-800">
+                                            {{ $concat[0] }}</div>
                                         <div class="text-xs text-center text-slate-800">
-                                            {{ $stock->drug->dmdnost }}{{ $stock->drug->strength->stredesc ?? '' }}
-                                            {{ $stock->drug->form->formdesc }}</div>
+                                            {{ $concat[1] }}</div>
                                     </div>
                                 </td>
                                 <td class="text-right">
