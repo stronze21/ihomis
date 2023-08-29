@@ -221,7 +221,7 @@
                         @forelse($encounter->active_prescription->all() as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
                                 <tr class="cursor-pointer hover"
-                                    wire:click="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')"
+                                    wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')"
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->created_at)) }}

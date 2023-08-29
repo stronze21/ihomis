@@ -231,6 +231,15 @@ class DeliveryView extends Component
                 'chrgcode' => $item->charge_code,
                 'exp_date' => $item->expiry_date,
                 'retail_price' => $item->retail_price,
+                'drug_concat' => $item->drug->drug_name(),
+                'dmdnost' => $item->drug->dmdnost,
+                'strecode' => $item->drug->strecode,
+                'formcode' => $item->drug->formcode,
+                'rtecode' => $item->drug->rtecode,
+                'brandname' => $item->drug->brandname,
+                'dmdrem' => $item->drug->dmdrem,
+                'dmdrxot' => $item->drug->dmdrxot,
+                'gencode' => $item->drug->generic->gzencode,
             ]);
             $add_to->stock_bal = $add_to->stock_bal + $item->qty;
             $add_to->beg_bal = $add_to->beg_bal + $item->qty;

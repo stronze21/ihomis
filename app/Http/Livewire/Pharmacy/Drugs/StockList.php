@@ -38,11 +38,10 @@ class StockList extends Component
                 return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
             })->get();
 
-        $stocks = DrugStock::with('charge')->with('location')->with('drug')->with('current_price')->has('current_price')
+        $stocks = DrugStock::with('charge')->with('location')->with('current_price')->has('current_price')
             ->where('loc_code', $this->location_id)
-            ->whereHas('drug', function ($query) {
-                return $query->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
-            })->paginate(20);
+            ->where('drug_concat', 'LIKE', '%' . $this->search . '%')
+            ->paginate(20);
 
         return view('livewire.pharmacy.drugs.stock-list', [
             'stocks' => $stocks,
@@ -108,6 +107,8 @@ class StockList extends Component
 
         $dm = explode(',', $this->dmdcomb);
 
+        $drug = Drug::where('dmdcomb', $dm[0])->where('dmdctr', $dm[1])->first();
+
         $stock = DrugStock::firstOrCreate([
             'dmdcomb' => $dm[0],
             'dmdctr' => $dm[1],
@@ -115,6 +116,15 @@ class StockList extends Component
             'chrgcode' => $this->chrgcode,
             'exp_date' => $this->expiry_date,
             'retail_price' => $retail_price,
+            'drug_concat' => $drug->drug_name(),
+            'dmdnost' => $drug->dmdnost,
+            'strecode' => $drug->strecode,
+            'formcode' => $drug->formcode,
+            'rtecode' => $drug->rtecode,
+            'brandname' => $drug->brandname,
+            'dmdrem' => $drug->dmdrem,
+            'dmdrxot' => $drug->dmdrxot,
+            'gencode' => $drug->generic->gzencode,
         ]);
         $stock->stock_bal = $stock->stock_bal + $this->qty;
         $stock->beg_bal = $stock->beg_bal + $this->qty;

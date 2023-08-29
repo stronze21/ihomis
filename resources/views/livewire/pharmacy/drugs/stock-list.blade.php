@@ -72,11 +72,11 @@
             <tbody>
                 @forelse ($stocks as $stk)
                     <tr class="hover"
-                        onclick="update_item({{ $stk->id }}, '{{ $stk->drug->drug_name() }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->balance() }}', '{{ $stk->current_price->acquisition_cost() }}', '{{ $stk->current_price->has_compounding }}', '{{ $stk->current_price->compounding_fee }}')">
+                        onclick="update_item({{ $stk->id }}, '{{ $stk->drug_concat }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->balance() }}', '{{ $stk->current_price->acquisition_cost() }}', '{{ $stk->current_price->has_compounding }}', '{{ $stk->current_price->compounding_fee }}')">
                         <th>{{ $stk->charge->chrgdesc }}</th>
                         <td>{{ $stk->location->description }}</td>
                         <td>{{ $stk->updated_at }}</td>
-                        <td class="font-bold">{{ $stk->drug->drug_name() }}</td>
+                        <td class="font-bold">{{ $stk->drug_concat }}</td>
                         @role('warehouse')
                             <th>{{ $stk->current_price->acquisition_cost() }}</th>
                         @endrole

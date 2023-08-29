@@ -33,6 +33,15 @@ class DrugStock extends Model
         'beg_bal',
         'retail_price',
         'dmdprdte',
+        'drug_concat',
+        'dmdnost',
+        'strecode',
+        'formcode',
+        'rtecode',
+        'brandname',
+        'dmdrem',
+        'dmdrxot',
+        'gencode',
     ];
 
     public function charge()
