@@ -18,13 +18,14 @@ use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
 use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
 use App\Models\Pharmacy\Dispensing\OrderChargeCode;
+use App\Models\Record\Prescriptions\PrescriptionData;
 use App\Models\Record\Prescriptions\PrescriptionDataIssued;
 
 class EncounterTransactionView extends Component
 {
     use LivewireAlert;
 
-    protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'refresh' => '$refresh'];
+    protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'add_prescribed_item', 'refresh' => '$refresh'];
 
     public $generic, $charge_code = [];
     public $enccode, $location_id, $hpercode, $toecode;
@@ -43,14 +44,11 @@ class EncounterTransactionView extends Component
     {
 
         $stocks = DrugStock::with('charge')->with('current_price')->has('current_price')
-            ->where('loc_code', $this->location_id)
-            ->where('drug_concat', 'LIKE', '%' . $this->generic . '%');
+            ->where('loc_code', $this->location_id);
         if ($this->charge_code) {
             $stocks->whereIn('chrgcode', $this->charge_code);
         }
         $stocks->groupBy('dmdcomb', 'dmdctr', 'chrgcode', 'dmdprdte', 'drug_concat')->select('dmdcomb', 'dmdctr', 'drug_concat', 'chrgcode', 'dmdprdte')->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id');
-
-        $this->dispatchBrowserEvent('refreshComponent', ['componentName' => '#myTable']);
 
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', [
             'stocks' => $stocks->get(),
@@ -664,5 +662,98 @@ class EncounterTransactionView extends Component
 
         $this->emit('refresh');
         $this->alert('success', 'Item returned.');
+    }
+
+    public function add_prescribed_item(PrescriptionData $rxd)
+    {
+        $dmdcomb = $rxd->dmdcomb;
+        $dmdctr = $rxd->dmdctr;
+        $loc_code = $this->location_id;
+        $total_deduct = $this->order_qty;
+
+        if ($this->sc) {
+            $this->type = 'sc_pwd';
+        } else if ($this->ems) {
+            $this->type = 'ems';
+        } else if ($this->maip) {
+            $this->type = 'maip';
+        } else if ($this->wholesale) {
+            $this->type = 'wholesale';
+        } else if ($this->pay) {
+            $this->type = 'pay';
+        } else if ($this->medicare) {
+            $this->type = 'medicare';
+        } else if ($this->service) {
+            $this->type = 'service';
+        } else if ($this->caf) {
+            $this->type = 'caf';
+        } else if ($this->govt) {
+            $this->type = 'govt';
+        }
+
+        $dm = DrugStock::where('dmdcomb', $dmdcomb)
+            ->where('dmdctr', $dmdctr)
+            ->where('loc_code', $this->location_id)
+            ->where('stock_bal', '>', '0')
+            ->orderBy('exp_date', 'ASC')
+            ->first();
+
+        if ($dm) {
+            $available = DrugStock::where('dmdcomb', $dmdcomb)
+                ->where('dmdctr', $dmdctr)
+                ->where('loc_code', $loc_code)
+                ->where('stock_bal', '>', '0')
+                ->where('exp_date', '>', now())
+                ->sum('stock_bal');
+
+            if ($this->is_ris or $available >= $total_deduct) {
+                $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+                DrugOrder::updateOrCreate([
+                    'docointkey' => '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $dm->chrgcode . $dm->dmdcomb . $dm->dmdctr,
+                    'enccode' => $enccode,
+                    'hpercode' => $this->hpercode,
+                    'rxooccid' => '1',
+                    'rxoref' => '1',
+                    'dmdcomb' => $dm->dmdcomb,
+                    'repdayno1' => '1',
+                    'rxostatus' => 'A',
+                    'rxolock' => 'N',
+                    'rxoupsw' => 'N',
+                    'rxoconfd' => 'N',
+                    'dmdctr' => $dm->dmdctr,
+                    'estatus' => 'U',
+                    'entryby' => auth()->user()->employeeid,
+                    'ordcon' => 'NEWOR',
+                    'orderupd' => 'ACTIV',
+                    'locacode' => 'PHARM',
+                    'orderfrom' => $dm->chrgcode,
+                    'issuetype' => 'c',
+                    'has_tag' => $this->type ? true : false, //added
+                    'tx_type' => $this->type, //added
+                    'ris' =>  $this->is_ris ? true : false,
+                    'prescription_data_id' => $rxd->id,
+                    'prescribed_by' => $rxd->rx->empid,
+                ], [
+                    'pchrgqty' => $this->order_qty,
+                    'pchrgup' => $this->unit_price,
+                    'pcchrgamt' => $this->order_qty * $this->unit_price,
+                    'dodate' => now(),
+                    'dotime' => now(),
+                    'dodtepost' => now(),
+                    'dotmepost' => now(),
+                    'dmdprdte' => $dm->dmdprdte,
+                    'exp_date' => $dm->exp_date, //added
+                    'loc_code' => $dm->loc_code, //added
+                    'item_id' => $dm->id, //added
+                ]);
+                $this->resetExcept('enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items');
+                $this->emit('refresh');
+                $this->alert('success', 'Item added.');
+            } else {
+                $this->alert('error', 'Insufficient stock!');
+            }
+        } else {
+            $this->alert('error', 'Insufficient stock!');
+        }
     }
 }

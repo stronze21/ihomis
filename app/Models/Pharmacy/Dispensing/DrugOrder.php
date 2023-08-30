@@ -33,6 +33,8 @@ class DrugOrder extends Model
         'tx_type', //added
         'order_by',
         'ris',
+        'prescription_data_id',
+        'prescribed_by',
     ];
 
     public function patient()

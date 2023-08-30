@@ -24,6 +24,7 @@ use App\Http\Livewire\References\Security\ListPermissions;
 use App\Http\Livewire\Pharmacy\Reports\DrugsTransactionLog;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 use App\Http\Livewire\Pharmacy\Reports\EmergencyPurchases;
+use App\Http\Livewire\Trash\SampleView;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,4 +95,5 @@ Route::middleware([
     });
 
     Route::get('/pusher', Pusher::class)->name('pusher');
+    Route::get('/sample', SampleView::class)->name('sample');
 });

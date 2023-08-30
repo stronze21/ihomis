@@ -30,4 +30,9 @@ class PrescriptionData extends Model
     {
         return $this->belongsTo(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])->where('stock_bal', '>', '0')->orderBy('exp_date', 'ASC');
     }
+
+    public function rx()
+    {
+        return $this->belongsTo(Prescription::class, 'presc_id', 'id');
+    }
 }

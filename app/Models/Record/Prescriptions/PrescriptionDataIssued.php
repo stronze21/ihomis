@@ -24,4 +24,9 @@ class PrescriptionDataIssued extends Model
     {
         return $this->belongsTo(DrugOrder::class, 'docointkey');
     }
+
+    public function rx()
+    {
+        return $this->belongsTo(Prescription::class, 'presc_id', 'id');
+    }
 }

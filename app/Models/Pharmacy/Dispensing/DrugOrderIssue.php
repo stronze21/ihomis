@@ -24,42 +24,45 @@ class DrugOrderIssue extends Model
     public $timestamps = false, $incrementing = false;
 
     protected $fillable = [
-            'docointkey',
-            'enccode',
-            'hpercode',
-            'dmdcomb',
-            'dmdctr',
-            'issuedte',
-            'issuetme',
-            'qty',
-            'uomcode', //NULL
-            'issuedby',
-            'status', //A
-            'rxolock', //N
-            'datemod', //NULL
-            'updsw', //N
-            'confdl', //N
-            'entryby',
-            'locacode', //PHARM
-            'dmdprdte',
-            'issuedfrom',
-            'pcchrgcod',
-            'chrgcode',
-            'pchrgup', //NULL
-            'tagg', //NULL
-            'taggdte', //NULL
-            'enctype', //NULL
-            'othcrge', //NULL
-            'issuetype', //c
-            'amt_paid', //NULL
+        'docointkey',
+        'enccode',
+        'hpercode',
+        'dmdcomb',
+        'dmdctr',
+        'issuedte',
+        'issuetme',
+        'qty',
+        'uomcode', //NULL
+        'issuedby',
+        'status', //A
+        'rxolock', //N
+        'datemod', //NULL
+        'updsw', //N
+        'confdl', //N
+        'entryby',
+        'locacode', //PHARM
+        'dmdprdte',
+        'issuedfrom',
+        'pcchrgcod',
+        'chrgcode',
+        'pchrgup', //NULL
+        'tagg', //NULL
+        'taggdte', //NULL
+        'enctype', //NULL
+        'othcrge', //NULL
+        'issuetype', //c
+        'amt_paid', //NULL
+        'ris',
+        'prescription_data_id',
+        'prescribed_by',
     ];
 
     public function dm()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                    ->with('generic')
-                    ->with('strength')
-                    ->with('form');
+            ->with('generic')
+            ->with('strength')
+            ->with('form');
     }
 
     public function charge()
@@ -95,14 +98,12 @@ class DrugOrderIssue extends Model
     public function adm_pat_room()
     {
         return $this->hasOneThrough(PatientRoom::class, AdmissionLog::class, 'enccode', 'enccode', 'enccode')
-                    ->with('ward')
-                    ->with('room');
+            ->with('ward')
+            ->with('room');
     }
 
     public function main_order()
     {
         return $this->belongsTo(DrugOrder::class, 'docointkey', 'docointkey');
     }
-
-
 }

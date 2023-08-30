@@ -154,29 +154,29 @@
             </div>
         </div>
         <div class="col-span-12 xl:col-span-4">
-            <div class="overflow-x-hidden overflow-y-auto max-h-96">
-                <div class="flex flex-col space-y-1">
-                    <div class="w-full" wire:ignore>
-                        <select id="filter_charge_code" class="w-full select select-bordered select-sm select2" multiple
-                            wire:model="charge_code">
-                            @foreach ($charges as $charge)
-                                <option value="{{ $charge->chrgcode }}">{{ $charge->chrgdesc }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="w-full">
-                        <input type="text" placeholder="Type here" class="w-full input input-sm input-bordered"
-                            wire:model.lazy="generic" />
-                    </div>
+            <div class="flex flex-col space-y-1">
+                <div class="w-full" wire:ignore>
+                    <select id="filter_charge_code" class="w-full select select-bordered select-sm select2" multiple
+                        wire:model="charge_code">
+                        @foreach ($charges as $charge)
+                            <option value="{{ $charge->chrgcode }}">{{ $charge->chrgdesc }}</option>
+                        @endforeach
+                    </select>
                 </div>
-                <table class="table w-full table-fixed">
+                <div class="w-full">
+                    <input type="text" placeholder="Type here" class="w-full input input-sm input-bordered"
+                        id="generic" />
+                </div>
+            </div>
+            <div class="mt-2 overflow-x-hidden overflow-y-auto max-h-96">
+                <table class="table w-full table-fixed table-compact" id="stockTable">
                     <thead class="sticky top-0 border-b ">
                         <tr>
                             <td>Description</td>
                             <td class="!text-right">Stock And Price</td>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="stockTableBody">
                         @forelse($stocks as $stock)
                             @php
                                 $concat = explode('_,', $stock->drug_concat);
@@ -222,14 +222,14 @@
                     <tbody class="bg-white">
                         @forelse($encounter->active_prescription->all() as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
-                                <tr class="cursor-pointer hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}}
-                                    wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})"
+                                <tr class="cursor-pointer hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}}
+                                    onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat }}', '{{ $presc_data->qty }}')"
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->created_at)) }}
                                         {{ date('h:i A', strtotime($presc_data->created_at)) }}
                                     </td>
-                                    <td class="text-xs">{{ $presc_data->dm->drug_name() }}</td>
+                                    <td class="text-xs">{{ $presc_data->dm->drug_concat }}</td>
                                     <td class="text-xs">{{ $presc_data->qty }}</td>
                                     <td class="text-xs">{{ $presc_data->remark }}</td>
                                     <td class="text-xs">{{ $presc->employee->fullname() }}</td>
@@ -252,6 +252,15 @@
 
     @push('scripts')
         <script>
+            $(document).ready(function() {
+                $("#generic").on("keyup", function() {
+                    var value = $(this).val().toLowerCase();
+                    $("#stockTableBody tr").filter(function() {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+                });
+            });
+
             $('.select2').select2({
                 width: 'resolve',
                 placeholder: 'Fund Source',
@@ -549,6 +558,123 @@
                         @this.set('return_qty', return_qty.value);
 
                         Livewire.emit('return_issued', docointkey);
+                    }
+                });
+            }
+
+            function select_rx_item(rx_id, drug, rx_qty) {
+                Swal.fire({
+                    html: `
+                        <div class="text-xl font-bold">` + drug + `</div>
+                        <div class="flex w-full space-x-3">
+                            <div class="w-full mb-3 form-control">
+                                <label class="label">
+                                    <span class="label-text">Quantity</span>
+                                </label>
+                                <input id="order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
+                            <div class="col-span-4 font-bold">TAG</div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="pay" name="radio" checked>
+                                <label class="cursor-pointer" for="pay">
+                                    <span class="label-text">PAY</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="sc" name="radio">
+                                <label class="cursor-pointer" for="sc">
+                                    <span class="label-text">SC/PWD</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="ems" name="radio">
+                                <label class="cursor-pointer" for="ems">
+                                    <span class="label-text">EMS</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="maip" name="radio">
+                                <label class="cursor-pointer" for="maip">
+                                    <span class="label-text">MAIP</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="wholesale" name="radio">
+                                <label class="cursor-pointer" for="wholesale">
+                                    <span class="label-text">WHOLESALE</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="medicare" name="radio">
+                                <label class="cursor-pointer" for="medicare">
+                                    <span class="label-text">MEDICARE</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="service" name="radio">
+                                <label class="cursor-pointer" for="service">
+                                    <span class="label-text">SERVICE</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="caf" name="radio">
+                                <label class="cursor-pointer" for="caf">
+                                    <span class="label-text">CAF</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="radio" id="govt" name="radio">
+                                <label class="cursor-pointer" for="govt">
+                                    <span class="label-text">Gov't Emp</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle" type="checkbox" id="is_ris" name="is_ris">
+                                <label class="cursor-pointer" for="is_ris">
+                                    <span class="label-text">RIS</span>
+                                </label>
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                    didOpen: () => {
+                        const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
+                        const sc = Swal.getHtmlContainer().querySelector('#sc')
+                        const ems = Swal.getHtmlContainer().querySelector('#ems')
+                        const maip = Swal.getHtmlContainer().querySelector('#maip')
+                        const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
+                        const pay = Swal.getHtmlContainer().querySelector('#pay')
+                        const medicare = Swal.getHtmlContainer().querySelector('#medicare')
+                        const service = Swal.getHtmlContainer().querySelector('#service')
+                        const caf = Swal.getHtmlContainer().querySelector('#caf')
+                        const govt = Swal.getHtmlContainer().querySelector('#govt')
+                        const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
+
+                        order_qty.focus();
+                        order_qty.value = rx_qty;
+
+                    }
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        @this.set('order_qty', order_qty.value)
+
+                        @this.set('sc', sc.checked);
+                        @this.set('ems', ems.checked);
+                        @this.set('maip', maip.checked);
+                        @this.set('wholesale', wholesale.checked);
+                        @this.set('pay', pay.checked);
+                        @this.set('medicare', medicare.checked);
+                        @this.set('service', service.checked);
+                        @this.set('caf', caf.checked);
+                        @this.set('govt', govt.checked);
+                        @this.set('is_ris', is_ris.checked);
+
+                        Livewire.emit('add_prescribed_item', rx_id)
                     }
                 });
             }
