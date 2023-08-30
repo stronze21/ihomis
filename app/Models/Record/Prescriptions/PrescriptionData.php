@@ -5,6 +5,7 @@ namespace App\Models\Record\Prescriptions;
 use App\Models\Pharmacy\Drug;
 use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Pharmacy\Drugs\DrugStock;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PrescriptionData extends Model
@@ -23,5 +24,10 @@ class PrescriptionData extends Model
     public function dm()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr']);
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])->where('stock_bal', '>', '0')->orderBy('exp_date', 'ASC');
     }
 }

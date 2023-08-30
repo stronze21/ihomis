@@ -42,13 +42,15 @@ class EncounterTransactionView extends Component
     public function render()
     {
 
-        $stocks = DrugStock::with('charge')->with('location')->with('current_price')->has('current_price')
+        $stocks = DrugStock::with('charge')->with('current_price')->has('current_price')
             ->where('loc_code', $this->location_id)
             ->where('drug_concat', 'LIKE', '%' . $this->generic . '%');
         if ($this->charge_code) {
             $stocks->whereIn('chrgcode', $this->charge_code);
         }
         $stocks->groupBy('dmdcomb', 'dmdctr', 'chrgcode', 'dmdprdte', 'drug_concat')->select('dmdcomb', 'dmdctr', 'drug_concat', 'chrgcode', 'dmdprdte')->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id');
+
+        $this->dispatchBrowserEvent('refreshComponent', ['componentName' => '#myTable']);
 
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', [
             'stocks' => $stocks->get(),

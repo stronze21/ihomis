@@ -165,11 +165,11 @@
                         </select>
                     </div>
                     <div class="w-full">
-                        <input type="text" placeholder="Type here"
-                            class="hidden w-full input input-sm input-bordered" wire:model.lazy="generic" />
+                        <input type="text" placeholder="Type here" class="w-full input input-sm input-bordered"
+                            wire:model.lazy="generic" />
                     </div>
                 </div>
-                <table class="table w-full table-fixed datatable">
+                <table class="table w-full table-fixed">
                     <thead class="sticky top-0 border-b ">
                         <tr>
                             <td>Description</td>
@@ -222,8 +222,8 @@
                     <tbody class="bg-white">
                         @forelse($encounter->active_prescription->all() as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
-                                <tr class="cursor-pointer hover"
-                                    wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')"
+                                <tr class="cursor-pointer hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}}
+                                    wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})"
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->created_at)) }}
