@@ -154,22 +154,19 @@
                                                 <input type="text" class="input input-bordered"
                                                     value="{{ $rxo->remarks }}" wire:model.lazy="new_remarks"
                                                     wire:key="rem-input-{{ $rxo->docointkey }}" />
-                                                <span wire:click="update_remarks()"
+                                                <button class="btn-primary btn btn-square"
+                                                    wire:click="update_remarks()"
                                                     wire:key="update-rem-{{ $rxo->docointkey }}">
-                                                    <button class="text-success">
-                                                        <i class="las la-lg la-save"></i>
-                                                    </button>
-                                                </span>
+                                                    <i class="las la-lg la-save"></i>
+                                                </button>
                                             @else
                                                 <input type="text" class="input input-bordered"
                                                     value="{{ $rxo->remarks }}" disabled />
-                                                <span>
-                                                    <button class="text-white"
-                                                        wire:click="$set('selected_remarks', '{{ $rxo->docointkey }}')"
-                                                        wire:key="set-rem-id-{{ $rxo->docointkey }}">
-                                                        <i class="las la-lg la-edit"></i>
-                                                    </button>
-                                                </span>
+                                                <button class="btn btn-square"
+                                                    wire:click="$set('selected_remarks', '{{ $rxo->docointkey }}')"
+                                                    wire:key="set-rem-id-{{ $rxo->docointkey }}">
+                                                    <i class="las la-lg la-edit"></i>
+                                                </button>
                                             @endif
 
                                         </label>
@@ -605,7 +602,7 @@
                             <label class="label">
                                 <span class="label-text">Return Qty</span>
                             </label>
-                            <input id="return_qty" type="number" max="` + or_qty + ` class="w-full input input-bordered" autofocus/>
+                            <input id="return_qty" type="number" max="` + or_qty + `" class="w-full input input-bordered" autofocus/>
                         </div>
 
                         <div class="w-full px-2 mb-3 form-control">
