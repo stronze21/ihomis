@@ -64,7 +64,7 @@ class EncounterTransactionView extends Component
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
 
         $this->encounter = EncounterLog::where('enccode', $enccode)
-            ->with('patient')->with('rxo')->with('active_prescription')->first();
+            ->with('patient')->with('rxo')->with('active_prescription')->with('adm')->first();
 
         if (!$this->hpercode) {
             $this->hpercode = $this->encounter->hpercode;

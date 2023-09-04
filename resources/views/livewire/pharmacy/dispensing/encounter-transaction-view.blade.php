@@ -57,8 +57,18 @@
                                     class="fw-bold">{{ $encounter->patient->patmiddle }}</span></td>
                         </tr>
                         <tr>
-                            <td colspan="5" class="w-1/3 border border-black"><span>Room/Encounter Type: </span>
-                                <span class="fw-bold">{{ $encounter->toecode }}</span>
+                            <td colspan="5" class="w-1/3 border border-black">
+                                <span class="fw-bold">
+                                    <div class="flex space-x-2">
+                                        <span>Room/Encounter Type: </span>
+                                        @if ($encounter->toecode == 'ADM' or $encounter->toecode == 'OPDAD' or $encounter->toecode == 'ERADM')
+                                            <div> {{ $encounter->adm->patient_room->ward->wardname }}</div>
+                                            <div class="text-sm">{{ $encounter->adm->patient_room->room->rmname }} /
+                                            </div>
+                                        @endif
+                                        {{ $encounter->toecode }}
+                                    </div>
+                                </span>
                             </td>
                             <td colspan="6" class="border border-black"><span>Encounter Date/Time: </span> <span
                                     class="fw-bold">{{ \Carbon\Carbon::create($encounter->encdate)->format('F j, Y / g:i A') }}</span>
@@ -72,9 +82,7 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td></td>
-                            <td></td>
-                            <td colspan="2" class="text-right uppercase">Grand Total:
+                            <td colspan="3" class="text-right uppercase">Grand Total:
                                 {{ number_format($encounter->rxo->sum('pcchrgamt', 2)) }}</td>
                         </tr>
                         <tr class="border border-black">
