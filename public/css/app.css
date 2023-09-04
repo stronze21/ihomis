@@ -2037,6 +2037,21 @@ html {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: var(--rounded-btn, 0.5rem);
 }
+.input-group-vertical {
+  flex-direction: column;
+}
+.input-group-vertical :first-child {
+  border-top-left-radius: var(--rounded-btn, 0.5rem);
+  border-top-right-radius: var(--rounded-btn, 0.5rem);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.input-group-vertical :last-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: var(--rounded-btn, 0.5rem);
+  border-bottom-right-radius: var(--rounded-btn, 0.5rem);
+}
 .link {
   cursor: pointer;
   text-decoration-line: underline;
@@ -4152,6 +4167,9 @@ html {
 .z-50 {
   z-index: 50 !important;
 }
+.col-span-12 {
+  grid-column: span 12 / span 12 !important;
+}
 .col-span-2 {
   grid-column: span 2 / span 2 !important;
 }
@@ -4163,9 +4181,6 @@ html {
 }
 .col-span-6 {
   grid-column: span 6 / span 6 !important;
-}
-.col-span-12 {
-  grid-column: span 12 / span 12 !important;
 }
 .float-right {
   float: right !important;
@@ -4434,9 +4449,6 @@ html {
   width: -moz-min-content !important;
   width: min-content !important;
 }
-.\!w-10 {
-  width: 2.5rem !important;
-}
 .min-w-0 {
   min-width: 0px !important;
 }
@@ -4572,14 +4584,14 @@ html {
 .gap-2 {
   gap: 0.5rem !important;
 }
+.gap-3 {
+  gap: 0.75rem !important;
+}
 .gap-4 {
   gap: 1rem !important;
 }
 .gap-6 {
   gap: 1.5rem !important;
-}
-.gap-3 {
-  gap: 0.75rem !important;
 }
 .gap-y-2 {
   row-gap: 0.5rem !important;
@@ -4964,9 +4976,6 @@ html {
   text-align: left !important;
 }
 .text-center {
-  text-align: center !important;
-}
-.\!text-center {
   text-align: center !important;
 }
 .\!text-right {
@@ -5678,14 +5687,6 @@ html {
   }
 }
 @media (min-width: 1280px) {
-
-  .xl\:col-span-1 {
-    grid-column: span 1 / span 1 !important;
-  }
-
-  .xl\:col-span-3 {
-    grid-column: span 3 / span 3 !important;
-  }
 
   .xl\:col-span-4 {
     grid-column: span 4 / span 4 !important;

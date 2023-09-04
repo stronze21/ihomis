@@ -140,7 +140,18 @@
                                 <td class="text-right w-min">{{ number_format($rxo->pchrgup, 2) }}</td>
                                 <td class="text-right w-min">{{ number_format($rxo->pcchrgamt, 2) }}</td>
                                 <td>
-                                    {{ $rxo->remarks }}
+                                    <div class="form-control">
+                                        <label class="input-group">
+                                            <input type="text" class="input input-bordered"
+                                                value="{{ $rxo->remarks }}" />
+                                            <span>
+                                                <button>
+                                                    <i class="las la-lg la-save"></i>
+                                                </button>
+                                            </span>
+
+                                        </label>
+                                    </div>
                                 </td>
                                 <td class="text-center w-min">{!! $rxo->status() !!}</td>
                             </tr>

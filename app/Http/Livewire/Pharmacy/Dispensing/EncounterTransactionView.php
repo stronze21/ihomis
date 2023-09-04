@@ -735,8 +735,8 @@ class EncounterTransactionView extends Component
                     'prescribed_by' => $rxd->rx->empid,
                 ], [
                     'pchrgqty' => $this->order_qty,
-                    'pchrgup' => $this->unit_price,
-                    'pcchrgamt' => $this->order_qty * $this->unit_price,
+                    'pchrgup' => $dm->current_price->dmselprice,
+                    'pcchrgamt' => $this->order_qty * $dm->current_price->dmselprice,
                     'dodate' => now(),
                     'dotime' => now(),
                     'dodtepost' => now(),
