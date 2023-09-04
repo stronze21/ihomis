@@ -25,6 +25,7 @@ module.exports = {
         'justify-self-start',
         'textarea',
         'textarea-bordered',
+        'textarea-ghost',
     ],
     important: true,
 

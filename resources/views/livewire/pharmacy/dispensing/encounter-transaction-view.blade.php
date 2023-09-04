@@ -150,13 +150,27 @@
                                 <td>
                                     <div class="form-control">
                                         <label class="input-group">
-                                            <input type="text" class="input input-bordered"
-                                                value="{{ $rxo->remarks }}" />
-                                            <span>
-                                                <button>
-                                                    <i class="las la-lg la-save"></i>
-                                                </button>
-                                            </span>
+                                            @if ($selected_remarks == $rxo->docointkey)
+                                                <input type="text" class="input input-bordered"
+                                                    value="{{ $rxo->remarks }}" wire:model.lazy="new_remarks"
+                                                    wire:key="rem-input-{{ $rxo->docointkey }}" />
+                                                <span wire:click="update_remarks()"
+                                                    wire:key="update-rem-{{ $rxo->docointkey }}">
+                                                    <button class="text-success">
+                                                        <i class="las la-lg la-save"></i>
+                                                    </button>
+                                                </span>
+                                            @else
+                                                <input type="text" class="input input-bordered"
+                                                    value="{{ $rxo->remarks }}" disabled />
+                                                <span>
+                                                    <button class="text-white"
+                                                        wire:click="$set('selected_remarks', '{{ $rxo->docointkey }}')"
+                                                        wire:key="set-rem-id-{{ $rxo->docointkey }}">
+                                                        <i class="las la-lg la-edit"></i>
+                                                    </button>
+                                                </span>
+                                            @endif
 
                                         </label>
                                     </div>
@@ -175,8 +189,8 @@
         <div class="col-span-12 xl:col-span-4">
             <div class="flex flex-col space-y-1">
                 <div class="w-full" wire:ignore>
-                    <select id="filter_charge_code" class="w-full select select-bordered select-sm select2" multiple
-                        wire:model="charge_code">
+                    <select id="filter_charge_code" class="w-full select select-bordered select-sm select2" multiple>
+                        {{-- wire:model="charge_code"> --}}
                         @foreach ($charges as $charge)
                             <option value="{{ $charge->chrgcode }}">{{ $charge->chrgdesc }}</option>
                         @endforeach
@@ -200,7 +214,7 @@
                             @php
                                 $concat = explode('_,', $stock->drug_concat);
                             @endphp
-                            <tr class="cursor-pointer hover"
+                            <tr class="cursor-pointer hover content {{ $stock->chrgcode }}"
                                 onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat }}', '{{ $stock->current_price->dmselprice }}')">
                                 <td class="break-words">
                                     <div>
@@ -274,8 +288,52 @@
             $(document).ready(function() {
                 $("#generic").on("keyup", function() {
                     var value = $(this).val().toLowerCase();
+                    var value_select = $('#filter_charge_code').select2('val');
+
+                    var myArray = ['DRUMA', 'DRUMAA', 'DRUMAB', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMR',
+                        'DRUMS'
+                    ];
+                    $.each(value_select, function(index, value_row) {
+                        const myArray_index = myArray.indexOf(value_row);
+                        const x = myArray.splice(myArray_index, 1);
+                    });
+
                     $("#stockTableBody tr").filter(function() {
                         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+
+                    if (value_select.length === 0) {
+                        myArray = [];
+                    }
+
+                    $.each(myArray, function(index, value_row_2) {
+                        $('.' + value_row_2).hide();
+                    });
+                });
+
+                $('#filter_charge_code').on('change', function() {
+                    var value = $("#generic").val().toLowerCase();
+                    var value_select = $('#filter_charge_code').select2('val');
+
+                    var myArray = ['DRUMA', 'DRUMAA', 'DRUMAB', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMR',
+                        'DRUMS'
+                    ];
+
+                    $.each(value_select, function(index, value_row) {
+                        const myArray_index = myArray.indexOf(value_row);
+                        const x = myArray.splice(myArray_index, 1);
+                    });
+
+                    $("#stockTableBody tr").filter(function() {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+
+                    if (value_select.length === 0) {
+                        myArray = [];
+                    }
+
+                    $.each(myArray, function(index, value_row_2) {
+                        $('.' + value_row_2).hide();
                     });
                 });
             });
@@ -285,9 +343,9 @@
                 placeholder: 'Fund Source',
             });
 
-            $('#filter_charge_code').on('change', function() {
-                @this.set('charge_code', $('#filter_charge_code').select2('val'));
-            });
+            // $('#filter_charge_code').on('change', function() {
+            //     @this.set('charge_code', $('#filter_charge_code').select2('val'));
+            // });
 
             function charge_items() {
                 Swal.fire({
@@ -414,6 +472,9 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="px-2 mt-2">
+                            <textarea id="remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
+                        </div>
                             `,
                     showCancelButton: true,
                     confirmButtonText: `Confirm`,
@@ -431,6 +492,7 @@
                         const caf = Swal.getHtmlContainer().querySelector('#caf')
                         const govt = Swal.getHtmlContainer().querySelector('#govt')
                         const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
+                        const remarks = Swal.getHtmlContainer().querySelector('#remarks')
 
                         order_qty.focus();
                         unit_price.value = up;
@@ -440,46 +502,56 @@
                             if (sc.checked) {
                                 unit_price.value = unit_price.value - (unit_price.value * 0.20);
                             }
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
 
                         unit_price.addEventListener('input', () => {
                             if (sc.checked) {
                                 unit_price.value = unit_price.value - (unit_price.value * 0.20);
                             }
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
                         ems.addEventListener('change', () => {
                             unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
                         maip.addEventListener('change', () => {
                             unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
                         wholesale.addEventListener('change', () => {
                             unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
                         pay.addEventListener('change', () => {
                             unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
                         medicare.addEventListener('change', () => {
                             unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
                         service.addEventListener('change', () => {
                             unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
                         caf.addEventListener('change', () => {
                             unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
                         govt.addEventListener('change', () => {
                             unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
                         })
 
                         sc.addEventListener('change', () => {
@@ -489,7 +561,8 @@
                             } else {
                                 unit_price.value = up;
                             }
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
 
                         })
                     }
@@ -509,6 +582,7 @@
                         @this.set('caf', caf.checked);
                         @this.set('govt', govt.checked);
                         @this.set('is_ris', is_ris.checked);
+                        @this.set('remarks', remarks.value);
 
                         Livewire.emit('add_item', dm_id)
                     }
@@ -561,11 +635,13 @@
                         return_qty.focus();
 
                         return_qty.addEventListener('input', () => {
-                            total.value = parseFloat(return_qty.value) * parseFloat(unit_price.value);
+                            total.value = parseFloat(return_qty.value) * parseFloat(unit_price
+                                .value);
                         })
 
                         unit_price.addEventListener('input', () => {
-                            total.value = parseFloat(return_qty.value) * parseFloat(unit_price.value);
+                            total.value = parseFloat(return_qty.value) * parseFloat(unit_price
+                                .value);
                         })
                     }
                 }).then((result) => {
@@ -590,108 +666,113 @@
                                 <label class="label">
                                     <span class="label-text">Quantity</span>
                                 </label>
-                                <input id="order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+                                <input id="rx_order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
                             </div>
                         </div>
 
                         <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
                             <div class="col-span-4 font-bold">TAG</div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="pay" name="radio" checked>
+                                <input class="toggle" type="radio" id="rx_pay" name="radio" checked>
                                 <label class="cursor-pointer" for="pay">
                                     <span class="label-text">PAY</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="sc" name="radio">
+                                <input class="toggle" type="radio" id="rx_sc" name="radio">
                                 <label class="cursor-pointer" for="sc">
                                     <span class="label-text">SC/PWD</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="ems" name="radio">
+                                <input class="toggle" type="radio" id="rx_ems" name="radio">
                                 <label class="cursor-pointer" for="ems">
                                     <span class="label-text">EMS</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="maip" name="radio">
+                                <input class="toggle" type="radio" id="rx_maip" name="radio">
                                 <label class="cursor-pointer" for="maip">
                                     <span class="label-text">MAIP</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="wholesale" name="radio">
+                                <input class="toggle" type="radio" id="rx_wholesale" name="radio">
                                 <label class="cursor-pointer" for="wholesale">
                                     <span class="label-text">WHOLESALE</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="medicare" name="radio">
+                                <input class="toggle" type="radio" id="rx_medicare" name="radio">
                                 <label class="cursor-pointer" for="medicare">
                                     <span class="label-text">MEDICARE</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="service" name="radio">
+                                <input class="toggle" type="radio" id="rx_service" name="radio">
                                 <label class="cursor-pointer" for="service">
                                     <span class="label-text">SERVICE</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="caf" name="radio">
+                                <input class="toggle" type="radio" id="rx_caf" name="radio">
                                 <label class="cursor-pointer" for="caf">
                                     <span class="label-text">CAF</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="govt" name="radio">
+                                <input class="toggle" type="radio" id="rx_govt" name="radio">
                                 <label class="cursor-pointer" for="govt">
                                     <span class="label-text">Gov't Emp</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="checkbox" id="is_ris" name="is_ris">
+                                <input class="toggle" type="checkbox" id="rx_is_ris" name="is_ris">
                                 <label class="cursor-pointer" for="is_ris">
                                     <span class="label-text">RIS</span>
                                 </label>
                             </div>
                         </div>
+                        <div class="px-2 mt-2">
+                            <textarea id="rx_remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
+                        </div>
                     `,
                     showCancelButton: true,
                     confirmButtonText: `Confirm`,
                     didOpen: () => {
-                        const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
-                        const sc = Swal.getHtmlContainer().querySelector('#sc')
-                        const ems = Swal.getHtmlContainer().querySelector('#ems')
-                        const maip = Swal.getHtmlContainer().querySelector('#maip')
-                        const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
-                        const pay = Swal.getHtmlContainer().querySelector('#pay')
-                        const medicare = Swal.getHtmlContainer().querySelector('#medicare')
-                        const service = Swal.getHtmlContainer().querySelector('#service')
-                        const caf = Swal.getHtmlContainer().querySelector('#caf')
-                        const govt = Swal.getHtmlContainer().querySelector('#govt')
-                        const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
+                        const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
+                        const rx_sc = Swal.getHtmlContainer().querySelector('#rx_sc')
+                        const rx_ems = Swal.getHtmlContainer().querySelector('#rx_ems')
+                        const rx_maip = Swal.getHtmlContainer().querySelector('#rx_maip')
+                        const rx_wholesale = Swal.getHtmlContainer().querySelector('#rx_wholesale')
+                        const rx_pay = Swal.getHtmlContainer().querySelector('#rx_pay')
+                        const rx_medicare = Swal.getHtmlContainer().querySelector('#rx_medicare')
+                        const rx_service = Swal.getHtmlContainer().querySelector('#rx_service')
+                        const rx_caf = Swal.getHtmlContainer().querySelector('#rx_caf')
+                        const rx_govt = Swal.getHtmlContainer().querySelector('#rx_govt')
+                        const rx_is_ris = Swal.getHtmlContainer().querySelector('#rx_is_ris')
+                        const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
 
-                        order_qty.focus();
-                        order_qty.value = rx_qty;
+                        rx_order_qty.focus();
+                        rx_order_qty.value = rx_qty;
 
                     }
                 }).then((result) => {
                     /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
-                        @this.set('order_qty', order_qty.value)
+                        @this.set('order_qty', rx_order_qty.value)
 
-                        @this.set('sc', sc.checked);
-                        @this.set('ems', ems.checked);
-                        @this.set('maip', maip.checked);
-                        @this.set('wholesale', wholesale.checked);
-                        @this.set('pay', pay.checked);
-                        @this.set('medicare', medicare.checked);
-                        @this.set('service', service.checked);
-                        @this.set('caf', caf.checked);
-                        @this.set('govt', govt.checked);
-                        @this.set('is_ris', is_ris.checked);
+                        @this.set('sc', rx_sc.checked);
+                        @this.set('ems', rx_ems.checked);
+                        @this.set('maip', rx_maip.checked);
+                        @this.set('wholesale', rx_wholesale.checked);
+                        @this.set('pay', rx_pay.checked);
+                        @this.set('medicare', rx_medicare.checked);
+                        @this.set('service', rx_service.checked);
+                        @this.set('caf', rx_caf.checked);
+                        @this.set('govt', rx_govt.checked);
+                        @this.set('is_ris', rx_is_ris.checked);
+                        @this.set('remarks', rx_remarks.value);
 
                         Livewire.emit('add_prescribed_item', rx_id)
                     }

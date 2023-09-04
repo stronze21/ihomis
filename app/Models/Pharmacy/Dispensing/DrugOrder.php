@@ -35,6 +35,7 @@ class DrugOrder extends Model
         'ris',
         'prescription_data_id',
         'prescribed_by',
+        'remarks',
     ];
 
     public function patient()

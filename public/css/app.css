@@ -2037,21 +2037,6 @@ html {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: var(--rounded-btn, 0.5rem);
 }
-.input-group-vertical {
-  flex-direction: column;
-}
-.input-group-vertical :first-child {
-  border-top-left-radius: var(--rounded-btn, 0.5rem);
-  border-top-right-radius: var(--rounded-btn, 0.5rem);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-.input-group-vertical :last-child {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: var(--rounded-btn, 0.5rem);
-  border-bottom-right-radius: var(--rounded-btn, 0.5rem);
-}
 .link {
   cursor: pointer;
   text-decoration-line: underline;
@@ -3361,6 +3346,15 @@ html {
 .textarea:focus {
   outline: 2px solid hsla(var(--bc) / 0.2);
   outline-offset: 2px;
+}
+.textarea-ghost {
+  --tw-bg-opacity: 0.05;
+}
+.textarea-ghost:focus {
+  --tw-bg-opacity: 1;
+  --tw-text-opacity: 1;
+  color: hsl(var(--bc) / var(--tw-text-opacity));
+  box-shadow: none;
 }
 .textarea-disabled,
   .textarea[disabled] {
@@ -5137,6 +5131,10 @@ html {
 .text-slate-800 {
   --tw-text-opacity: 1 !important;
   color: rgb(30 41 59 / var(--tw-text-opacity)) !important;
+}
+.text-success {
+  --tw-text-opacity: 1 !important;
+  color: hsl(var(--su) / var(--tw-text-opacity)) !important;
 }
 .text-white {
   --tw-text-opacity: 1 !important;

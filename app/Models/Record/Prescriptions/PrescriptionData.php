@@ -26,6 +26,11 @@ class PrescriptionData extends Model
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr']);
     }
 
+    public function dmd()
+    {
+        return $this->join('hospital.dbo.hdmhdr as hdm', 'hdm.dmdcomb', 'LIKE', 'webapp.dbo.prescription_data.dmdcomb');
+    }
+
     public function item()
     {
         return $this->belongsTo(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])->where('stock_bal', '>', '0')->orderBy('exp_date', 'ASC');
