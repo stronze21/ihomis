@@ -37,7 +37,7 @@
                     </div>
                 </div>
                 <table class="w-full mb-40 text-sm table-compact">
-                    <thead class="sticky top-0 font-bold bg-gray-200">
+                    <thead class="sticky font-bold bg-gray-200">
                         <tr>
                             <td colspan="4" class="w-1/3 border border-black"><span>Hospital #: </span> <span
                                     class="fw-bold">{{ $encounter->patient->hpercode }}</span></td>
