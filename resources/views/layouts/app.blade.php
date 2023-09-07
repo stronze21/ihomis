@@ -21,6 +21,12 @@
     @livewireStyles
 
     <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{{ mix('js/turbolinks.js') }}" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
+        data-turbolinks-eval="false" data-turbo-eval="false" defer></script>
+
 </head>
 
 <body class="max-h-screen overflow-auto font-sans antialiased ">
@@ -49,8 +55,6 @@
     @livewireScripts
     <x-livewire-alert::scripts />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ mix('js/app.js') }}"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
 
@@ -85,14 +89,6 @@
                     title: e.message,
                 })
             });
-
-        $(document).ready(function() {
-            $('.datatable').DataTable({
-                info: false,
-                ordering: false,
-                paging: false
-            });
-        });
     </script>
 </body>
 

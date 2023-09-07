@@ -15,7 +15,6 @@
 </x-slot>
 
 <div class="p-3">
-
     <div class="grid grid-cols-12 gap-4">
         <div class="col-span-12 xl:col-span-8">
             <div class="flex flex-col max-h-screen p-1 overflow-scroll">
@@ -279,108 +278,108 @@
             </div>
         </div>
     </div>
+</div>
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $("#generic").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                var value_select = $('#filter_charge_code').select2('val');
 
-    @push('scripts')
-        <script>
-            $(document).ready(function() {
-                $("#generic").on("keyup", function() {
-                    var value = $(this).val().toLowerCase();
-                    var value_select = $('#filter_charge_code').select2('val');
-
-                    var myArray = ['DRUMA', 'DRUMAA', 'DRUMAB', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMR',
-                        'DRUMS'
-                    ];
-                    $.each(value_select, function(index, value_row) {
-                        const myArray_index = myArray.indexOf(value_row);
-                        const x = myArray.splice(myArray_index, 1);
-                    });
-
-                    $("#stockTableBody tr").filter(function() {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                    });
-
-                    if (value_select.length === 0) {
-                        myArray = [];
-                    }
-
-                    $.each(myArray, function(index, value_row_2) {
-                        $('.' + value_row_2).hide();
-                    });
+                var myArray = ['DRUMA', 'DRUMAA', 'DRUMAB', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMR',
+                    'DRUMS'
+                ];
+                $.each(value_select, function(index, value_row) {
+                    const myArray_index = myArray.indexOf(value_row);
+                    const x = myArray.splice(myArray_index, 1);
                 });
 
-                $('#filter_charge_code').on('change', function() {
-                    var value = $("#generic").val().toLowerCase();
-                    var value_select = $('#filter_charge_code').select2('val');
+                $("#stockTableBody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
 
-                    var myArray = ['DRUMA', 'DRUMAA', 'DRUMAB', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMR',
-                        'DRUMS'
-                    ];
+                if (value_select.length === 0) {
+                    myArray = [];
+                }
 
-                    $.each(value_select, function(index, value_row) {
-                        const myArray_index = myArray.indexOf(value_row);
-                        const x = myArray.splice(myArray_index, 1);
-                    });
-
-                    $("#stockTableBody tr").filter(function() {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                    });
-
-                    if (value_select.length === 0) {
-                        myArray = [];
-                    }
-
-                    $.each(myArray, function(index, value_row_2) {
-                        $('.' + value_row_2).hide();
-                    });
+                $.each(myArray, function(index, value_row_2) {
+                    $('.' + value_row_2).hide();
                 });
             });
 
-            $('.select2').select2({
-                width: 'resolve',
-                placeholder: 'Fund Source',
+            $('#filter_charge_code').on('change', function() {
+                var value = $("#generic").val().toLowerCase();
+                var value_select = $('#filter_charge_code').select2('val');
+
+                var myArray = ['DRUMA', 'DRUMAA', 'DRUMAB', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMR',
+                    'DRUMS'
+                ];
+
+                $.each(value_select, function(index, value_row) {
+                    const myArray_index = myArray.indexOf(value_row);
+                    const x = myArray.splice(myArray_index, 1);
+                });
+
+                $("#stockTableBody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+
+                if (value_select.length === 0) {
+                    myArray = [];
+                }
+
+                $.each(myArray, function(index, value_row_2) {
+                    $('.' + value_row_2).hide();
+                });
             });
+        });
 
-            // $('#filter_charge_code').on('change', function() {
-            //     @this.set('charge_code', $('#filter_charge_code').select2('val'));
-            // });
+        $('.select2').select2({
+            width: 'resolve',
+            placeholder: 'Fund Source',
+        });
 
-            function charge_items() {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    showCancelButton: true,
-                    confirmButtonText: 'Continue',
-                    html: `
+        // $('#filter_charge_code').on('change', function() {
+        //     @this.set('charge_code', $('#filter_charge_code').select2('val'));
+        // });
+
+        function charge_items() {
+            Swal.fire({
+                title: 'Are you sure?',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+                html: `
                         <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
                         <div class="mt-2 text-slate-500" id="inf">Create charge slip for all pending items. Continue?</div>
                     `,
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        Livewire.emit('charge_items')
-                    }
-                })
-            }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('charge_items')
+                }
+            })
+        }
 
-            function issue_order() {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    showCancelButton: true,
-                    confirmButtonText: 'Continue',
-                    html: `
+        function issue_order() {
+            Swal.fire({
+                title: 'Are you sure?',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+                html: `
                         <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
                         <div class="mt-2 text-slate-500" id="inf">Issue all chared items. Continue?</div>
                     `,
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        Livewire.emit('issue_order')
-                    }
-                })
-            }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('issue_order')
+                }
+            })
+        }
 
-            function select_item(dm_id, drug, up) {
-                Swal.fire({
-                    html: `
+        function select_item(dm_id, drug, up) {
+            Swal.fire({
+                html: `
                         <div class="text-xl font-bold">` + drug + `</div>
                         <div class="flex w-full space-x-3">
                             <div class="w-full mb-3 form-control">
@@ -473,122 +472,122 @@
                             <textarea id="remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
                         </div>
                             `,
-                    showCancelButton: true,
-                    confirmButtonText: `Confirm`,
-                    didOpen: () => {
-                        const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
-                        const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
-                        const total = Swal.getHtmlContainer().querySelector('#total')
-                        const sc = Swal.getHtmlContainer().querySelector('#sc')
-                        const ems = Swal.getHtmlContainer().querySelector('#ems')
-                        const maip = Swal.getHtmlContainer().querySelector('#maip')
-                        const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
-                        const pay = Swal.getHtmlContainer().querySelector('#pay')
-                        const medicare = Swal.getHtmlContainer().querySelector('#medicare')
-                        const service = Swal.getHtmlContainer().querySelector('#service')
-                        const caf = Swal.getHtmlContainer().querySelector('#caf')
-                        const govt = Swal.getHtmlContainer().querySelector('#govt')
-                        const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
-                        const remarks = Swal.getHtmlContainer().querySelector('#remarks')
+                showCancelButton: true,
+                confirmButtonText: `Confirm`,
+                didOpen: () => {
+                    const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
+                    const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
+                    const total = Swal.getHtmlContainer().querySelector('#total')
+                    const sc = Swal.getHtmlContainer().querySelector('#sc')
+                    const ems = Swal.getHtmlContainer().querySelector('#ems')
+                    const maip = Swal.getHtmlContainer().querySelector('#maip')
+                    const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
+                    const pay = Swal.getHtmlContainer().querySelector('#pay')
+                    const medicare = Swal.getHtmlContainer().querySelector('#medicare')
+                    const service = Swal.getHtmlContainer().querySelector('#service')
+                    const caf = Swal.getHtmlContainer().querySelector('#caf')
+                    const govt = Swal.getHtmlContainer().querySelector('#govt')
+                    const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
+                    const remarks = Swal.getHtmlContainer().querySelector('#remarks')
 
-                        order_qty.focus();
+                    order_qty.focus();
+                    unit_price.value = up;
+                    total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+
+                    order_qty.addEventListener('input', () => {
+                        if (sc.checked) {
+                            unit_price.value = unit_price.value - (unit_price.value * 0.20);
+                        }
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+
+                    unit_price.addEventListener('input', () => {
+                        if (sc.checked) {
+                            unit_price.value = unit_price.value - (unit_price.value * 0.20);
+                        }
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+                    ems.addEventListener('change', () => {
                         unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+                    maip.addEventListener('change', () => {
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+                    wholesale.addEventListener('change', () => {
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+                    pay.addEventListener('change', () => {
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+                    medicare.addEventListener('change', () => {
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+                    service.addEventListener('change', () => {
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+                    caf.addEventListener('change', () => {
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
+                    govt.addEventListener('change', () => {
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
+                    })
 
-                        order_qty.addEventListener('input', () => {
-                            if (sc.checked) {
-                                unit_price.value = unit_price.value - (unit_price.value * 0.20);
-                            }
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
+                    sc.addEventListener('change', () => {
+                        // @this.set('unit_price',unit_price.value)
+                        if (sc.checked) {
+                            unit_price.value = unit_price.value - (unit_price.value * 0.20);
+                        } else {
+                            unit_price.value = up;
+                        }
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                            .value)
 
-                        unit_price.addEventListener('input', () => {
-                            if (sc.checked) {
-                                unit_price.value = unit_price.value - (unit_price.value * 0.20);
-                            }
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
-                        ems.addEventListener('change', () => {
-                            unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
-                        maip.addEventListener('change', () => {
-                            unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
-                        wholesale.addEventListener('change', () => {
-                            unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
-                        pay.addEventListener('change', () => {
-                            unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
-                        medicare.addEventListener('change', () => {
-                            unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
-                        service.addEventListener('change', () => {
-                            unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
-                        caf.addEventListener('change', () => {
-                            unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
-                        govt.addEventListener('change', () => {
-                            unit_price.value = up;
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
-                        })
+                    })
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    @this.set('unit_price', unit_price.value)
+                    @this.set('order_qty', order_qty.value)
 
-                        sc.addEventListener('change', () => {
-                            // @this.set('unit_price',unit_price.value)
-                            if (sc.checked) {
-                                unit_price.value = unit_price.value - (unit_price.value * 0.20);
-                            } else {
-                                unit_price.value = up;
-                            }
-                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                                .value)
+                    @this.set('sc', sc.checked);
+                    @this.set('ems', ems.checked);
+                    @this.set('maip', maip.checked);
+                    @this.set('wholesale', wholesale.checked);
+                    @this.set('pay', pay.checked);
+                    @this.set('medicare', medicare.checked);
+                    @this.set('service', service.checked);
+                    @this.set('caf', caf.checked);
+                    @this.set('govt', govt.checked);
+                    @this.set('is_ris', is_ris.checked);
+                    @this.set('remarks', remarks.value);
 
-                        })
-                    }
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        @this.set('unit_price', unit_price.value)
-                        @this.set('order_qty', order_qty.value)
+                    Livewire.emit('add_item', dm_id)
+                }
+            });
+        }
 
-                        @this.set('sc', sc.checked);
-                        @this.set('ems', ems.checked);
-                        @this.set('maip', maip.checked);
-                        @this.set('wholesale', wholesale.checked);
-                        @this.set('pay', pay.checked);
-                        @this.set('medicare', medicare.checked);
-                        @this.set('service', service.checked);
-                        @this.set('caf', caf.checked);
-                        @this.set('govt', govt.checked);
-                        @this.set('is_ris', is_ris.checked);
-                        @this.set('remarks', remarks.value);
-
-                        Livewire.emit('add_item', dm_id)
-                    }
-                });
-            }
-
-            function return_issued(docointkey, drug, up, or_qty) {
-                Swal.fire({
-                    html: `
+        function return_issued(docointkey, drug, up, or_qty) {
+            Swal.fire({
+                html: `
                         <div class="text-xl font-bold">` + drug + `</div>
 
                         <div class="w-full px-2 mb-3 form-control">
@@ -619,44 +618,44 @@
                             <input id="total" type="number" step="0.01" class="w-full input input-bordered disabled bg-slate-200" readonly tabindex='-1' />
                         </div>
                             `,
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: `Confirm`,
-                    didOpen: () => {
-                        const order_qty = Swal.getHtmlContainer().querySelector('#order_qty');
-                        const return_qty = Swal.getHtmlContainer().querySelector('#return_qty');
-                        const unit_price = Swal.getHtmlContainer().querySelector('#unit_price');
-                        const total = Swal.getHtmlContainer().querySelector('#total');
-                        order_qty.value = or_qty;
-                        unit_price.value = up;
-                        return_qty.focus();
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: `Confirm`,
+                didOpen: () => {
+                    const order_qty = Swal.getHtmlContainer().querySelector('#order_qty');
+                    const return_qty = Swal.getHtmlContainer().querySelector('#return_qty');
+                    const unit_price = Swal.getHtmlContainer().querySelector('#unit_price');
+                    const total = Swal.getHtmlContainer().querySelector('#total');
+                    order_qty.value = or_qty;
+                    unit_price.value = up;
+                    return_qty.focus();
 
-                        return_qty.addEventListener('input', () => {
-                            total.value = parseFloat(return_qty.value) * parseFloat(unit_price
-                                .value);
-                        })
+                    return_qty.addEventListener('input', () => {
+                        total.value = parseFloat(return_qty.value) * parseFloat(unit_price
+                            .value);
+                    })
 
-                        unit_price.addEventListener('input', () => {
-                            total.value = parseFloat(return_qty.value) * parseFloat(unit_price
-                                .value);
-                        })
-                    }
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        @this.set('unit_price', unit_price.value);
-                        @this.set('order_qty', or_qty);
-                        @this.set('docointkey', docointkey);
-                        @this.set('return_qty', return_qty.value);
+                    unit_price.addEventListener('input', () => {
+                        total.value = parseFloat(return_qty.value) * parseFloat(unit_price
+                            .value);
+                    })
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    @this.set('unit_price', unit_price.value);
+                    @this.set('order_qty', or_qty);
+                    @this.set('docointkey', docointkey);
+                    @this.set('return_qty', return_qty.value);
 
-                        Livewire.emit('return_issued', docointkey);
-                    }
-                });
-            }
+                    Livewire.emit('return_issued', docointkey);
+                }
+            });
+        }
 
-            function select_rx_item(rx_id, drug, rx_qty) {
-                Swal.fire({
-                    html: `
+        function select_rx_item(rx_id, drug, rx_qty) {
+            Swal.fire({
+                html: `
                         <div class="text-xl font-bold">` + drug + `</div>
                         <div class="flex w-full space-x-3">
                             <div class="w-full mb-3 form-control">
@@ -734,46 +733,46 @@
                             <textarea id="rx_remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
                         </div>
                     `,
-                    showCancelButton: true,
-                    confirmButtonText: `Confirm`,
-                    didOpen: () => {
-                        const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
-                        const rx_sc = Swal.getHtmlContainer().querySelector('#rx_sc')
-                        const rx_ems = Swal.getHtmlContainer().querySelector('#rx_ems')
-                        const rx_maip = Swal.getHtmlContainer().querySelector('#rx_maip')
-                        const rx_wholesale = Swal.getHtmlContainer().querySelector('#rx_wholesale')
-                        const rx_pay = Swal.getHtmlContainer().querySelector('#rx_pay')
-                        const rx_medicare = Swal.getHtmlContainer().querySelector('#rx_medicare')
-                        const rx_service = Swal.getHtmlContainer().querySelector('#rx_service')
-                        const rx_caf = Swal.getHtmlContainer().querySelector('#rx_caf')
-                        const rx_govt = Swal.getHtmlContainer().querySelector('#rx_govt')
-                        const rx_is_ris = Swal.getHtmlContainer().querySelector('#rx_is_ris')
-                        const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
+                showCancelButton: true,
+                confirmButtonText: `Confirm`,
+                didOpen: () => {
+                    const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
+                    const rx_sc = Swal.getHtmlContainer().querySelector('#rx_sc')
+                    const rx_ems = Swal.getHtmlContainer().querySelector('#rx_ems')
+                    const rx_maip = Swal.getHtmlContainer().querySelector('#rx_maip')
+                    const rx_wholesale = Swal.getHtmlContainer().querySelector('#rx_wholesale')
+                    const rx_pay = Swal.getHtmlContainer().querySelector('#rx_pay')
+                    const rx_medicare = Swal.getHtmlContainer().querySelector('#rx_medicare')
+                    const rx_service = Swal.getHtmlContainer().querySelector('#rx_service')
+                    const rx_caf = Swal.getHtmlContainer().querySelector('#rx_caf')
+                    const rx_govt = Swal.getHtmlContainer().querySelector('#rx_govt')
+                    const rx_is_ris = Swal.getHtmlContainer().querySelector('#rx_is_ris')
+                    const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
 
-                        rx_order_qty.focus();
-                        rx_order_qty.value = rx_qty;
+                    rx_order_qty.focus();
+                    rx_order_qty.value = rx_qty;
 
-                    }
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        @this.set('order_qty', rx_order_qty.value)
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    @this.set('order_qty', rx_order_qty.value)
 
-                        @this.set('sc', rx_sc.checked);
-                        @this.set('ems', rx_ems.checked);
-                        @this.set('maip', rx_maip.checked);
-                        @this.set('wholesale', rx_wholesale.checked);
-                        @this.set('pay', rx_pay.checked);
-                        @this.set('medicare', rx_medicare.checked);
-                        @this.set('service', rx_service.checked);
-                        @this.set('caf', rx_caf.checked);
-                        @this.set('govt', rx_govt.checked);
-                        @this.set('is_ris', rx_is_ris.checked);
-                        @this.set('remarks', rx_remarks.value);
+                    @this.set('sc', rx_sc.checked);
+                    @this.set('ems', rx_ems.checked);
+                    @this.set('maip', rx_maip.checked);
+                    @this.set('wholesale', rx_wholesale.checked);
+                    @this.set('pay', rx_pay.checked);
+                    @this.set('medicare', rx_medicare.checked);
+                    @this.set('service', rx_service.checked);
+                    @this.set('caf', rx_caf.checked);
+                    @this.set('govt', rx_govt.checked);
+                    @this.set('is_ris', rx_is_ris.checked);
+                    @this.set('remarks', rx_remarks.value);
 
-                        Livewire.emit('add_prescribed_item', rx_id)
-                    }
-                });
-            }
-        </script>
-    @endpush
+                    Livewire.emit('add_prescribed_item', rx_id)
+                }
+            });
+        }
+    </script>
+@endpush

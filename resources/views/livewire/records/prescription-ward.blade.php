@@ -28,16 +28,19 @@
 
 <div class="flex flex-col py-5 mx-auto max-w-7xl">
     <div class="flex justify-between space-x-8">
-        <div class="form-control">
-            <label class="input-group input-group-sm">
-                <span class="text-sm">Ward</span>
-                <select class="p-0 pl-2 text-sm w-80 select select-bordered select-sm" wire:model="wardcode">
-                    <option value="">All</option>
+        <div class="flex space-x-8">
+            <div class="form-control">
+                <select id="filter_wardcode" class="w-full select select-bordered select-sm">
+                    <option value="All">All</option>
                     @foreach ($wards as $ward)
-                        <option value="{{ $ward->wardcode }}">{{ $ward->wardname }} ({{ $ward->wclcode }})</option>
+                        <option value="{{ $ward->slug_desc() }}">{{ $ward->wardname }}</option>
                     @endforeach
                 </select>
-            </label>
+            </div>
+            <div class="form-control">
+                <input type="text" placeholder="Patient Name" class="w-full input input-sm input-bordered"
+                    id="patient_name" />
+            </div>
         </div>
         <div class="btn-group">
             <button class="btn btn-sm tooltip {{ $is_basic ? 'btn-primary' : '' }}" data-tip="BASIC"
@@ -62,7 +65,7 @@
             </span>
         </div>
         <div wire:loading.class="hidden">
-            <table class="table w-full mb-3 table-compact table-zebra">
+            <table class="table w-full mb-3 table-compact">
                 <thead>
                     <tr>
                         <th>Date Admitted</th>
@@ -71,10 +74,10 @@
                         <th>Order Type</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="admittedTable">
                     @forelse ($prescriptions as $rx)
                         <tr wire:key="view-enctr-{{ $rx->enccode }}-{{ $loop->iteration }}"
-                            class="cursor-pointer hover clickable-row"
+                            class="cursor-pointer hover clickable-row content {{ $rx->adm_pat_room->ward->slug_desc() }}"
                             data-href="{{ route('dispensing.view.enctr', ['enccode' => Crypt::encrypt(str_replace(' ', '-', $rx->enccode))]) }}">
                             <td>
                                 <div class="flex-col">
@@ -93,7 +96,6 @@
                             <td class="whitespace-nowrap">
                                 <div class="flex-col">
                                     <div>{{ $rx->adm_pat_room->ward->wardname }}</div>
-                                    <div class="text-sm">{{ $rx->adm_pat_room->room->rmname }}</div>
                                 </div>
                             </td>
                             <td>
@@ -137,17 +139,74 @@
                     @endforelse
                 </tbody>
             </table>
-            <div class="mt-2">
+            {{-- <div class="mt-2">
                 {{ $prescriptions->links() }}
-            </div>
+            </div> --}}
         </div>
     </div>
 </div>
-
-
 @push('scripts')
-    <script>
-        jQuery(document).ready(function($) {
+    <script async>
+        $(document).ready(function() {
+
+            $("#patient_name").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                var filter_wardcode = $('#filter_wardcode').val();
+                var wards = [
+                    @foreach ($wards as $filt_ward)
+                        '{{ $filt_ward->slug_desc() }}',
+                    @endforeach
+                ];
+
+                var ward_index = wards.indexOf(filter_wardcode);
+                var x = wards.splice(ward_index, 1);
+
+                $("#admittedTable tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+
+                if (filter_wardcode === 'All') {
+                    wards = [];
+                }
+
+                $.each(wards, function(index, value_row_2) {
+                    $('.' + value_row_2).hide();
+                });
+            });
+
+            $('#filter_wardcode').on('change', function() {
+                var value = $('#patient_name').val().toLowerCase();
+                var filter_wardcode = $('#filter_wardcode').val();
+                var wards = [
+                    @foreach ($wards as $filt_ward)
+                        '{{ $filt_ward->slug_desc() }}',
+                    @endforeach
+                ];
+
+                var ward_index = wards.indexOf(filter_wardcode);
+                var x = wards.splice(ward_index, 1);
+
+                $("#admittedTable tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+
+                if (filter_wardcode === 'All') {
+                    wards = [];
+                }
+
+                $.each(wards, function(index, value_row_2) {
+                    $('.' + value_row_2).hide();
+                });
+            });
+        });
+
+        $('.select2').select2({
+            width: 'resolve',
+            placeholder: 'Filter by ward',
+        });
+
+
+        $(document).ready(function($) {
             $(".clickable-row").click(function() {
                 window.location = $(this).data("href");
             });

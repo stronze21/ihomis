@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "daisyui": "^2.51.5",
-        "sweetalert2": "^11.4.8"
+        "sweetalert2": "^11.4.8",
+        "turbolinks": "^5.2.0"
     }
 }

@@ -2,8 +2,9 @@
 
 namespace App\Models\Hospital;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Ward extends Model
 {
@@ -12,4 +13,8 @@ class Ward extends Model
     protected $connection = 'hospital';
     protected $table = 'hospital.dbo.hward', $primaryKey = 'wardcode', $keyType = 'string';
 
+    public function slug_desc()
+    {
+        return Str::slug($this->wardname, '-');
+    }
 }
