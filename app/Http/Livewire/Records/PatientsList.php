@@ -74,8 +74,15 @@ class PatientsList extends Component
 
     public function select_patient($hpercode)
     {
-        $patient = Patient::find($hpercode);
-        $encounter = $patient->latest_encounter->first();
+
+        $encounter = EncounterLog::where('hpercode', $hpercode)
+            ->where('encstat', 'A')
+            ->where('toecode', '<>', 'WALKN')
+            ->where('toecode', '<>', '32')
+            ->where('enclock', 'N')
+            ->latest('encdate')
+            ->first();
+
         $this->hpercode = $hpercode;
         if ($encounter) {
             $this->enccode = $encounter->enccode;

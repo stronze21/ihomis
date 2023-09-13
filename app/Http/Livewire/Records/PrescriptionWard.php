@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Records;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Hospital\Ward;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Models\Record\Prescriptions\Prescription;
@@ -43,21 +44,56 @@ class PrescriptionWard extends Component
 
     public function render()
     {
-        $prescriptions = Prescription::with('active_adm')
-            ->with('adm_pat_room')->with('active_basic')->with('active_g24')->with('active_or');
+        $prescriptions = DB::table(DB::raw('hospital.dbo.henctr enctr'))
+            ->rightJoin(DB::raw('webapp.dbo.prescription rx'), 'enctr.enccode', 'rx.enccode')
+            ->rightJoin(DB::raw('hospital.dbo.hadmlog adm'), 'enctr.enccode', 'adm.enccode')
+            ->rightJoin(DB::raw('hospital.dbo.hpatroom pat_room'), 'rx.enccode', 'pat_room.enccode')
+            ->rightJoin(DB::raw('hospital.dbo.hroom room'), 'pat_room.rmintkey', 'room.rmintkey')
+            ->rightJoin(DB::raw('hospital.dbo.hward ward'), 'pat_room.wardcode', 'ward.wardcode')
+            ->rightJoin(DB::raw('hospital.dbo.hperson pt'), 'adm.hpercode', 'pt.hpercode')
+            ->select(
+                'adm.enccode',
+                'adm.admdate',
+                'adm.hpercode',
+                'pt.patfirst',
+                'pt.patmiddle',
+                'pt.patlast',
+                'pt.patsuffix',
+                'room.rmname',
+                'ward.wardname',
+                DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND (data.order_type = '' OR data.order_type IS NULL)) basic"),
+                DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND data.order_type = 'G24') g24"),
+                DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND data.order_type = 'OR') 'or'")
+            )
+            ->where('pt.patstat', 'A')
+            ->where('rx.stat', 'A')
+            ->where('enctr.encstat', 'A')
+            ->where('pat_room.patrmstat', 'A')
+            ->where('rx.created_at', '>', '2023-01-01')
+            ->orderBy('pt.patlast', 'ASC')
+            ->orderBy('pt.patfirst', 'ASC')
+            ->orderBy('pt.patmiddle', 'ASC')
+            ->orderByDesc('rx.created_at');
 
-        if ($this->is_basic) {
-            $prescriptions->has('active_basic');
-        } else if ($this->is_g24) {
-            $prescriptions->has('active_g24');
-        } else if ($this->is_or) {
-            $prescriptions->has('active_or');
-        }
+        // dd($prescriptions);
 
-        $prescriptions->has('active_adm')->has('data_active')
-            ->whereRelation('adm_pat_room', 'hospital.dbo.hpatroom.wardcode', 'LIKE', $this->wardcode . '%')
-            ->where('stat', 'A')
-            ->where('created_at', '>', '2023-01-01');
+        // $prescriptions = Prescription::with('active_adm')
+        //     ->with('adm_pat_room')->with('active_basic')->with('active_g24')->with('active_or');
+
+        // if ($this->is_basic) {
+        //     $prescriptions->has('active_basic');
+        // } else if ($this->is_g24) {
+        //     $prescriptions->has('active_g24');
+        // } else if ($this->is_or) {
+        //     $prescriptions->has('active_or');
+        // }
+
+        // $prescriptions->has('active_adm')->has('data_active')
+        //     ->whereRelation('adm_pat_room', 'hospital.dbo.hpatroom.wardcode', 'LIKE', $this->wardcode . '%')
+        //     ->where('stat', 'A')
+        //     ->where('created_at', '>', '2023-01-01');
+
+        // dd($prescriptions->toSql());
 
         return view('livewire.records.prescription-ward', [
             'prescriptions' => $prescriptions->get(),

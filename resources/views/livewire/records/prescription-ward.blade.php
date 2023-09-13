@@ -27,34 +27,35 @@
 
 
 <div class="flex flex-col py-5 mx-auto max-w-7xl">
-    <div class="flex justify-between space-x-8">
-        <div class="flex space-x-8">
-            <div class="form-control">
-                <select id="filter_wardcode" class="w-full select select-bordered select-sm">
-                    <option value="All">All</option>
-                    @foreach ($wards as $ward)
-                        <option value="{{ $ward->slug_desc() }}">{{ $ward->wardname }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-control">
-                <input type="text" placeholder="Patient Name" class="w-full input input-sm input-bordered"
-                    id="patient_name" />
-            </div>
+    <div class="flex space-x-8 justify-even">
+        <div class="form-control">
+            <label for="filter_wardcode">
+                <span class="label-text">Ward</span>
+            </label>
+            <select id="filter_wardcode" class="w-full select select-bordered select-sm">
+                <option value="All">All</option>
+                @foreach ($wards as $ward)
+                    <option value="{{ $ward->slug_desc() }}">{{ $ward->wardname }}</option>
+                @endforeach
+            </select>
         </div>
-        <div class="btn-group">
-            <button class="btn btn-sm tooltip {{ $is_basic ? 'btn-primary' : '' }}" data-tip="BASIC"
-                wire:click="toggle_basic">
-                <i class="las la-2g la-prescription"></i>
-            </button>
-            <button class="btn btn-sm tooltip {{ $is_g24 ? 'btn-primary' : '' }}" data-tip="Good For 24 Hrs"
-                wire:click="toggle_g24">
-                <i class="las la-2g la-hourglass-start"></i>
-            </button>
-            <button class="btn btn-sm tooltip {{ $is_or ? 'btn-primary' : '' }}" data-tip="For Operating Use"
-                wire:click="toggle_or">
-                <i class="las la-2g la-syringe"></i>
-            </button>
+        <div class="w-full max-w-xs form-control">
+            <label for="filter_type">
+                <span class="label-text">Rx Tag</span>
+            </label>
+            <select id="filter_type" class="w-full select select-bordered select-sm">
+                <option value="All">All</option>
+                <option value="has-basic"><i class="las la-2g la-prescription"></i> Basic</option>
+                <option value="has-g24"><i class="las la-2g la-hourglass-start"></i> G24</option>
+                <option value="has-or"><i class="las la-2g la-syringe"></i> OR</option>
+            </select>
+        </div>
+        <div class="w-full max-w-xs form-control ">
+            <label for="patient_name">
+                <span class="label-text">Patient</span>
+            </label>
+            <input type="text" placeholder="Patient Name" class="w-full input input-sm input-bordered"
+                id="patient_name" />
         </div>
     </div>
     <div class="flex flex-col justify-center w-full mt-3 overflow-x-auto">
@@ -71,38 +72,41 @@
                         <th>Date Admitted</th>
                         <th>Patient Name</th>
                         <th>Department</th>
-                        <th>Order Type</th>
+                        <th>Rx Tag</th>
                     </tr>
                 </thead>
                 <tbody id="admittedTable">
                     @forelse ($prescriptions as $rx)
                         <tr wire:key="view-enctr-{{ $rx->enccode }}-{{ $loop->iteration }}"
-                            class="cursor-pointer hover clickable-row content {{ $rx->adm_pat_room->ward->slug_desc() }}"
+                            class="cursor-pointer hover clickable-row content {{ Illuminate\Support\Str::slug($rx->wardname, '-') }}@if ($rx->basic) has-basic @elseif ($rx->g24) has-g24 @elseif ($rx->or) has-or @else has-none @endif"
                             data-href="{{ route('dispensing.view.enctr', ['enccode' => Crypt::encrypt(str_replace(' ', '-', $rx->enccode))]) }}">
                             <td>
                                 <div class="flex-col">
-                                    <div>{{ $rx->active_adm->disdate_format1() }}</div>
-                                    <div>{{ $rx->active_adm->distime_format1() }}</div>
+                                    <div>{{ Carbon\Carbon::parse($rx->admdate)->format('Y/m/d') }}</div>
+                                    <div>{{ Carbon\Carbon::parse($rx->admdate)->format('g:i A') }}</div>
                                 </div>
                             </td>
                             <td class="whitespace-nowrap">
                                 <div class="flex-col">
-                                    <div>{{ $rx->active_adm->patient->fullname() }}</div>
+                                    <div>
+                                        {{ $rx->patlast . ', ' . $rx->patfirst . ' ' . $rx->patsuffix . ' ' . $rx->patmiddle }}
+                                    </div>
                                     <div class="text-sm"><span
-                                            class="badge badge-ghost badge-sm">{{ $rx->active_adm->hpercode }}</span>
+                                            class="badge badge-ghost badge-sm">{{ $rx->hpercode }}</span>
                                     </div>
                                 </div>
                             </td>
                             <td class="whitespace-nowrap">
                                 <div class="flex-col">
-                                    <div>{{ $rx->adm_pat_room->ward->wardname }}</div>
+                                    <div>{{ $rx->wardname }}</div>
+                                    <div>{{ $rx->rmname }}</div>
                                 </div>
                             </td>
                             <td>
                                 @php
-                                    $basic = $rx->active_basic->count();
-                                    $g24 = $rx->active_g24->count();
-                                    $or = $rx->active_or->count();
+                                    $basic = $rx->basic;
+                                    $g24 = $rx->g24;
+                                    $or = $rx->or;
                                 @endphp
                                 <ul class="text-sm rounded-md menu menu-horizontal bg-base-200">
                                     @if ($basic)
@@ -157,9 +161,20 @@
                         '{{ $filt_ward->slug_desc() }}',
                     @endforeach
                 ];
+                var type = $('#filter_type').val().toLowerCase();
+
+                var types = [
+                    'has-basic',
+                    'has-g24',
+                    'has-or',
+                    'has-none',
+                ];
 
                 var ward_index = wards.indexOf(filter_wardcode);
                 var x = wards.splice(ward_index, 1);
+
+                var type_index = types.indexOf(type);
+                var y = types.splice(type_index, 1);
 
                 $("#admittedTable tr").filter(function() {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
@@ -171,6 +186,10 @@
 
                 $.each(wards, function(index, value_row_2) {
                     $('.' + value_row_2).hide();
+                });
+
+                $.each(types, function(index_type, value_type) {
+                    $('.' + value_type).hide();
                 });
             });
 
@@ -182,9 +201,20 @@
                         '{{ $filt_ward->slug_desc() }}',
                     @endforeach
                 ];
+                var type = $('#filter_type').val().toLowerCase();
+
+                var types = [
+                    'has-basic',
+                    'has-g24',
+                    'has-or',
+                    'has-none',
+                ];
 
                 var ward_index = wards.indexOf(filter_wardcode);
                 var x = wards.splice(ward_index, 1);
+
+                var type_index = types.indexOf(type);
+                var y = types.splice(type_index, 1);
 
                 $("#admittedTable tr").filter(function() {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
@@ -196,6 +226,50 @@
 
                 $.each(wards, function(index, value_row_2) {
                     $('.' + value_row_2).hide();
+                });
+
+                $.each(types, function(index_type, value_type) {
+                    $('.' + value_type).hide();
+                });
+            });
+
+            $('#filter_type').on('change', function() {
+                var value = $('#patient_name').val().toLowerCase();
+                var filter_wardcode = $('#filter_wardcode').val();
+                var wards = [
+                    @foreach ($wards as $filt_ward)
+                        '{{ $filt_ward->slug_desc() }}',
+                    @endforeach
+                ];
+                var type = $('#filter_type').val().toLowerCase();
+
+                var types = [
+                    'has-basic',
+                    'has-g24',
+                    'has-or',
+                    'has-none',
+                ];
+
+                var ward_index = wards.indexOf(filter_wardcode);
+                var x = wards.splice(ward_index, 1);
+
+                var type_index = types.indexOf(type);
+                var y = types.splice(type_index, 1);
+
+                $("#admittedTable tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+
+                if (filter_wardcode === 'All') {
+                    wards = [];
+                }
+
+                $.each(wards, function(index, value_row_2) {
+                    $('.' + value_row_2).hide();
+                });
+
+                $.each(types, function(index_type, value_type) {
+                    $('.' + value_type).hide();
                 });
             });
         });

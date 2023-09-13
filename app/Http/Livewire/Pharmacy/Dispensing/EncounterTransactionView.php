@@ -109,8 +109,8 @@ class EncounterTransactionView extends Component
             ->where('estatus', 'U')->get();
 
         foreach ($rxo as $rx) {
-            if ($this->is_ris or $rx->item and $rx->item->sum('stock_bal') >= $rx->pchrgqty) {
-                foreach ($rx->item->all() as $item) {
+            if ($this->is_ris or $rx->items and $rx->items->sum('stock_bal') >= $rx->pchrgqty) {
+                foreach ($rx->items->all() as $item) {
                     $rx->pcchrgcod = $pcchrgcod;
                     $rx->estatus = 'P';
                     $rx->save();
@@ -156,8 +156,8 @@ class EncounterTransactionView extends Component
             ->where('estatus', 'P')->get();
 
         foreach ($rxos as $row) {
-            if ($row->item) {
-                if ($row->item->sum('stock_bal') >= $row->pchrgqty) {
+            if ($row->items) {
+                if ($row->items->sum('stock_bal') >= $row->pchrgqty) {
                     $cnt = 1;
                 } else {
                     $cnt = 2;

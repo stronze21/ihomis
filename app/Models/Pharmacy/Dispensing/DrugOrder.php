@@ -60,7 +60,12 @@ class DrugOrder extends Model
 
     public function item()
     {
-        return $this->belongsTo(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])->where('stock_bal', '>', '0')->orderBy('exp_date', 'ASC');
+        return $this->belongsTo(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])->whereNotNull('dmdprdte')->where('stock_bal', '>', '0')->orderBy('exp_date', 'ASC');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])->whereNotNull('dmdprdte')->where('stock_bal', '>', '0')->orderBy('exp_date', 'ASC');
     }
 
     public function charge()
