@@ -39,7 +39,7 @@
                     <thead class="sticky font-bold bg-gray-200">
                         <tr>
                             <td colspan="4" class="w-1/3 border border-black"><span>Hospital #: </span> <span
-                                    class="fw-bold">{{ $encounter->patient->hpercode }}</span></td>
+                                    class="fw-bold">{{ $patient->hpercode }}</span></td>
                             <td colspan="7" class="w-2/3 border border-black">
                                 <span>Diagnosis: </span>
                                 <div class="text-xs font-light">
@@ -49,11 +49,11 @@
                         </tr>
                         <tr>
                             <td colspan="3" class="w-1/3 border border-black"><span>Last Name: </span> <span
-                                    class="fw-bold">{{ $encounter->patient->patlast }}</span></td>
+                                    class="fw-bold">{{ $patient->patlast }}</span></td>
                             <td colspan="5" class="w-1/3 border border-black"><span>First Name: </span> <span
-                                    class="fw-bold">{{ $encounter->patient->patfirst }}</span></td>
+                                    class="fw-bold">{{ $patient->patfirst }}</span></td>
                             <td colspan="3" class="w-1/3 border border-black"><span>Middle Name: </span> <span
-                                    class="fw-bold">{{ $encounter->patient->patmiddle }}</span></td>
+                                    class="fw-bold">{{ $patient->patmiddle }}</span></td>
                         </tr>
                         <tr>
                             <td colspan="5" class="w-1/3 border border-black">
@@ -61,8 +61,8 @@
                                     <div class="flex space-x-2">
                                         <span>Room/Encounter Type: </span>
                                         @if ($encounter->toecode == 'ADM' or $encounter->toecode == 'OPDAD' or $encounter->toecode == 'ERADM')
-                                            <div> {{ $encounter->adm->patient_room->ward->wardname }}</div>
-                                            <div class="text-sm">{{ $encounter->adm->patient_room->room->rmname }} /
+                                            <div> {{ $adm->patient_room->ward->wardname }}</div>
+                                            <div class="text-sm">{{ $adm->patient_room->room->rmname }} /
                                             </div>
                                         @endif
                                         {{ $encounter->toecode }}
@@ -82,7 +82,7 @@
                             <td></td>
                             <td></td>
                             <td colspan="3" class="text-right uppercase">Grand Total:
-                                {{ number_format($encounter->rxo->sum('pcchrgamt', 2)) }}</td>
+                                {{ number_format($encounter->rxo->sum('pcchrgamt'), 2) }}</td>
                         </tr>
                         <tr class="border border-black">
                             <td class="text-center w-min"></td>
@@ -211,10 +211,10 @@
                                 $concat = explode('_,', $stock->drug_concat);
                             @endphp
                             <tr class="cursor-pointer hover content {{ $stock->chrgcode }}"
-                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat }}', '{{ $stock->current_price->dmselprice }}')">
+                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat }}', '{{ $stock->dmselprice }}')">
                                 <td class="break-words">
                                     <div>
-                                        <span class="text-xs text-slate-600">{{ $stock->charge->chrgdesc }}</span>
+                                        <span class="text-xs text-slate-600">{{ $stock->chrgdesc }}</span>
                                         {{-- <span class="font-bold">{{ $stock->drug->generic->gendesc }}</span> --}}
                                         <div class="text-sm font-bold text-slate-800">
                                             {{ $concat[0] }}</div>
@@ -225,7 +225,7 @@
                                 <td class="text-right">
                                     <div class="flex flex-col">
                                         <div class="ml-5 font-bold">{{ $stock->balance() }}</div>
-                                        <div>{!! '&#8369; ' . $stock->current_price->dmselprice !!}</div>
+                                        <div>{!! '&#8369; ' . $stock->dmselprice !!}</div>
                                     </div>
                                 </td>
                             </tr>
@@ -249,7 +249,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white">
-                        @forelse($encounter->active_prescription->all() as $presc)
+                        @forelse($active_prescription as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
                                 <tr class="cursor-pointer hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}}
                                     onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat }}', '{{ $presc_data->qty }}')"

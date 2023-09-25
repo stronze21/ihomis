@@ -85,7 +85,7 @@ class EncounterLog extends Model
 
     public function rxo()
     {
-        return $this->hasMany(DrugOrder::class, 'enccode', 'enccode')->with('charge')->with('dm')->latest('dodate');
+        return $this->hasMany(DrugOrder::class, 'enccode', 'enccode')->with('charge')->with('dm');
     }
 
     public function active_prescription()

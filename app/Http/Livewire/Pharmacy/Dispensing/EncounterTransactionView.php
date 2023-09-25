@@ -7,12 +7,14 @@ use App\Models\Pharmacy\Drug;
 use Illuminate\Support\Facades\Auth;
 use App\Models\References\ChargeCode;
 use Illuminate\Support\Facades\Crypt;
+use App\Models\Record\Patients\Patient;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Http\Controllers\SharedController;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
 use App\Models\Pharmacy\Dispensing\DrugOrder;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use App\Models\Record\Encounters\AdmissionLog;
 use App\Models\Record\Encounters\EncounterLog;
 use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
@@ -45,7 +47,9 @@ class EncounterTransactionView extends Component
 
     public $stocks;
 
-
+    public $patient;
+    public $active_prescription;
+    public $adm;
     // public function updatingChargeCode()
     // {
     //     $stocks = DrugStock::with('charge')->with('current_price')->has('current_price')
@@ -74,8 +78,13 @@ class EncounterTransactionView extends Component
 
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
 
-        $this->encounter = EncounterLog::where('enccode', $enccode)
-            ->with('patient')->with('rxo')->with('active_prescription')->with('adm')->first();
+        // $this->encounter = EncounterLog::where('enccode', $enccode)
+        //     ->with('patient')->with('rxo')->with('active_prescription')->with('adm')->first();
+
+        $this->encounter = EncounterLog::where('enccode', $enccode)->with('rxo')->first();
+        $this->patient = Patient::find($this->encounter->hpercode);
+        $this->active_prescription = Prescription::where('enccode', $enccode)->with('employee')->with('data_active')->has('data_active')->get();
+        $this->adm = AdmissionLog::where('enccode', $enccode)->has('patient_room')->first();
 
         if (!$this->hpercode) {
             $this->hpercode = $this->encounter->hpercode;
@@ -88,10 +97,11 @@ class EncounterTransactionView extends Component
                 ->get();
         }
 
-        $this->stocks = DrugStock::with('charge')->with('current_price')->has('current_price')
+        $this->stocks = DrugStock::join('hdmhdrprice', 'pharm_drug_stocks.dmdprdte', 'hdmhdrprice.dmdprdte')
+            ->join('hcharge', 'hcharge.chrgcode', 'pharm_drug_stocks.chrgcode')
             ->where('loc_code', $this->location_id)
-            ->groupBy('dmdcomb', 'dmdctr', 'chrgcode', 'dmdprdte', 'drug_concat')
-            ->select('dmdcomb', 'dmdctr', 'drug_concat', 'chrgcode', 'dmdprdte')
+            ->groupBy('pharm_drug_stocks.dmdcomb', 'pharm_drug_stocks.dmdctr', 'pharm_drug_stocks.chrgcode', 'dmselprice', 'drug_concat', 'chrgdesc')
+            ->select('pharm_drug_stocks.dmdcomb', 'pharm_drug_stocks.dmdctr', 'drug_concat', 'chrgdesc', 'pharm_drug_stocks.chrgcode', 'dmselprice')
             ->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id')
             ->get();
     }
