@@ -27,10 +27,10 @@
                     <div>Patient's Name: <span class="font-semibold">{{ $rxo_header->patient->fullname() }}</span></div>
                     <div>Hosp Number: <span class="font-semibold">{{ $rxo_header->patient->hpercode }}</span></div>
                     <div>Ward: <span
-                            class="font-semibold">{{ $prescription ? $prescription->adm_pat_room->ward->wardname : '' }}</span>
+                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? $prescription->adm_pat_room->ward->wardname : '' }}</span>
                     </div>
                     <div>Ordering Physician: <span
-                            class="font-semibold">{{ $prescription ? 'Dr. ' . $prescription->employee->fullname() : '' }}</span>
+                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . $prescription->employee->fullname() : '' }}</span>
                     </div>
                 </div>
             </div>

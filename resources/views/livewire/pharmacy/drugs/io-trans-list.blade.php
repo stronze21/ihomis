@@ -2,7 +2,7 @@
     <div class="text-sm breadcrumbs">
         <ul>
             <li class="font-bold">
-                <i class="mr-1 las la-map-marked la-lg"></i> {{Auth::user()->location->description}}
+                <i class="mr-1 las la-map-marked la-lg"></i> {{ Auth::user()->location->description }}
             </li>
             <li>
                 <i class="mr-1 las la-exchange la-lg"></i> IO Transactions
@@ -20,9 +20,10 @@
             <div class="form-control">
                 <label class="input-group input-group-sm">
                     <span><i class="las la-search"></i></span>
-                    <input type="text" placeholder="Search" class="input input-bordered input-sm" wire:model.lazy="search" />
+                    <input type="text" placeholder="Search" class="input input-bordered input-sm"
+                        wire:model.lazy="search" />
                 </label>
-              </div>
+            </div>
         </div>
     </div>
     <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
@@ -41,108 +42,134 @@
             </thead>
             <tbody>
                 @forelse ($trans as $tran)
-                <tr class="cursor-pointer hover" wire:key="select-txt-{{$loop->iteration.$tran->id}}"
-                    @if($tran->trans_stat == 'Requested') @can('issue-requested-drugs') wire:click="select_request({{$tran->id}})" @endcan @endif
-                    @if($tran->trans_stat == 'Issued' AND auth()->user()->location->description != 'Warehouse') onclick="cancel_issued({{$tran->id}})" @endif
-                >
-                    <th>{{$tran->trans_no}}</th>
-                    <td>{{$tran->created_at()}}</td>
-                    <td>{{$tran->location->description}}</td>
-                    <td>{{$tran->drug->drug_name()}}</td>
-                    <td>{{$tran->requested_qty}}</td>
-                    <td>{{$tran->issued_qty < 1 ? '0' : $tran->issued_qty}}</td>
-                    <td>{!!$tran->updated_at()!!}</td>
-                    <td></td>
-                </tr>
+                    <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}"
+                        @if ($tran->trans_stat == 'Requested') @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
+                        @if ($tran->trans_stat == 'Issued' and auth()->user()->location->description != 'Warehouse') onclick="cancel_issued({{ $tran->id }})" @endif>
+                        <th>{{ $tran->trans_no }}</th>
+                        <td>{{ $tran->created_at() }}</td>
+                        <td>{{ $tran->location->description }}</td>
+                        <td>{{ $tran->drug->drug_name() }}</td>
+                        <td>{{ $tran->requested_qty }}</td>
+                        <td>{{ $tran->issued_qty < 1 ? '0' : $tran->issued_qty }}</td>
+                        <td>{!! $tran->updated_at() !!}</td>
+                        <td></td>
+                    </tr>
                 @empty
-                <tr>
-                    <th class="text-center" colspan="10">No record found!</th>
-                </tr>
+                    <tr>
+                        <th class="text-center" colspan="10">No record found!</th>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
-        {{$trans->links()}}
-      </div>
+        {{ $trans->links() }}
+    </div>
 
     <!-- Put this part before </body> tag -->
     <input type="checkbox" id="issueModal" class="modal-toggle" />
     <div class="modal">
         <div class="relative modal-box">
             <label for="issueModal" class="absolute btn btn-sm btn-circle right-2 top-2">✕</label>
-            @if($selected_request)
-            <span class="text-xl font-bold"> Issue Drugs/Medicine to {{$selected_request->location->description}}</span>
-            <div class="w-full form-control">
-                <label class="label" for="stock_id">
-                    <span class="label-text">Drug/Medicine</span>
-                </label>
-                <select class="select select-bordered" id="stock_id" wire:model.defer="chrgcode">
-                        <option></option>
-                    @forelse ($available_drugs as $charge)
-                        @if(is_object($charge)) <option value="{{$charge->chrgcode}}">{{$charge->charge->chrgdesc}} - [avail QTY: {{$charge->avail}}]</option> @endif
-                        @if(is_array($charge)) <option value="{{$charge['chrgcode']}}">{{$charge['charge']['chrgdesc']}} - [avail QTY: {{$charge['avail']}}]</option> @endif
-                    @empty
-                        <option disabled selected>No available stock in warehouse</option>
-                    @endforelse
-                </select>
-                @error('chrgcode')
-                    <span class="text-sm text-red-600">{{$message}}</span>
-                @enderror
-            </div>
-            <div class="w-full form-control">
-                <label class="label" for="requested_qty">
-                    <span class="label-text">Issue QTY</span>
-                </label>
-                <input id="requested_qty" type="number" min="1" max="{{$selected_request->requested_qty}}" class="w-full input input-bordered" wire:model.defer="issue_qty" />
-                <div class="flex justify-end text-red-600">
-                    <label class="float-right cursor-pointer label" for="requested_qty">
-                        <span class="text-xs">Requested QTY: {{$selected_request->requested_qty}}</span>
+            @if ($selected_request)
+                <span class="text-xl font-bold"> Issue Drugs/Medicine to
+                    {{ $selected_request->location->description }}</span>
+                <div class="w-full form-control">
+                    <label class="label" for="stock_id">
+                        <span class="label-text">Drug/Medicine</span>
                     </label>
+                    <select class="select select-bordered" id="stock_id" wire:model.defer="chrgcode">
+                        <option></option>
+                        @forelse ($available_drugs as $charge)
+                            @if (is_object($charge))
+                                <option value="{{ $charge->chrgcode }}">{{ $charge->charge->chrgdesc }} - [avail QTY:
+                                    {{ $charge->avail }}]</option>
+                            @endif
+                            @if (is_array($charge))
+                                <option value="{{ $charge['chrgcode'] }}">{{ $charge['charge']['chrgdesc'] }} - [avail
+                                    QTY: {{ $charge['avail'] }}]</option>
+                            @endif
+                        @empty
+                            <option disabled selected>No available stock in warehouse</option>
+                        @endforelse
+                    </select>
+                    @error('chrgcode')
+                        <span class="text-sm text-red-600">{{ $message }}</span>
+                    @enderror
                 </div>
-            </div>
-            <div class="w-full form-control">
-                <label class="label" for="remarks">
-                    <span class="label-text">Remarks</span>
-                </label>
-                <input id="remarks" type="text" class="w-full input input-bordered" wire:model.defer="remarks" />
-            </div>
-            <div class="flex justify-end mt-3">
-                <div>
-                    <button class="btn btn-primary" wire:click="issue_request()">Issue</button>
+                <div class="w-full form-control">
+                    <label class="label" for="requested_qty">
+                        <span class="label-text">Issue QTY</span>
+                    </label>
+                    <input id="requested_qty" type="number" min="1"
+                        max="{{ $selected_request->requested_qty }}" class="w-full input input-bordered"
+                        wire:model.defer="issue_qty" />
+                    <div class="flex justify-end text-red-600">
+                        <label class="float-right cursor-pointer label" for="requested_qty">
+                            <span class="text-xs">Requested QTY: {{ $selected_request->requested_qty }}</span>
+                        </label>
+                    </div>
                 </div>
-            </div>
+                <div class="w-full form-control">
+                    <label class="label" for="remarks">
+                        <span class="label-text">Remarks</span>
+                    </label>
+                    <input id="remarks" type="text" class="w-full input input-bordered"
+                        wire:model.defer="remarks" />
+                </div>
+                <div class="flex justify-end mt-3">
+                    <div>
+                        <button class="btn btn-primary" onclick="issue_request()">Issue</button>
+                    </div>
+                </div>
             @endif
         </div>
     </div>
 </div>
 
 @push('scripts')
-<script>
-    function cancel_issued(trans_id)
-    {
-        Swal.fire({
-            title: 'Are you sure you want to cancel this transaction?',
-            showCancelButton: true,
-            confirmButtonText: 'Continue',
-            confirmButtonColor: 'red',
-            html: `
+    <script>
+        function issue_request() {
+            Swal.fire({
+                title: 'Are you sure you want to cancel this transaction?',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+                confirmButtonColor: 'red',
+                html: `
+                    <i data-feather="alert-triangle" class="w-16 h-16 mx-auto mt-3 text-warning"></i>
+                    <div class="mt-2 text-slate-500" id="inf">You are about to issue requested items. <br>This process cannot be undone. Continue?</div>
+                `,
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('issue_request')
+                }
+            })
+        }
+
+        function cancel_issued(trans_id) {
+            Swal.fire({
+                title: 'Are you sure you want to cancel this transaction?',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+                confirmButtonColor: 'red',
+                html: `
                     <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
                     <div class="mt-2 text-slate-500" id="inf">All items issued that have not been received will return to warehouse. <br>This process cannot be undone. Continue?</div>
                 `,
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                Livewire.emit('cancel_issued', trans_id)
-            }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('cancel_issued', trans_id)
+                }
+            })
+        }
+
+        window.addEventListener('toggleIssue', event => {
+            $('#issueModal').click();
         })
-    }
 
-    window.addEventListener('toggleIssue', event => {
-        $('#issueModal').click();
-    })
-
-    Echo.private(`ioTrans.{{auth()->user()->pharm_location_id}}`)
-        .listen('IoTransNewRequest', (e) => {
-            Livewire.emit('refreshComponent');
-        });
-</script>
+        Echo.private(`ioTrans.{{ auth()->user()->pharm_location_id }}`)
+            .listen('IoTransNewRequest', (e) => {
+                Livewire.emit('refreshComponent');
+            });
+    </script>
 @endpush

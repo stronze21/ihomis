@@ -2528,6 +2528,13 @@ html {
   --tw-text-opacity: 1;
   color: hsl(var(--wa) / var(--tw-text-opacity));
 }
+.btn-outline.btn-error .badge-outline {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--er) / var(--tw-border-opacity));
+  background-color: transparent;
+  --tw-text-opacity: 1;
+  color: hsl(var(--er) / var(--tw-text-opacity));
+}
 .btn-outline:hover .badge {
   --tw-border-opacity: 1;
   border-color: hsl(var(--b2, var(--b1)) / var(--tw-border-opacity));
@@ -2724,6 +2731,24 @@ html {
 .btn-warning:focus-visible {
   outline: 2px solid hsl(var(--wa));
 }
+.btn-error {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--er) / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--er) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--erc, var(--nc)) / var(--tw-text-opacity));
+}
+.btn-error:hover,
+    .btn-error.btn-active {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--er) / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--er) / var(--tw-bg-opacity));
+}
+.btn-error:focus-visible {
+  outline: 2px solid hsl(var(--er));
+}
 .btn.glass:hover,
     .btn.glass.btn-active {
   --glass-opacity: 25%;
@@ -2783,6 +2808,19 @@ html {
   background-color: hsl(var(--wa) / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: hsl(var(--wac, var(--nc)) / var(--tw-text-opacity));
+}
+.btn-outline.btn-error {
+  --tw-text-opacity: 1;
+  color: hsl(var(--er) / var(--tw-text-opacity));
+}
+.btn-outline.btn-error:hover,
+      .btn-outline.btn-error.btn-active {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--er) / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--er) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--erc, var(--nc)) / var(--tw-text-opacity));
 }
 .btn-disabled,
   .btn-disabled:hover,
@@ -2914,6 +2952,9 @@ html {
 }
 .drawer-toggle:focus-visible ~ .drawer-content .drawer-button.btn-warning {
   outline: 2px solid hsl(var(--wa));
+}
+.drawer-toggle:focus-visible ~ .drawer-content .drawer-button.btn-error {
+  outline: 2px solid hsl(var(--er));
 }
 .dropdown.dropdown-open .dropdown-content,
 .dropdown.dropdown-hover:hover .dropdown-content,
@@ -4140,9 +4181,6 @@ html {
 .prose :where(.prose > :last-child):not(:where([class~="not-prose"] *)) {
   margin-bottom: 0;
 }
-.static {
-  position: static !important;
-}
 .fixed {
   position: fixed !important;
 }
@@ -5077,6 +5115,10 @@ html {
   --tw-text-opacity: 1 !important;
   color: rgb(37 99 235 / var(--tw-text-opacity)) !important;
 }
+.text-error {
+  --tw-text-opacity: 1 !important;
+  color: hsl(var(--er) / var(--tw-text-opacity)) !important;
+}
 .text-gray-200 {
   --tw-text-opacity: 1 !important;
   color: rgb(229 231 235 / var(--tw-text-opacity)) !important;
@@ -5156,6 +5198,14 @@ html {
 .text-white {
   --tw-text-opacity: 1 !important;
   color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
+}
+.text-success {
+  --tw-text-opacity: 1 !important;
+  color: hsl(var(--su) / var(--tw-text-opacity)) !important;
+}
+.text-warning {
+  --tw-text-opacity: 1 !important;
+  color: hsl(var(--wa) / var(--tw-text-opacity)) !important;
 }
 .underline {
   text-decoration-line: underline !important;

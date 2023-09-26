@@ -23,7 +23,7 @@ class IoTransList extends Component
     use WithPagination;
     use LivewireAlert;
 
-    protected $listeners = ['add_request', 'cancel_issued', 'refreshComponent' => '$refresh'];
+    protected $listeners = ['add_request', 'cancel_issued', 'refreshComponent' => '$refresh', 'issue_request'];
     // protected $listeners = ['add_request', 'cancel_issued', 'echo:io-trans,new-request' => 'notifyRequest'];
     // protected $listeners = ['add_request', 'cancel_issued', 'echo:private-io-trans,new-request' => 'notifyRequest', 'echo:io-trans,new-request' => 'notifyRequest'];
 

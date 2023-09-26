@@ -25,6 +25,9 @@
                         </div>
                     @endif
                     <div class="flex ml-auto">
+                        <div><button class="ml-2 btn btn-sm btn-error" onclick="delete_item()"
+                                wire:loading.attr="disabled" wire:loading.class="btn-secondary">Delete Item/s</button>
+                        </div>
                         <div><button class="ml-2 btn btn-sm btn-warning" onclick="charge_items()"
                                 wire:loading.attr="disabled" wire:loading.class="btn-secondary">Charge Slip</button>
                         </div>
@@ -82,7 +85,9 @@
                             <td></td>
                             <td></td>
                             <td colspan="3" class="text-right uppercase">Grand Total:
-                                {{ number_format($encounter->rxo->sum('pcchrgamt'), 2) }}</td>
+                                <span id="sum"></span>
+                                {{-- {{ number_format($encounter->rxo->sum('pcchrgamt'), 2) }}</td> --}}
+                            </td>
                         </tr>
                         <tr class="border border-black">
                             <td class="text-center w-min"></td>
@@ -102,7 +107,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white">
-                        @forelse ($encounter->rxo->all() as $rxo)
+                        @forelse ($rxos as $rxo)
                             @php
                                 $concat = explode('_,', $rxo->dm->drug_concat);
                             @endphp
@@ -145,7 +150,7 @@
                                     @endif
                                 </td>
                                 <td class="text-right w-min">{{ number_format($rxo->pchrgup, 2) }}</td>
-                                <td class="text-right w-min">{{ number_format($rxo->pcchrgamt, 2) }}</td>
+                                <td class="text-right w-min total">{{ number_format($rxo->pcchrgamt, 2) }}</td>
                                 <td>
                                     <div class="form-control">
                                         <label class="input-group">
@@ -205,17 +210,16 @@
                             <td class="!text-right">Stock And Price</td>
                         </tr>
                     </thead>
-                    <tbody id="stockTableBody">
-                        @forelse($stocks as $stock)
+                    <tbody id="stockTableBody" wire:ignore>
+                        @foreach ($stocks as $stock)
                             @php
                                 $concat = explode('_,', $stock->drug_concat);
                             @endphp
                             <tr class="cursor-pointer hover content {{ $stock->chrgcode }}"
-                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat }}', '{{ $stock->dmselprice }}')">
+                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat }}', '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}')">
                                 <td class="break-words">
                                     <div>
                                         <span class="text-xs text-slate-600">{{ $stock->chrgdesc }}</span>
-                                        {{-- <span class="font-bold">{{ $stock->drug->generic->gendesc }}</span> --}}
                                         <div class="text-sm font-bold text-slate-800">
                                             {{ $concat[0] }}</div>
                                         <div class="text-xs text-center text-slate-800">
@@ -229,11 +233,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="2"><i class="las la-lg la-ban"></i> No record found!</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -332,7 +332,17 @@
                     $('.' + value_row_2).hide();
                 });
             });
+
+            grand_total();
         });
+
+        function grand_total() {
+            var sum = 0;
+            $(".total").each(function() {
+                sum += parseFloat($(this).text().replace(',', '').replace(',', ''));
+            });
+            $('#sum').text(number_format(sum, 2, '.', ','));
+        }
 
         $('.select2').select2({
             width: 'resolve',
@@ -360,6 +370,23 @@
             })
         }
 
+        function delete_item(item_id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+                html: `
+                <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-error"></i>
+                <div class="mt-2 text-slate-500" id="inf">You can only delete pending items. All deleted items cannot be recovered. Continue?</div>
+            `,
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('delete_item')
+                }
+            })
+        }
+
         function issue_order() {
             Swal.fire({
                 title: 'Are you sure?',
@@ -377,7 +404,7 @@
             })
         }
 
-        function select_item(dm_id, drug, up) {
+        function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available, exp_date) {
             Swal.fire({
                 html: `
                         <div class="text-xl font-bold">` + drug + `</div>
@@ -580,7 +607,8 @@
                     @this.set('is_ris', is_ris.checked);
                     @this.set('remarks', remarks.value);
 
-                    Livewire.emit('add_item', dm_id)
+                    Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
+                        available, exp_date)
                 }
             });
         }
@@ -667,6 +695,14 @@
                         </div>
 
                         <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
+                            <div class="col-span-4 font-bold">Fund Source</div>
+                            <div class="col-span-4">
+                            <select id="rx_charge_code" class="w-full select select-bordered select-sm">
+                                @foreach ($charges as $charge)
+                                    <option value="{{ $charge->chrgcode }}" @if ($loop->iteration == 1) selected @endif>{{ $charge->chrgdesc }}</option>
+                                @endforeach
+                            </select>
+                            </div>
                             <div class="col-span-4 font-bold">TAG</div>
                             <div class="col-span-2">
                                 <input class="toggle" type="radio" id="rx_pay" name="radio" checked>
@@ -737,6 +773,7 @@
                 confirmButtonText: `Confirm`,
                 didOpen: () => {
                     const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
+                    const rx_charge_code = Swal.getHtmlContainer().querySelector('#rx_charge_code')
                     const rx_sc = Swal.getHtmlContainer().querySelector('#rx_sc')
                     const rx_ems = Swal.getHtmlContainer().querySelector('#rx_ems')
                     const rx_maip = Swal.getHtmlContainer().querySelector('#rx_maip')
@@ -758,6 +795,7 @@
                 if (result.isConfirmed) {
                     @this.set('order_qty', rx_order_qty.value)
 
+                    @this.set('rx_charge_code', rx_charge_code.value);
                     @this.set('sc', rx_sc.checked);
                     @this.set('ems', rx_ems.checked);
                     @this.set('maip', rx_maip.checked);
@@ -774,5 +812,10 @@
                 }
             });
         }
+
+        window.addEventListener('charged', event => {
+            window.open('{{ url('/dispensing/encounter/charge') }}' + '/' +
+                event.detail.pcchrgcod, '_blank');
+        })
     </script>
 @endpush
