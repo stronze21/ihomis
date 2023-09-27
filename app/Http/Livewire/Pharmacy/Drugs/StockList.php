@@ -38,9 +38,33 @@ class StockList extends Component
                 return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
             })->get();
 
-        $stocks = DrugStock::with('charge')->with('location')->with('current_price')->has('current_price')
-            ->where('loc_code', $this->location_id)
+        // $stocks = DrugStock::with('charge')->with('location')->with('current_price')->has('current_price')
+        //     ->where('loc_code', $this->location_id)
+        //     ->where('drug_concat', 'LIKE', '%' . $this->search . '%')
+        //     ->paginate(20);
+
+        $stocks = DrugStock::join('hcharge', 'hcharge.chrgcode', 'pharm_drug_stocks.chrgcode')
+            ->join('hdmhdrprice', 'hdmhdrprice.dmdprdte', 'pharm_drug_stocks.dmdprdte')
+            ->join('pharm_locations', 'pharm_locations.id', 'pharm_drug_stocks.loc_code')
             ->where('drug_concat', 'LIKE', '%' . $this->search . '%')
+            ->where('loc_code', $this->location_id)
+            ->select('pharm_drug_stocks.dmdcomb',
+                        'pharm_drug_stocks.dmdctr',
+                        'drug_concat',
+                        'hcharge.chrgdesc',
+                        'pharm_drug_stocks.chrgcode',
+                        'hdmhdrprice.dmselprice',
+                        'hdmhdrprice.dmduprice',
+                        'pharm_drug_stocks.loc_code',
+                        'pharm_drug_stocks.dmdprdte',
+                        'pharm_drug_stocks.updated_at',
+                        'pharm_drug_stocks.exp_date',
+                        'pharm_drug_stocks.stock_bal',
+                        'pharm_drug_stocks.id',
+                        'hdmhdrprice.has_compounding',
+                        'hdmhdrprice.compounding_fee',
+                        'pharm_locations.description',
+                        )
             ->paginate(20);
 
         return view('livewire.pharmacy.drugs.stock-list', [
