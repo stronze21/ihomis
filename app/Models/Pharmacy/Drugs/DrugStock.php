@@ -102,4 +102,11 @@ class DrugStock extends Model
     {
         return $this->belongsTo(DrugPrice::class, 'dmdprdte', 'dmdprdte');
     }
+
+    public function drug_concat()
+    {
+        $concat = explode('_', $this->drug_concat);
+
+        return implode("", $concat);
+    }
 }

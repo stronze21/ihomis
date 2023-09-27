@@ -216,7 +216,7 @@
                                 $concat = explode('_,', $stock->drug_concat);
                             @endphp
                             <tr class="cursor-pointer hover content {{ $stock->chrgcode }}"
-                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat }}', '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}')">
+                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat() }}', '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}')">
                                 <td class="break-words">
                                     <div>
                                         <span class="text-xs text-slate-600">{{ $stock->chrgdesc }}</span>
@@ -252,13 +252,13 @@
                         @forelse($active_prescription as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
                                 <tr class="cursor-pointer hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}}
-                                    onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat }}', '{{ $presc_data->qty }}')"
+                                    onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}')"
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->created_at)) }}
                                         {{ date('h:i A', strtotime($presc_data->created_at)) }}
                                     </td>
-                                    <td class="text-xs">{{ $presc_data->dm->drug_concat }}</td>
+                                    <td class="text-xs">{{ $presc_data->dm->drug_concat() }}</td>
                                     <td class="text-xs">{{ $presc_data->qty }}</td>
                                     <td class="text-xs">{{ $presc_data->remark }}</td>
                                     <td class="text-xs">{{ $presc->employee->fullname() }}</td>

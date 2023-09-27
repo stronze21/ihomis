@@ -72,11 +72,11 @@
             <tbody>
                 @forelse ($stocks as $stk)
                     <tr class="hover"
-                        onclick="update_item({{ $stk->id }}, '{{ $stk->drug_concat }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}', '{{ $stk->dmduprice }}', '{{ $stk->has_compounding }}', '{{ $stk->compounding_fee }}')">
+                        onclick="update_item({{ $stk->id }}, '{{ $stk->drug_concat() }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}', '{{ $stk->dmduprice }}', '{{ $stk->has_compounding }}', '{{ $stk->compounding_fee }}')">
                         <th>{{ $stk->chrgdesc }}</th>
                         <td>{{ $stk->description }}</td>
                         <td>{{ $stk->updated_at }}</td>
-                        <td class="font-bold">{{ $stk->drug_concat }}</td>
+                        <td class="font-bold">{{ $stk->drug_concat() }}</td>
                         @role('warehouse')
                             <th>{{ $stk->dmduprice }}</th>
                         @endrole
@@ -119,7 +119,7 @@
                         <select class="select select-bordered select2" id="dmdcomb">
                             <option disabled selected>Choose drug/medicine</option>
                             @foreach ($drugs as $drug)
-                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ $drug->generic->gendesc }}, {{ $drug->brandname }} {{ $drug->dmdnost }} {{ $drug->strength->stredesc ?? $drug->strecode }} {{ $drug->form->formdesc ?? $drug->formcode }} {{ $drug->route->rtedesc ?? $drug->rtecode }}</option>
+                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ $drug->drug_concat() }}</option>
                             @endforeach
                         </select>
                     </div>
