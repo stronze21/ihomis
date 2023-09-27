@@ -22,16 +22,21 @@ class DeliveryView extends Component
 
     public function render()
     {
-        $drugs = Drug::with('generic')->with('route')->with('form')->with('strength')
-            ->has('generic')
-            ->where('dmdstat', 'A')
+        // $drugs = Drug::with('generic')->with('route')->with('form')->with('strength')
+        //     ->has('generic')
+        //     ->where('dmdstat', 'A')
+        //     ->whereHas('sub', function ($query) {
+        //         // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
+        //         return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
+        //     });
+        $drugs = Drug::where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
                 // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
                 return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
-            });
+            })->get();
 
         return view('livewire.pharmacy.deliveries.delivery-view', [
-            'drugs' => $drugs->get(),
+            'drugs' => $drugs,
         ]);
     }
 

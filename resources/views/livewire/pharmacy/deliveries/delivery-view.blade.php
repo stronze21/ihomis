@@ -104,7 +104,7 @@
                     <tr
                         @if ($details->status == 'pending') class="cursor-pointer hover" onclick="edit_item('{{ $item->id }}', '{{ $item->lot_no }}', '{{ $item->qty }}', '{{ $item->unit_price }}', '{{ $item->retail_price }}', '{{ $item->total_amount }}', '{{ $item->expiry_date }}', '{{ $dm->drug_name() }}')" @endif>
                         <td>{{ $item->lot_no }}</td>
-                        <td>{{ $dm->drug_name() }} (exp: {{ $item->expiry_date }})</td>
+                        <td>{{ $dm->drug_concat() }} (exp: {{ $item->expiry_date }})</td>
                         <td class="text-right">{{ $item->qty }}</td>
                         <td class="text-right">{{ $item->unit_price }}</td>
                         <td class="text-right">
@@ -151,7 +151,7 @@
                         <select class="select select-bordered select2" id="dmdcomb">
                             <option disabled selected>Choose drug/medicine</option>
                             @foreach ($drugs as $drug)
-                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ $drug->generic->gendesc }}, {{ $drug->brandname }} {{ $drug->dmdnost }} {{ $drug->strength->stredesc ?? $drug->strecode }} {{ $drug->form->formdesc ?? $drug->formcode }} {{ $drug->route->rtedesc ?? $drug->rtecode }}</option>
+                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ $drug->drug_concat() }}</option>
                             @endforeach
                         </select>
                     </div>
