@@ -58,4 +58,11 @@ class Drug extends Model
 
         return $drug;
     }
+
+    public function drug_concat()
+    {
+        $concat = explode('_', $this->drug_concat);
+
+        return implode("", $concat);
+    }
 }
