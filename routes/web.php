@@ -24,6 +24,8 @@ use App\Http\Livewire\References\Security\ListPermissions;
 use App\Http\Livewire\Pharmacy\Reports\DrugsTransactionLog;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 use App\Http\Livewire\Pharmacy\Reports\EmergencyPurchases;
+use App\Http\Livewire\Pharmacy\Reports\IoTransIssuedReport;
+use App\Http\Livewire\Pharmacy\Reports\IoTransReceivedReport;
 use App\Http\Livewire\Trash\SampleView;
 
 /*
@@ -92,6 +94,8 @@ Route::middleware([
         Route::get('/issuance/returns', DrugsReturned::class)->name('issuance.returns');
         Route::get('/issuance/chargeslips', DrugsChargeSlips::class)->name('issuance.charges');
         Route::get('/consumption', ConssumptionReport::class)->name('consumption');
+        Route::get('/iotrans/issued', IoTransIssuedReport::class)->name('iotrans.issued');
+        Route::get('/iotrans/received', IoTransReceivedReport::class)->name('iotrans.received');
     });
 
     Route::get('/pusher', Pusher::class)->name('pusher');

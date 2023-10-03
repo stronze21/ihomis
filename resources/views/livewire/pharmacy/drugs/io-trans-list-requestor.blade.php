@@ -2,7 +2,7 @@
     <div class="text-sm breadcrumbs">
         <ul>
             <li class="font-bold">
-                <i class="mr-1 las la-map-marked la-lg"></i> {{Auth::user()->location->description}}
+                <i class="mr-1 las la-map-marked la-lg"></i> {{ Auth::user()->location->description }}
             </li>
             <li>
                 <i class="mr-1 las la-exchange la-lg"></i> IO Transactions
@@ -14,9 +14,9 @@
 <div class="flex flex-col p-5 mx-auto">
     <div class="flex justify-between">
         @can('request-drugs')
-        <div>
-            <button class="btn btn-sm btn-primary" onclick="add_request()">Add Request</button>
-        </div>
+            <div>
+                <button class="btn btn-sm btn-primary" onclick="add_request()">Add Request</button>
+            </div>
         @endcan
         {{-- <div>
             <button class="btn btn-sm btn-primary" wire:click="notify_request()">notify_request</button>
@@ -28,9 +28,10 @@
             <div class="form-control">
                 <label class="input-group input-group-sm">
                     <span><i class="las la-search"></i></span>
-                    <input type="text" placeholder="Search" class="input input-bordered input-sm" wire:model.lazy="search" />
+                    <input type="text" placeholder="Search" class="input input-bordered input-sm"
+                        wire:model.lazy="search" />
                 </label>
-              </div>
+            </div>
         </div>
     </div>
     <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
@@ -49,37 +50,34 @@
             </thead>
             <tbody>
                 @forelse ($trans as $tran)
-                <tr class="cursor-pointer hover" wire:key="select-txt-{{$loop->iteration.$tran->id}}"
-                    @if($tran->trans_stat == 'Requested') onclick="cancel_tx({{$tran->id}})" @endif
-                    @if($tran->trans_stat == 'Issued' AND auth()->user()->pharm_location_id == $tran->loc_code) @can('receive-requested-drugs') onclick="receive_issued('{{$tran->id}}', '{{$tran->drug->drug_name()}}', '{{$tran->issued_qty}}')" @endcan @endif
-                >
-                    <th>{{$tran->trans_no}}</th>
-                    <td>{{$tran->created_at()}}</td>
-                    <td>{{$tran->location->description}}</td>
-                    <td>{{$tran->drug->drug_name()}}</td>
-                    <td>{{$tran->requested_qty}}</td>
-                    <td>{{$tran->issued_qty < 1 ? '0' : $tran->issued_qty}}</td>
-                    <td>{!!$tran->updated_at()!!}</td>
-                    <td></td>
-                </tr>
+                    <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}"
+                        @if ($tran->trans_stat == 'Requested') onclick="cancel_tx({{ $tran->id }})" @endif
+                        @if ($tran->trans_stat == 'Issued' and auth()->user()->pharm_location_id == $tran->loc_code) @can('receive-requested-drugs') onclick="receive_issued('{{ $tran->id }}', '{{ $tran->drug->drug_name() }}', '{{ $tran->issued_qty }}')" @endcan @endif>
+                        <th>{{ $tran->trans_no }}</th>
+                        <td>{{ $tran->created_at() }}</td>
+                        <td>{{ $tran->location->description }}</td>
+                        <td>{{ $tran->drug->drug_concat() }}</td>
+                        <td>{{ $tran->requested_qty }}</td>
+                        <td>{{ $tran->issued_qty < 1 ? '0' : $tran->issued_qty }}</td>
+                        <td>{!! $tran->updated_at() !!}</td>
+                        <td></td>
+                    </tr>
                 @empty
-                <tr>
-                    <th class="text-center" colspan="10">No record found!</th>
-                </tr>
+                    <tr>
+                        <th class="text-center" colspan="10">No record found!</th>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
-        {{$trans->links()}}
-      </div>
+        {{ $trans->links() }}
+    </div>
 </div>
 
 @push('scripts')
-<script>
-
-    function add_request()
-    {
-        Swal.fire({
-            html: `
+    <script>
+        function add_request() {
+            Swal.fire({
+                html: `
                     <span class="text-xl font-bold"> Request Drugs/Medicine </span>
                     <div class="w-full form-control">
                         <label class="label" for="stock_id">
@@ -88,7 +86,7 @@
                         <select class="select select-bordered select2" id="stock_id">
                             <option disabled selected>Choose drug/medicine</option>
                             @foreach ($drugs as $drug)
-                                <option value="{{$drug->id}}">{{$drug->drug->drug_name()}} - [avail QTY: {{$drug->avail}}]</option>
+                                <option value="{{ $drug->id }}">{{ $drug->drug->drug_concat() }} - [avail QTY: {{ $drug->avail }}]</option>
                             @endforeach
                         </select>
                     </div>
@@ -104,82 +102,79 @@
                         </label>
                         <input id="remarks" type="text" class="w-full input input-bordered" />
                     </div>`,
-            showCancelButton: true,
-            confirmButtonText: `Save`,
-            didOpen: () => {
-                const stock_id = Swal.getHtmlContainer().querySelector('#stock_id');
-                const requested_qty = Swal.getHtmlContainer().querySelector('#requested_qty');
-                const remarks = Swal.getHtmlContainer().querySelector('#remarks');
+                showCancelButton: true,
+                confirmButtonText: `Save`,
+                didOpen: () => {
+                    const stock_id = Swal.getHtmlContainer().querySelector('#stock_id');
+                    const requested_qty = Swal.getHtmlContainer().querySelector('#requested_qty');
+                    const remarks = Swal.getHtmlContainer().querySelector('#remarks');
 
-                $('.select2').select2({
-                    dropdownParent: $('.swal2-container'),
-                    width: 'resolve',
-                    dropdownCssClass: "text-sm",
-                });
+                    $('.select2').select2({
+                        dropdownParent: $('.swal2-container'),
+                        width: 'resolve',
+                        dropdownCssClass: "text-sm",
+                    });
 
-            }
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                @this.set('stock_id', stock_id.value);
-                @this.set('requested_qty', requested_qty.value);
-                @this.set('remarks', remarks.value);
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    @this.set('stock_id', stock_id.value);
+                    @this.set('requested_qty', requested_qty.value);
+                    @this.set('remarks', remarks.value);
 
-                Livewire.emit('add_request');
-            }
-        });
-    }
+                    Livewire.emit('add_request');
+                }
+            });
+        }
 
-    function cancel_tx(trans_id)
-    {
-        Swal.fire({
-            title: 'Are you sure you want to cancel this transaction?',
-            showCancelButton: true,
-            confirmButtonText: 'Continue',
-            confirmButtonColor: 'red',
-            html: `
+        function cancel_tx(trans_id) {
+            Swal.fire({
+                title: 'Are you sure you want to cancel this transaction?',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+                confirmButtonColor: 'red',
+                html: `
                     <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
                     <div class="mt-2 text-slate-500" id="inf">All items issued that have not been received will return to warehouse. <br>This process cannot be undone. Continue?</div>
                 `,
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                Livewire.emit('cancel_tx', trans_id)
-            }
-        })
-    }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('cancel_tx', trans_id)
+                }
+            })
+        }
 
-    function receive_issued(trans_id, drug, issued_drug_qty)
-    {
-        Swal.fire({
-            html: `
+        function receive_issued(trans_id, drug, issued_drug_qty) {
+            Swal.fire({
+                html: `
                     <span class="text-lg text-xl font-bold"> Receive Drugs/Medicine </span>
                     <div class="w-full mt-3 form-control">
-                        <span class="font-bold text-7xl"> `+ issued_drug_qty + ` </span>
-                        <span class="text-2xl font-medium"> ` + drug +` </span>
+                        <span class="font-bold text-7xl"> ` + issued_drug_qty + ` </span>
+                        <span class="text-2xl font-medium"> ` + drug + ` </span>
                     </div>`,
-            showCancelButton: true,
-            confirmButtonText: `Receive`,
-            didOpen: () => {
-                const received_qty = Swal.getHtmlContainer().querySelector('#received_qty');
-            }
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                Livewire.emit('receive_issued', trans_id);
-            }
-        });
-    }
+                showCancelButton: true,
+                confirmButtonText: `Receive`,
+                didOpen: () => {
+                    const received_qty = Swal.getHtmlContainer().querySelector('#received_qty');
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('receive_issued', trans_id);
+                }
+            });
+        }
 
 
-    window.addEventListener('toggleIssue', event => {
-        $('#issueModal').click();
-    })
+        window.addEventListener('toggleIssue', event => {
+            $('#issueModal').click();
+        })
 
-    Echo.private(`ioTrans.{{auth()->user()->pharm_location_id}}`)
-        .listen('IoTransRequestUpdated', (e) => {
-            Livewire.emit('refreshComponent');
-        });
-
-</script>
+        Echo.private(`ioTrans.{{ auth()->user()->pharm_location_id }}`)
+            .listen('IoTransRequestUpdated', (e) => {
+                Livewire.emit('refreshComponent');
+            });
+    </script>
 @endpush

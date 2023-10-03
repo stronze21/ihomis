@@ -102,7 +102,7 @@
                         $total_amount += $item->total_amount;
                     @endphp
                     <tr
-                        @if ($details->status == 'pending') class="cursor-pointer hover" onclick="edit_item('{{ $item->id }}', '{{ $item->lot_no }}', '{{ $item->qty }}', '{{ $item->unit_price }}', '{{ $item->retail_price }}', '{{ $item->total_amount }}', '{{ $item->expiry_date }}', '{{ $dm->drug_name() }}')" @endif>
+                        @if ($details->status == 'pending') class="cursor-pointer hover" onclick="edit_item('{{ $item->id }}', '{{ $item->lot_no }}', '{{ $item->qty }}', '{{ $item->unit_price }}', '{{ $item->retail_price }}', '{{ $item->total_amount }}', '{{ $item->expiry_date }}', '{{ $dm->drug_concat() }}')" @endif>
                         <td>{{ $item->lot_no }}</td>
                         <td>{{ $dm->drug_concat() }} (exp: {{ $item->expiry_date }})</td>
                         <td class="text-right">{{ $item->qty }}</td>

@@ -63,12 +63,7 @@
                         <td>{{ $purchase->or_no }}</td>
                         <td>{{ $purchase->pharmacy_name }}</td>
                         <td>
-                            <div class="flex flex-col">
-                                <div class="text-sm font-bold">{{ $purchase->drug->generic->gendesc }}</div>
-                                <div class="ml-10 text-xs text-slate-800">
-                                    {{ $purchase->drug->dmdnost }}{{ $purchase->drug->strength->stredesc ?? '' }}
-                                    {{ $purchase->drug->form->formdesc ?? '' }}</div>
-                            </div>
+                            {{ $purchase->drug->drug_concat() }} (exp: {{ $purchase->expiry_date }})
                         </td>
                         <td>{{ $purchase->unit_price }}</td>
                         <td>{{ $purchase->qty }}</td>
@@ -136,7 +131,7 @@
                         <select class="select select-sm select-bordered select2" id="dmdcomb">
                             <option disabled selected>Choose drug/medicine</option>
                             @foreach ($drugs as $drug)
-                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ $drug->generic->gendesc }}, {{ $drug->brandname }} {{ $drug->dmdnost }} {{ $drug->strength->stredesc ?? $drug->strecode }} {{ $drug->form->formdesc ?? $drug->formcode }} {{ $drug->route->rtedesc ?? $drug->rtecode }}</option>
+                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ $drug->drug_concat() }}</option>
                             @endforeach
                         </select>
                     </div>

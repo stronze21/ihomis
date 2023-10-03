@@ -40,9 +40,7 @@ class DrugEmergencyPurchase extends Model
 
     public function drug()
     {
-        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-            ->with('generic')->with('strength')
-            ->with('form')->with('route');
+        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr']);
     }
 
     public function current_price()

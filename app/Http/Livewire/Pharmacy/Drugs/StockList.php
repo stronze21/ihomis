@@ -46,23 +46,24 @@ class StockList extends Component
             ->join('pharm_locations', 'pharm_locations.id', 'pharm_drug_stocks.loc_code')
             ->where('drug_concat', 'LIKE', '%' . $this->search . '%')
             ->where('loc_code', $this->location_id)
-            ->select('pharm_drug_stocks.dmdcomb',
-                        'pharm_drug_stocks.dmdctr',
-                        'drug_concat',
-                        'hcharge.chrgdesc',
-                        'pharm_drug_stocks.chrgcode',
-                        'hdmhdrprice.dmselprice',
-                        'hdmhdrprice.dmduprice',
-                        'pharm_drug_stocks.loc_code',
-                        'pharm_drug_stocks.dmdprdte',
-                        'pharm_drug_stocks.updated_at',
-                        'pharm_drug_stocks.exp_date',
-                        'pharm_drug_stocks.stock_bal',
-                        'pharm_drug_stocks.id',
-                        'hdmhdrprice.has_compounding',
-                        'hdmhdrprice.compounding_fee',
-                        'pharm_locations.description',
-                        )
+            ->select(
+                'pharm_drug_stocks.dmdcomb',
+                'pharm_drug_stocks.dmdctr',
+                'drug_concat',
+                'hcharge.chrgdesc',
+                'pharm_drug_stocks.chrgcode',
+                'hdmhdrprice.dmselprice',
+                'hdmhdrprice.dmduprice',
+                'pharm_drug_stocks.loc_code',
+                'pharm_drug_stocks.dmdprdte',
+                'pharm_drug_stocks.updated_at',
+                'pharm_drug_stocks.exp_date',
+                'pharm_drug_stocks.stock_bal',
+                'pharm_drug_stocks.id',
+                'hdmhdrprice.has_compounding',
+                'hdmhdrprice.compounding_fee',
+                'pharm_locations.description',
+            )
             ->paginate(20);
 
         return view('livewire.pharmacy.drugs.stock-list', [

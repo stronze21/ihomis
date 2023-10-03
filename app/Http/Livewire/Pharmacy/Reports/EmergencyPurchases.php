@@ -24,9 +24,7 @@ class EmergencyPurchases extends Component
 
     public function render()
     {
-        $drugs = Drug::with('generic')->with('route')->with('form')->with('strength')
-            ->has('generic')
-            ->where('dmdstat', 'A')
+        $drugs = Drug::where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
                 // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
                 return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
@@ -155,7 +153,9 @@ class EmergencyPurchases extends Component
             'chrgcode' => $purchase->charge_code,
             'exp_date' => $purchase->expiry_date,
             'retail_price' => $purchase->retail_price,
+            'drug_concat' => $purchase->drug->drug_name(),
         ]);
+
         $add_to->stock_bal = $add_to->stock_bal + $purchase->qty;
         $add_to->beg_bal = $add_to->beg_bal + $purchase->qty;
 

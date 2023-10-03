@@ -39,8 +39,7 @@ class InOutTransaction extends Model
 
     public function drug()
     {
-        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-            ->with('strength')->with('form')->with('route')->with('generic');
+        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr']);
     }
 
     public function warehouse_stocks()
