@@ -6,11 +6,13 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Pharmacy\Drug;
+use App\Jobs\LogDrugTransaction;
 use App\Models\Pharmacy\DrugPrice;
 use Illuminate\Support\Facades\DB;
 use App\Events\IoTransRequestIssued;
 use Illuminate\Support\Facades\Auth;
 use App\Events\IoTransRequestUpdated;
+use App\Jobs\LogIoTransIssue;
 use App\Models\Pharmacy\PharmLocation;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
@@ -152,21 +154,8 @@ class IoTransList extends Component
                         'retail_price' => $stock->retail_price,
                         'dmdprdte' => $stock->dmdprdte,
                     ]);
-
-                    $log = DrugStockLog::firstOrNew([
-                        'loc_code' => $warehouse_id,
-                        'dmdcomb' => $trans_item->dmdcomb,
-                        'dmdctr' => $trans_item->dmdctr,
-                        'chrgcode' => $trans_item->chrgcode,
-                        'date_logged' => date('Y-m-d'),
-                        'unit_price' => $stock->retail_price,
-                        'dmdprdte' => $stock->dmdprdte,
-                    ]);
-                    $log->time_logged = now();
-                    $log->transferred += $trans_item->qty;
-
-                    $log->save();
                     $stock->save();
+                    LogIoTransIssue::dispatch($warehouse_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty);
                 }
             }
             $this->selected_request->issued_qty = $issued_qty;

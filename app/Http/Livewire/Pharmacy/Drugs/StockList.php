@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Pharmacy\Drugs;
 
+use App\Jobs\LogDrugTransaction;
 use Livewire\Component;
 use App\Models\Pharmacy\Drug;
 use App\Models\Pharmacy\DrugPrice;
@@ -29,12 +30,6 @@ class StockList extends Component
 
     public function render()
     {
-
-        $this->drugs = Drug::where('dmdstat', 'A')
-            ->whereHas('sub', function ($query) {
-                // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
-                return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
-            })->get();
 
         // $stocks = DrugStock::with('charge')->with('location')->with('current_price')->has('current_price')
         //     ->where('loc_code', $this->location_id)
@@ -81,6 +76,12 @@ class StockList extends Component
             ->where('chrgstat', 'A')
             ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'))
             ->get();
+
+        $this->drugs = Drug::where('dmdstat', 'A')
+            ->whereHas('sub', function ($query) {
+                // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
+                return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
+            })->get();
     }
 
     public function add_item_new()
@@ -120,7 +121,6 @@ class StockList extends Component
         }
 
         if ($this->has_compounding) {
-
             $this->validate([
                 'compounding_fee' => ['required', 'numeric', 'min:0'],
             ]);
@@ -174,21 +174,8 @@ class StockList extends Component
 
         $stock->dmdprdte = $dmdprdte;
 
-        $log = DrugStockLog::firstOrNew([
-            'loc_code' =>  Auth::user()->pharm_location_id,
-            'dmdcomb' => $stock->dmdcomb,
-            'dmdctr' => $stock->dmdctr,
-            'chrgcode' => $stock->chrgcode,
-            'date_logged' => date('Y-m-d'),
-            'dmdprdte' => $dmdprdte,
-            'unit_cost' => $unit_cost,
-            'unit_price' => $retail_price,
-        ]);
-        $log->time_logged = now();
-        $log->beg_bal += $this->qty;
-
-        $log->save();
         $stock->save();
+        LogDrugTransaction::dispatch(Auth::user()->pharm_location_id, $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty);
 
         $this->resetExcept('location_id', 'drugs', 'locations', 'charge_codes');
         $this->alert('success', 'Item beginning balance has been saved!');

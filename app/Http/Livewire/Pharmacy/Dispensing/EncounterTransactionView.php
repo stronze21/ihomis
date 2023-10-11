@@ -459,10 +459,6 @@ class EncounterTransactionView extends Component
     // public function add_item(DrugStock $dm)
     public function add_item($dmdcomb, $dmdctr, $chrgcode, $loc_code, $dmdprdte, $id, $available, $exp_date)
     {
-        // $dmdcomb = $dm->dmdcomb;
-        // $dmdctr = $dm->dmdctr;
-        // $chrgcode = $dm->chrgcode;
-        // $loc_code = $dm->loc_code;
         $total_deduct = $this->order_qty;
 
         if ($this->sc) {

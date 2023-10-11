@@ -8,6 +8,7 @@ use Livewire\Component;
 use App\Events\UserUpdated;
 use App\Events\IoTransEvent;
 use App\Events\IoTransNewRequest;
+use App\Jobs\LogIoTransReceive;
 use Livewire\WithPagination;
 use App\Models\Pharmacy\DrugPrice;
 use Illuminate\Support\Facades\DB;
@@ -161,23 +162,11 @@ class IoTransListRequestor extends Component
                 $stock->beg_bal += $item->qty;
                 $txn->received_by += $item->qty;
 
-                $log = DrugStockLog::firstOrNew([
-                    'loc_code' => $item->to,
-                    'dmdcomb' => $item->dmdcomb,
-                    'dmdctr' => $item->dmdctr,
-                    'chrgcode' => $item->chrgcode,
-                    'date_logged' => date('Y-m-d'),
-                    'dmdprdte' => $item->dmdprdte,
-                    'unit_price' => $item->retail_price,
-                ]);
-                $log->time_logged = now();
-                $log->received += $item->qty;
-
                 $item->status = 'Received';
 
                 $stock->save();
                 $item->save();
-                $log->save();
+                LogIoTransReceive::dispatch($item->to, $item->dmdcomb, $item->dmdctr, $item->chrgcode, date('Y-m-d'), $item->dmdprdte, $item->retail_price, now(), $item->qty);
             }
         }
 
