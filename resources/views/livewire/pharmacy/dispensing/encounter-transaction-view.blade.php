@@ -788,10 +788,12 @@
                     const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
 
                     $.each(data, function(index, value) {
-                        rx_charge_code.options[rx_charge_code.options.length] = new Option(value[
-                            'text'], value['id']);
+                        if(index == 0){
+                            rx_charge_code.options[rx_charge_code.options.length] = new Option(value['text'], value['id'],true,true);
+                        }else{
+                            rx_charge_code.options[rx_charge_code.options.length] = new Option(value['text'], value['id']);
+                        }
                     });
-
                     rx_order_qty.focus();
                     rx_order_qty.value = rx_qty;
 
