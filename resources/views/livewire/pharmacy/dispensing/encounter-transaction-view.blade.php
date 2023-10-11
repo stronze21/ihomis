@@ -281,7 +281,9 @@
 </div>
 @push('scripts')
     <script>
+        var data;
         $(document).ready(function() {
+
             $("#generic").on("keyup", function() {
                 var value = $(this).val().toLowerCase();
                 var value_select = $('#filter_charge_code').select2('val');
@@ -310,6 +312,8 @@
             $('#filter_charge_code').on('change', function() {
                 var value = $("#generic").val().toLowerCase();
                 var value_select = $('#filter_charge_code').select2('val');
+
+                data = $('#filter_charge_code').select2('data');
 
                 var myArray = ['DRUMA', 'DRUMAA', 'DRUMAB', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMR',
                     'DRUMS'
@@ -698,9 +702,6 @@
                             <div class="col-span-4 font-bold">Fund Source</div>
                             <div class="col-span-4">
                             <select id="rx_charge_code" class="w-full select select-bordered select-sm">
-                                @foreach ($charges as $charge)
-                                    <option value="{{ $charge->chrgcode }}" @if ($loop->iteration == 1) selected @endif>{{ $charge->chrgdesc }}</option>
-                                @endforeach
                             </select>
                             </div>
                             <div class="col-span-4 font-bold">TAG</div>
@@ -785,6 +786,10 @@
                     const rx_govt = Swal.getHtmlContainer().querySelector('#rx_govt')
                     const rx_is_ris = Swal.getHtmlContainer().querySelector('#rx_is_ris')
                     const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
+
+                    $.each(data, function(index, value) {
+                        rx_charge_code.options[rx_charge_code.options.length]= new Option(value['text'], value['id']);
+                    });
 
                     rx_order_qty.focus();
                     rx_order_qty.value = rx_qty;

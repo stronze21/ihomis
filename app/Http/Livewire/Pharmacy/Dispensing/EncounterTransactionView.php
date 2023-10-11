@@ -51,6 +51,7 @@ class EncounterTransactionView extends Component
     public $active_prescription;
     public $adm;
     public $rx_charge_code;
+
     // public function updatingChargeCode()
     // {
     //     $stocks = DrugStock::with('charge')->with('current_price')->has('current_price')
