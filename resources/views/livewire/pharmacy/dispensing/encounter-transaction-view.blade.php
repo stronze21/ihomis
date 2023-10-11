@@ -109,7 +109,7 @@
                     <tbody class="bg-white">
                         @forelse ($rxos as $rxo)
                             @php
-                                $concat = explode('_,', $rxo->dm->drug_concat);
+                                $concat = explode('_,', $rxo->drug_concat);
                             @endphp
                             <tr class="border">
                                 <td class="w-10 text-center">
@@ -131,7 +131,7 @@
                                 </td>
                                 <td class="w-max">
                                     <div class="flex flex-col">
-                                        <div class="text-xs text-slate-600">{{ $rxo->charge->chrgdesc ?? '' }}</div>
+                                        <div class="text-xs text-slate-600">{{ $rxo->chrgdesc ?? '' }}</div>
                                         <div class="font-bold">{{ $concat[0] }}</div>
                                         <div class="text-xs text-center text-slate-800">
                                             {{ $concat[1] }}</div>
@@ -788,7 +788,8 @@
                     const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
 
                     $.each(data, function(index, value) {
-                        rx_charge_code.options[rx_charge_code.options.length]= new Option(value['text'], value['id']);
+                        rx_charge_code.options[rx_charge_code.options.length] = new Option(value[
+                            'text'], value['id']);
                     });
 
                     rx_order_qty.focus();

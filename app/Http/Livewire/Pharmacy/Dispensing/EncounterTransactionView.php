@@ -70,7 +70,18 @@ class EncounterTransactionView extends Component
     public function render()
     {
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-        $rxos = DrugOrder::where('enccode', $enccode)->with('charge')->with('dm')->latest('dodate')->get();
+        // $rxos = DrugOrder::where('enccode', $enccode)->with('charge')->with('dm')->latest('dodate')->get();
+
+        $rxos = DrugOrder::select('docointkey', 'pcchrgcod', 'dodate', 'pchrgqty', 'estatus', 'qtyissued', 'pchrgup', 'drug_concat', 'chrgdesc', 'remarks')
+            ->join('hdmhdr', function ($join) {
+                $join->on('hdmhdr.dmdcomb', 'hrxo.dmdcomb');
+                $join->on('hdmhdr.dmdctr', 'hrxo.dmdctr');
+            })
+            ->join('hcharge', 'orderfrom', 'chrgcode')
+            ->where('enccode', $enccode)
+            ->orderBy('dodate', 'DESC')
+            ->get();
+
 
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', compact(
             'rxos',
