@@ -2,7 +2,7 @@
     <div class="text-sm breadcrumbs">
         <ul>
             <li class="font-bold">
-                <i class="mr-1 las la-map-marked la-lg"></i> {{ Auth::user()->location->description }}
+                <i class="mr-1 las la-map-marked la-lg"></i> {{ session('pharm_location_name') }}
             </li>
             <li>
                 <i class="mr-1 las la-exchange la-lg"></i> Issued IO Transactions

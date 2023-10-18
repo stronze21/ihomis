@@ -68,7 +68,7 @@ class StockList extends Component
 
     public function mount()
     {
-        $this->location_id = Auth::user()->pharm_location_id;
+        $this->location_id = session('pharm_location_id');
 
         $this->locations = PharmLocation::all();
 
@@ -135,7 +135,7 @@ class StockList extends Component
         $stock = DrugStock::firstOrCreate([
             'dmdcomb' => $dm[0],
             'dmdctr' => $dm[1],
-            'loc_code' =>  Auth::user()->pharm_location_id,
+            'loc_code' =>  session('pharm_location_id'),
             'chrgcode' => $this->chrgcode,
             'exp_date' => $this->expiry_date,
             'retail_price' => $retail_price,
@@ -175,7 +175,7 @@ class StockList extends Component
         $stock->dmdprdte = $dmdprdte;
 
         $stock->save();
-        LogDrugTransaction::dispatch(Auth::user()->pharm_location_id, $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty);
+        LogDrugTransaction::dispatch(session('pharm_location_id'), $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty);
 
         $this->resetExcept('location_id', 'drugs', 'locations', 'charge_codes');
         $this->alert('success', 'Item beginning balance has been saved!');
@@ -253,7 +253,7 @@ class StockList extends Component
         }
         $new_price->retail_price = $retail_price;
 
-        $old_log = DrugStockLog::where('loc_code', Auth::user()->pharm_location_id)
+        $old_log = DrugStockLog::where('loc_code', session('pharm_location_id'))
             ->where('dmdcomb', $stock->dmdcomb)
             ->where('dmdctr', $stock->dmdctr)
             ->where('chrgcode', $old_chrgcode)
@@ -267,7 +267,7 @@ class StockList extends Component
         }
 
         $log = DrugStockLog::firstOrNew([
-            'loc_code' =>  Auth::user()->pharm_location_id,
+            'loc_code' =>  session('pharm_location_id'),
             'dmdcomb' => $stock->dmdcomb,
             'dmdctr' => $stock->dmdctr,
             'chrgcode' => $stock->chrgcode,
@@ -304,7 +304,7 @@ class StockList extends Component
         $stock = DrugStock::firstOrCreate([
             'dmdcomb' => $dm[0],
             'dmdctr' => $dm[1],
-            'loc_code' =>  Auth::user()->pharm_location_id,
+            'loc_code' =>  session('pharm_location_id'),
             'chrgcode' => $this->chrgcode,
             'exp_date' => $this->expiry_date,
             'retail_price' => $retail_price,
@@ -341,7 +341,7 @@ class StockList extends Component
         $stock->dmdprdte = $dmdprdte;
 
         $log = DrugStockLog::firstOrNew([
-            'loc_code' =>  Auth::user()->pharm_location_id,
+            'loc_code' =>  session('pharm_location_id'),
             'dmdcomb' => $stock->dmdcomb,
             'dmdctr' => $stock->dmdctr,
             'chrgcode' => $stock->chrgcode,

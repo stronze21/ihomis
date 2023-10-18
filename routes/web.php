@@ -26,6 +26,8 @@ use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 use App\Http\Livewire\Pharmacy\Reports\EmergencyPurchases;
 use App\Http\Livewire\Pharmacy\Reports\IoTransIssuedReport;
 use App\Http\Livewire\Pharmacy\Reports\IoTransReceivedReport;
+use App\Http\Livewire\References\CreateManual;
+use App\Http\Livewire\References\Manual;
 use App\Http\Livewire\Trash\SampleView;
 
 /*
@@ -86,6 +88,8 @@ Route::middleware([
         Route::get('/drugsandmedicine', ListDrugHomis::class)->name('dmd');
         Route::get('/permissions', ListPermissions::class)->name('permissions');
         Route::get('/users', UserManagement::class)->name('users');
+        Route::get('/manual', Manual::class)->name('manual');
+        Route::get('/manual/create', CreateManual::class)->name('manual.add');
     });
 
     Route::name('reports.')->prefix('/reports')->group(function () {

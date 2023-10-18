@@ -10,7 +10,10 @@ use Illuminate\Support\Facades\Crypt;
 use App\Models\Record\Patients\Patient;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Http\Controllers\SharedController;
+use App\Models\Hospital\Room;
+use App\Models\Hospital\Ward;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use App\Models\Record\Admission\PatientRoom;
 use App\Models\Pharmacy\Dispensing\DrugOrder;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -52,6 +55,8 @@ class EncounterTransactionView extends Component
     public $adm;
     public $rx_charge_code;
 
+    public $patient_room, $wardname, $rmname;
+
     // public function updatingChargeCode()
     // {
     //     $stocks = DrugStock::with('charge')->with('current_price')->has('current_price')
@@ -92,7 +97,7 @@ class EncounterTransactionView extends Component
     {
         $this->enccode = $enccode;
 
-        $this->location_id = Auth::user()->pharm_location_id;
+        $this->location_id = session('pharm_location_id');
 
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
 
@@ -102,12 +107,18 @@ class EncounterTransactionView extends Component
         $this->encounter = EncounterLog::where('enccode', $enccode)->first();
         $this->patient = Patient::find($this->encounter->hpercode);
         $this->active_prescription = Prescription::where('enccode', $enccode)->with('employee')->with('data_active')->has('data_active')->get();
-        $this->adm = AdmissionLog::where('enccode', $enccode)->has('patient_room')->first();
+        // $this->adm = AdmissionLog::where('enccode', $enccode)->has('patient_room')->first();
+        $patient_room = PatientRoom::where('enccode', $enccode)->first();
+        if ($patient_room) {
+            $this->wardname = Ward::select('wardname')->where('wardcode', $patient_room->wardcode)->first();
+            $this->rmname = Room::where('rmname', $patient_room->rmintkey)->first();
+        }
 
         if (!$this->hpercode) {
             $this->hpercode = $this->encounter->hpercode;
             $this->toecode = $this->encounter->toecode;
         }
+
         if (!$this->charges) {
             $this->charges = ChargeCode::where('bentypcod', 'DRUME')
                 ->where('chrgstat', 'A')

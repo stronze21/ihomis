@@ -144,7 +144,7 @@ class IoTransList extends Component
                         'iotrans_id' => $this->selected_request->id,
                         'dmdcomb' => $this->selected_request->dmdcomb,
                         'dmdctr' => $this->selected_request->dmdctr,
-                        'from' => Auth::user()->pharm_location_id,
+                        'from' => session('pharm_location_id'),
                         'to' => $this->selected_request->loc_code,
                         'chrgcode' => $stock->chrgcode,
                         'exp_date' => $stock->exp_date,

@@ -38,7 +38,7 @@ class IoTransListRequestor extends Component
     {
         $trans = InOutTransaction::with('drug')->with('location')
             ->with('charge')
-            ->where('loc_code', Auth::user()->pharm_location_id);
+            ->where('loc_code', session('pharm_location_id'));
 
         $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', DB::raw('SUM(stock_bal) as "avail"'))
             ->whereRelation('location', 'description', 'LIKE', '%Warehouse%')

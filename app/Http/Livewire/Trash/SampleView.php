@@ -27,6 +27,6 @@ class SampleView extends Component
 
     public function mount()
     {
-        $this->location_id = Auth::user()->pharm_location_id;
+        $this->location_id = session('pharm_location_id');
     }
 }

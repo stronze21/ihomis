@@ -2,7 +2,7 @@
     <div class="text-sm breadcrumbs">
         <ul>
             <li class="font-bold">
-                <i class="mr-1 las la-map-marked la-lg"></i> {{ Auth::user()->location->description }}
+                <i class="mr-1 las la-map-marked la-lg"></i> {{ session('pharm_location_name') }}
             </li>
             <li class="font-bold">
                 <i class="mr-1 las la-truck la-lg"></i> Drugs and Medicine Dispensing
@@ -64,8 +64,8 @@
                                     <div class="flex space-x-2">
                                         <span>Room/Encounter Type: </span>
                                         @if ($encounter->toecode == 'ADM' or $encounter->toecode == 'OPDAD' or $encounter->toecode == 'ERADM')
-                                            <div> {{ $adm->patient_room->ward->wardname }}</div>
-                                            <div class="text-sm">{{ $adm->patient_room->room->rmname }} /
+                                            <div> {{ $wardname }}</div>
+                                            <div class="text-sm">{{ $rmname }} /
                                             </div>
                                         @endif
                                         {{ $encounter->toecode }}
@@ -788,10 +788,12 @@
                     const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
 
                     $.each(data, function(index, value) {
-                        if(index == 0){
-                            rx_charge_code.options[rx_charge_code.options.length] = new Option(value['text'], value['id'],true,true);
-                        }else{
-                            rx_charge_code.options[rx_charge_code.options.length] = new Option(value['text'], value['id']);
+                        if (index == 0) {
+                            rx_charge_code.options[rx_charge_code.options.length] = new Option(value[
+                                'text'], value['id'], true, true);
+                        } else {
+                            rx_charge_code.options[rx_charge_code.options.length] = new Option(value[
+                                'text'], value['id']);
                         }
                     });
                     rx_order_qty.focus();

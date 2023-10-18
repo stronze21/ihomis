@@ -112,7 +112,7 @@ class EmergencyPurchases extends Component
             'lot_no' => $this->lot_no,
             'expiry_date' => $this->expiry_date,
             'charge_code' => $this->charge_code,
-            'pharm_location_id' => Auth::user()->pharm_location_id,
+            'pharm_location_id' => session('pharm_location_id'),
             'remarks' => $this->remarks,
         ]);
 

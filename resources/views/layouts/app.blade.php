@@ -27,10 +27,11 @@
     <script src="https://cdn.jsdelivr.net/gh/livewire/turbolinks@v0.1.x/dist/livewire-turbolinks.js"
         data-turbolinks-eval="false" data-turbo-eval="false" defer></script>
 
+    @stack('head')
+
 </head>
 
 <body class="max-h-screen overflow-auto font-sans antialiased ">
-    <x-jet-banner />
 
     <div class="min-h-screen bg-gray-100">
         @livewire('navigation-menu')
@@ -43,6 +44,8 @@
                 </div>
             </header>
         @endif
+
+        <x-jet-banner />
 
         <!-- Page Content -->
         <main>
