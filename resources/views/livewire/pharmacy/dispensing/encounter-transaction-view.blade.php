@@ -686,6 +686,11 @@
         }
 
         function select_rx_item(rx_id, drug, rx_qty) {
+
+            var search = drug.split(",");
+            $("#generic").val(search[0]);
+            $("#generic").trigger('keyup');
+
             Swal.fire({
                 html: `
                         <div class="text-xl font-bold">` + drug + `</div>

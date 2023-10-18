@@ -504,16 +504,6 @@ class EncounterTransactionView extends Component
             $this->type = 'govt';
         }
 
-        // $available = SharedController::available_stock($dmdcomb, $dmdctr, $chrgcode, $loc_code);
-
-        // $available = DrugStock::where('dmdcomb', $dmdcomb)
-        //     ->where('dmdctr', $dmdctr)
-        //     ->where('chrgcode', $chrgcode)
-        //     ->where('loc_code', $loc_code)
-        //     ->where('stock_bal', '>', '0')
-        //     ->where('exp_date', '>', now())
-        //     ->sum('stock_bal');
-
         if ($this->is_ris or $available >= $total_deduct) {
             $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
             DrugOrder::create([

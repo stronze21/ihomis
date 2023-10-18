@@ -157,6 +157,7 @@ class IoTransListRequestor extends Component
                     'exp_date' => $item->exp_date,
                     'retail_price' => $item->retail_price,
                     'dmdprdte' => $item->dmdprdte,
+                    'drug_concat' => $item->drug->drug_name(),
                 ]);
                 $stock->stock_bal += $item->qty;
                 $stock->beg_bal += $item->qty;
