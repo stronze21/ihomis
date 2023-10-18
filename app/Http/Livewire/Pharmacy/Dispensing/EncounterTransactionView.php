@@ -131,7 +131,7 @@ class EncounterTransactionView extends Component
             ->where('loc_code', $this->location_id)
             ->groupBy('pharm_drug_stocks.dmdcomb', 'pharm_drug_stocks.dmdctr', 'pharm_drug_stocks.chrgcode', 'hdmhdrprice.retail_price', 'dmselprice', 'drug_concat', 'hcharge.chrgdesc', 'pharm_drug_stocks.loc_code', 'pharm_drug_stocks.dmdprdte')
             ->select('pharm_drug_stocks.dmdcomb', 'pharm_drug_stocks.dmdctr', 'drug_concat', 'hcharge.chrgdesc', 'pharm_drug_stocks.chrgcode', 'hdmhdrprice.retail_price', 'dmselprice', 'pharm_drug_stocks.loc_code', 'pharm_drug_stocks.dmdprdte')
-            ->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id, MIN(exp_date)')
+            ->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id, MIN(exp_date) as exp_date')
             ->get();
     }
 

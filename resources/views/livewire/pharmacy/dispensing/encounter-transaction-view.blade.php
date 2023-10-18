@@ -220,6 +220,8 @@
                                 <td class="break-words">
                                     <div>
                                         <span class="text-xs text-slate-600">{{ $stock->chrgdesc }}</span>
+                                        <span
+                                            class="text-xs text-error-600 badge badge-outline badge-xs">{{ $stock->exp_date }}</span>
                                         <div class="text-sm font-bold text-slate-800">
                                             {{ $concat[0] }}</div>
                                         <div class="text-xs text-center text-slate-800">
