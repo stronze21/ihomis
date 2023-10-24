@@ -11,9 +11,17 @@
     </div>
 </x-slot>
 
+@push('head')
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+@endpush
+
 <div class="flex flex-col p-5 mx-auto">
     <div class="flex justify-between">
-        <div>
+        <div class="ml-2">
+            <button onclick="ExportToExcel('xlsx')" class="btn btn-sm btn-info"><i class="las la-lg la-file-excel"></i>
+                Export</button>
+        </div>
+        <div class="ml-2">
             <div class="form-control">
                 <label class="input-group input-group-sm">
                     <span><i class="las la-search"></i></span>
@@ -24,7 +32,7 @@
         </div>
     </div>
     <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
-        <table class="table w-full table-compact">
+        <table class="table w-full table-compact" id="table">
             <thead>
                 <tr>
                     <th class="w-1/12">Reference</th>
@@ -55,3 +63,22 @@
         {{ $trans->links() }}
     </div>
 </div>
+
+
+@push('scripts')
+    <script>
+        function ExportToExcel(type, fn, dl) {
+            var elt = document.getElementById('table');
+            var wb = XLSX.utils.table_to_book(elt, {
+                sheet: "sheet1"
+            });
+            return dl ?
+                XLSX.write(wb, {
+                    bookType: type,
+                    bookSST: true,
+                    type: 'base64'
+                }) :
+                XLSX.writeFile(wb, fn || ('Ward Consumption Report.' + (type || 'xlsx')));
+        }
+    </script>
+@endpush

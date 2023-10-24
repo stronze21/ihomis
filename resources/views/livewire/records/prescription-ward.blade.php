@@ -26,7 +26,7 @@
 </x-slot>
 
 
-<div class="flex flex-col py-5 mx-auto max-w-7xl">
+<div class="flex flex-col py-5 mx-auto max-w-screen-2xl">
     <div class="flex space-x-8 justify-even">
         <div class="form-control">
             <label for="filter_wardcode">
@@ -66,7 +66,7 @@
             </span>
         </div>
         <div wire:loading.class="hidden">
-            <table class="table w-full mb-3 table-compact">
+            <table class="table w-full mb-3 table-compact" wire:ignore>
                 <thead>
                     <tr>
                         <th>Date Admitted</th>
@@ -156,6 +156,7 @@
             $("#patient_name").on("keyup", function() {
                 var value = $(this).val().toLowerCase();
                 var filter_wardcode = $('#filter_wardcode').val();
+                var filter_type = $('#filter_type').val();
                 var wards = [
                     @foreach ($wards as $filt_ward)
                         '{{ $filt_ward->slug_desc() }}',
@@ -182,20 +183,25 @@
 
                 if (filter_wardcode === 'All') {
                     wards = [];
+                } else {
+                    $.each(wards, function(index, value_row_2) {
+                        $('.' + value_row_2).hide();
+                    });
                 }
 
-                $.each(wards, function(index, value_row_2) {
-                    $('.' + value_row_2).hide();
-                });
-
-                $.each(types, function(index_type, value_type) {
-                    $('.' + value_type).hide();
-                });
+                if (filter_type === 'All') {
+                    types = [];
+                } else {
+                    $.each(types, function(index_type, value_type) {
+                        $('.' + value_type).hide();
+                    });
+                }
             });
 
             $('#filter_wardcode').on('change', function() {
                 var value = $('#patient_name').val().toLowerCase();
                 var filter_wardcode = $('#filter_wardcode').val();
+                var filter_type = $('#filter_type').val();
                 var wards = [
                     @foreach ($wards as $filt_ward)
                         '{{ $filt_ward->slug_desc() }}',
@@ -222,20 +228,27 @@
 
                 if (filter_wardcode === 'All') {
                     wards = [];
+                } else {
+                    $.each(wards, function(index, value_row_2) {
+                        $('.' + value_row_2).hide();
+                    });
                 }
 
-                $.each(wards, function(index, value_row_2) {
-                    $('.' + value_row_2).hide();
-                });
+                if (filter_type === 'All') {
+                    types = [];
+                } else {
+                    $.each(types, function(index_type, value_type) {
+                        $('.' + value_type).hide();
+                    });
+                }
 
-                $.each(types, function(index_type, value_type) {
-                    $('.' + value_type).hide();
-                });
+
             });
 
             $('#filter_type').on('change', function() {
                 var value = $('#patient_name').val().toLowerCase();
                 var filter_wardcode = $('#filter_wardcode').val();
+                var filter_type = $('#filter_type').val();
                 var wards = [
                     @foreach ($wards as $filt_ward)
                         '{{ $filt_ward->slug_desc() }}',
@@ -262,15 +275,19 @@
 
                 if (filter_wardcode === 'All') {
                     wards = [];
+                } else {
+                    $.each(wards, function(index, value_row_2) {
+                        $('.' + value_row_2).hide();
+                    });
                 }
 
-                $.each(wards, function(index, value_row_2) {
-                    $('.' + value_row_2).hide();
-                });
-
-                $.each(types, function(index_type, value_type) {
-                    $('.' + value_type).hide();
-                });
+                if (filter_type === 'All') {
+                    types = [];
+                } else {
+                    $.each(types, function(index_type, value_type) {
+                        $('.' + value_type).hide();
+                    });
+                }
             });
         });
 

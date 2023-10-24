@@ -49,7 +49,7 @@ class DeliveryList extends Component
         $delivery->po_no = $this->po_no;
         $delivery->si_no = $this->si_no;
         $delivery->pharm_location_id = session('pharm_location_id');
-        $delivery->user_id = Auth::user()->id;
+        $delivery->user_id = session('user_id');
         $delivery->delivery_date = $this->delivery_date;
         $delivery->suppcode = $this->suppcode;
         $delivery->delivery_type = $this->delivery_type;

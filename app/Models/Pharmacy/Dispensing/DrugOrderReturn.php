@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Record\Admission\PatientRoom;
 use App\Models\Record\Encounters\AdmissionLog;
 use App\Models\Record\Encounters\EncounterLog;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class DrugOrderReturn extends Model
@@ -54,9 +55,9 @@ class DrugOrderReturn extends Model
     public function dm()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
-                    ->with('generic')
-                    ->with('strength')
-                    ->with('form');
+            ->with('generic')
+            ->with('strength')
+            ->with('form');
     }
 
     public function charge()
@@ -67,6 +68,11 @@ class DrugOrderReturn extends Model
     public function receiver()
     {
         return $this->belongsTo(Employee::class, 'returnby', 'employeeid');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'returnby', 'employeeid');
     }
 
     public function return_date()
@@ -87,8 +93,8 @@ class DrugOrderReturn extends Model
     public function adm_pat_room()
     {
         return $this->hasOneThrough(PatientRoom::class, AdmissionLog::class, 'enccode', 'enccode', 'enccode')
-                    ->with('ward')
-                    ->with('room');
+            ->with('ward')
+            ->with('room');
     }
 
     public function main_order()

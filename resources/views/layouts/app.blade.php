@@ -83,7 +83,7 @@
             return x1 + x2;
         }
 
-        Echo.private(`ioTrans.{{ auth()->user()->pharm_location_id }}`)
+        Echo.private(`ioTrans.{{ session('pharm_location_id') }}`)
             .listen('IoTransNewRequest', (e) => {
                 // console.log(e.requestor);
                 Swal.fire({
@@ -92,7 +92,7 @@
                 })
             });
 
-        Echo.private(`ioTrans.{{ auth()->user()->pharm_location_id }}`)
+        Echo.private(`ioTrans.{{ session('pharm_location_id') }}`)
             .listen('IoTransRequestUpdated', (e) => {
                 // console.log(e.requestor);
                 Swal.fire({
@@ -101,7 +101,7 @@
                 })
             });
 
-        Echo.private(`encounter-view.{{ auth()->user()->pharm_location_id }}`)
+        Echo.private(`encounter-view.{{ session('pharm_location_id') }}`)
             .listen('DrugOrderEvent', (e) => {
                 // console.log(e.requestor);
                 Swal.fire({

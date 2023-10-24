@@ -8,7 +8,7 @@
                 <i class="mr-1 las la-file-excel la-lg"></i> Report
             </li>
             <li>
-                <i class="mr-1 las la-file-invoice la-lg"></i> Charge Slips Summary
+                <i class="mr-1 las la-clone la-lg"></i> Drug Issuance
             </li>
         </ul>
     </div>
@@ -31,11 +31,11 @@
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
-                            <span>Location</span>
-                            <select class="text-sm select select-bordered select-sm" wire:model="location_id">
-                                <option value="">N/A</option>
-                                @foreach ($locations as $loc)
-                                    <option value="{{ $loc->id }}">{{ $loc->description }}</option>
+                            <span>Ward</span>
+                            <select class="text-sm select select-bordered select-sm" wire:model="wardcode">
+                                <option value="All">All</option>
+                                @foreach ($wards as $ward)
+                                    <option value="{{ $ward->wardcode }}">{{ $ward->wardname }}</option>
                                 @endforeach
                             </select>
                         </label>
@@ -59,30 +59,48 @@
                         </label>
                     </div>
                 </div>
+                <div class="ml-2">
+                    <div class="form-control">
+                        <label class="input-group">
+                            <span>Fund Source</span>
+                            <select class="select select-bordered select-sm" wire:model="filter_charge">
+                                <option></option>
+                                @foreach ($charge_codes as $charge)
+                                    <option value="{{ $charge->chrgcode }}">
+                                        {{ $charge->chrgdesc }}</option>
+                                @endforeach
+                            </select>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
         <table class="table bg-white shadow-md table-fixed table-compact" id="table">
             <thead class="font-bold bg-gray-200">
                 <tr>
-                    <td class="text-sm uppercase border">#</td>
-                    <td class="text-sm border">Date Ordered</td>
-                    <td class="text-sm border">Hosp. #</td>
-                    <td class="text-sm border">Name of Patient</td>
-                    <td class="text-sm border">Charge Slip</td>
-                    <td class="text-sm text-right border">Total Items</td>
-                    <td class="text-sm text-right border">Amount</td>
+                    <td class="text-sm text-center uppercase border">#</td>
+                    <td class="text-sm border">Ward</td>
+                    <td class="text-sm border">Item Description</td>
+                    <td class="text-sm text-right border">TOTAL</td>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($drugs_ordered as $rxo)
-                    <tr classs="border border-black">
+                @forelse ($drugs_issued as $rxi)
+                    @php
+                        $concat = implode(',', explode('_,', $rxi->drug_concat));
+                    @endphp
+                    <tr class="border border-black">
                         <td class="text-sm text-right border">{{ $loop->iteration }}</td>
-                        <td class="text-sm border">{{ date('F j, Y H:i A', strtotime($rxo->dodate)) }}</td>
-                        <td class="text-sm border">{{ $rxo->hpercode }}</td>
-                        <td class="text-sm border">{{ $rxo->patient->fullname() }}</td>
-                        <td class="text-sm border">{{ $rxo->pcchrgcod }}</td>
-                        <td class="text-sm text-right border">{{ $rxo->total_qty }}</td>
-                        <td class="text-sm text-right border">{{ $rxo->total_amount }}</td>
+                        <td class="text-sm border">{{ $rxi->wardname }}</td>
+                        <td class="text-sm border">
+                            <div class="flex flex-col">
+                                <div class="text-xs text-slate-500">
+                                    {{ $rxi->chrgdesc }}
+                                </div>
+                                <div class="text-sm font-bold">{{ $concat }}</div>
+                            </div>
+                        </td>
+                        <td class="text-sm text-right border">{{ $rxi->qty }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -92,9 +110,6 @@
                 @endforelse
             </tbody>
         </table>
-        <div class="mt-2">
-            {{ $drugs_ordered->links() }}
-        </div>
     </div>
 
     <!-- Put this part before </body> tag -->
@@ -110,7 +125,6 @@
         </div>
     </div>
 </div>
-
 
 @push('scripts')
     <script>

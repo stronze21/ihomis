@@ -14,24 +14,23 @@
     </div>
 </x-slot>
 
+@push('head')
+    <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+@endpush
+
 <div class="max-w-screen">
     <div class="flex flex-col px-2 py-5">
         <div class="flex justify-end my-2">
             <div class="ml-2">
-                <div class="form-control">
-                    <label class="input-group">
-                        <span>From</span>
-                        <input type="datetime-local" class="w-full input input-sm input-bordered"
-                            max="{{ $date_to }}" wire:model.lazy="date_from" />
-                    </label>
-                </div>
+                <button onclick="ExportToExcel('xlsx')" class="btn btn-sm btn-info"><i
+                        class="las la-lg la-file-excel"></i> Export</button>
             </div>
             <div class="ml-2">
                 <div class="form-control">
                     <label class="input-group">
-                        <span>To</span>
-                        <input type="datetime-local" class="w-full input input-sm input-bordered"
-                            min="{{ $date_from }}" wire:model.lazy="date_to" />
+                        <span>From</span>
+                        <input type="month" class="w-full input input-sm input-bordered"
+                            wire:model.lazy="date_from" />
                     </label>
                 </div>
             </div>
@@ -50,7 +49,7 @@
                 </div>
             </div>
         </div>
-        <table class="text-xs bg-white shadow-md table-fixed table-compact">
+        <table class="text-xs bg-white shadow-md table-fixed table-compact" id="table">
             <thead class="font-bold bg-gray-200">
                 <tr class="text-center uppercase">
                     <td class="w-2/12 text-xs border border-black">Source of Fund</td>
@@ -127,7 +126,8 @@
                         </td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->total_cogs(), 2) }}
                         </td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->total_profit(), 2) }}
+                        <td class="text-xs text-right border border-black">
+                            {{ number_format($rxi->total_profit(), 2) }}
                         </td>
                         <td class="text-xs text-right border border-black">
                             {{ number_format($rxi->ending_balance(), 2) }}</td>
@@ -144,3 +144,22 @@
         </table>
     </div>
 </div>
+
+
+@push('scripts')
+    <script>
+        function ExportToExcel(type, fn, dl) {
+            var elt = document.getElementById('table');
+            var wb = XLSX.utils.table_to_book(elt, {
+                sheet: "sheet1"
+            });
+            return dl ?
+                XLSX.write(wb, {
+                    bookType: type,
+                    bookSST: true,
+                    type: 'base64'
+                }) :
+                XLSX.writeFile(wb, fn || ('Ward Consumption Report.' + (type || 'xlsx')));
+        }
+    </script>
+@endpush

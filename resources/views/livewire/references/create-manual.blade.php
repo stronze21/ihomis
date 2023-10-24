@@ -19,7 +19,7 @@
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.0/dist/trix.umd.min.js"></script>
 @endpush
 
-<div class="flex flex-col h-screen py-5 mx-auto space-y-3 max-w-7xl">
+<div class="flex flex-col h-screen py-5 mx-auto space-y-3 max-w-screen-2xl">
     <div class="w-full h-full p-5 rounded shadow-md bg-neutral">
         <div class="flex flex-col w-full h-full p-3 space-y-3 bg-base-100 rounded-xl">
             <h2 class="font-bold">Add new item</h2>

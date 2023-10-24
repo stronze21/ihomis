@@ -34,12 +34,12 @@
                         <div><button class="ml-2 btn btn-sm btn-primary" onclick="issue_order()"
                                 wire:loading.attr="disabled" wire:loading.class="btn-secondary">Issue</button></div>
                         {{-- <div><button class="ml-2 btn btn-sm btn-danger" wire:click="reset_order()" wire:loading.attr="disabled" wire:loading.class="btn-secondary">Reset Order</button></div> --}}
-                        {{-- @if (auth()->user()->employeeid == '001783') --}}
+                        {{-- @if (session('employeeid') == '001783') --}}
                         {{-- @endif --}}
                     </div>
                 </div>
                 <table class="w-full mb-40 text-sm table-compact">
-                    <thead class="sticky font-bold bg-gray-200">
+                    <thead class="sticky font-bold bg-gray-200" wire:ignore>
                         <tr>
                             <td colspan="4" class="w-1/3 border border-black"><span>Hospital #: </span> <span
                                     class="fw-bold">{{ $patient->hpercode }}</span></td>
@@ -64,8 +64,8 @@
                                     <div class="flex space-x-2">
                                         <span>Room/Encounter Type: </span>
                                         @if ($encounter->toecode == 'ADM' or $encounter->toecode == 'OPDAD' or $encounter->toecode == 'ERADM')
-                                            <div> {{ $wardname }}</div>
-                                            <div class="text-sm">{{ $rmname }} /
+                                            <div> {{ $wardname->wardname }}</div>
+                                            <div class="text-sm">{{ $rmname->rmname }} /
                                             </div>
                                         @endif
                                         {{ $encounter->toecode }}
@@ -110,6 +110,7 @@
                         @forelse ($rxos as $rxo)
                             @php
                                 $concat = explode('_,', $rxo->drug_concat);
+                                $drug = implode('', $concat);
                             @endphp
                             <tr class="border">
                                 <td class="w-10 text-center">
@@ -176,7 +177,16 @@
                                         </label>
                                     </div>
                                 </td>
-                                <td class="text-center w-min">{!! $rxo->status() !!}</td>
+                                @php
+                                    if ($rxo->estatus == 'U') {
+                                        $badge = '<span class="badge badge-sm badge-warning">Pending</span>';
+                                    } elseif ($rxo->estatus == 'P') {
+                                        $badge = '<span class="badge badge-sm badge-primary">Charged</span>';
+                                    } elseif ($rxo->estatus == 'S') {
+                                        $badge = '<span class="badge badge-sm badge-success">Issued</span>';
+                                    }
+                                @endphp
+                                <td class="text-center w-min">{!! $badge !!}</td>
                             </tr>
                         @empty
                             <tr>
@@ -211,17 +221,31 @@
                         </tr>
                     </thead>
                     <tbody id="stockTableBody" wire:ignore>
-                        @foreach ($stocks as $stock)
+                        @foreach ($stocks as $key => $stock)
                             @php
                                 $concat = explode('_,', $stock->drug_concat);
+                                $drug = implode('', $concat);
                             @endphp
                             <tr class="cursor-pointer hover content {{ $stock->chrgcode }}"
-                                onclick="select_item('{{ $stock->id }}', '{{ $stock->drug_concat() }}', '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}')">
+                                onclick="select_item('{{ $stock->id }}', '{{ $drug }}', '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}')">
                                 <td class="break-words">
                                     <div>
                                         <span class="text-xs text-slate-600">{{ $stock->chrgdesc }}</span>
-                                        <span
-                                            class="text-xs text-error-600 badge badge-outline badge-xs">{{ $stock->exp_date }}</span>
+
+                                        @if (Carbon\Carbon::parse($stock->exp_date)->diffInDays(now(), false) >= 1 && $stock->stock_bal > 0)
+                                            <span class="badge badge-sm badge-danger">
+                                                {{ Carbon\Carbon::create($stock->exp_date)->format('F j, Y') }}</span>
+                                        @elseif (Carbon\Carbon::parse($stock->exp_date)->diffInDays(now(), false) > -168 && $stock->stock_bal > 0)
+                                            <span class="badge badge-sm badge-warning">
+                                                {{ Carbon\Carbon::create($stock->exp_date)->format('F j, Y') }}</span>
+                                        @elseif ($stock->stock_bal < 1)
+                                            <span class="badge badge-sm badge-ghost">
+                                                {{ Carbon\Carbon::create($stock->exp_date)->format('F j, Y') }}</span>
+                                        @elseif (Carbon\Carbon::parse($stock->exp_date)->diffInDays(now(), false) <= -168)
+                                            <span class="badge badge-sm badge-success">
+                                                {{ Carbon\Carbon::create($stock->exp_date)->format('F j, Y') }}</span>
+                                        @endif
+
                                         <div class="text-sm font-bold text-slate-800">
                                             {{ $concat[0] }}</div>
                                         <div class="text-xs text-center text-slate-800">
@@ -230,7 +254,9 @@
                                 </td>
                                 <td class="text-right">
                                     <div class="flex flex-col">
-                                        <div class="ml-5 font-bold">{{ $stock->balance() }}</div>
+                                        <div class="ml-5 font-bold">
+                                            {{ number_format($stock->stock_bal ?? 0, 0) }}
+                                        </div>
                                         <div>{!! '&#8369; ' . $stock->dmselprice !!}</div>
                                     </div>
                                 </td>
@@ -254,7 +280,7 @@
                         @forelse($active_prescription as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
                                 <tr class="cursor-pointer hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}}
-                                    onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}')"
+                                    onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->created_at)) }}
@@ -310,6 +336,13 @@
                     $('.' + value_row_2).hide();
                 });
             });
+
+            $("#generic").on("change", function() {
+                if (@this.rx_id) {
+                    @this.rx_id = null;
+                    @this.empid = null;
+                }
+            })
 
             $('#filter_charge_code').on('change', function() {
                 var value = $("#generic").val().toLowerCase();
@@ -687,11 +720,13 @@
             });
         }
 
-        function select_rx_item(rx_id, drug, rx_qty) {
+        function select_rx_item(rx_id, drug, rx_qty, empid, dmdcomb, dmdctr) {
 
             var search = drug.split(",");
             $("#generic").val(search[0]);
             $("#generic").trigger('keyup');
+            @this.rx_id = rx_id;
+            @this.empid = empid;
 
             Swal.fire({
                 html: `
@@ -825,7 +860,7 @@
                     @this.set('is_ris', rx_is_ris.checked);
                     @this.set('remarks', rx_remarks.value);
 
-                    Livewire.emit('add_prescribed_item', rx_id)
+                    Livewire.emit('add_prescribed_item', dmdcomb, dmdctr);
                 }
             });
         }
@@ -833,6 +868,6 @@
         window.addEventListener('charged', event => {
             window.open('{{ url('/dispensing/encounter/charge') }}' + '/' +
                 event.detail.pcchrgcod, '_blank');
-        })
+        });
     </script>
 @endpush

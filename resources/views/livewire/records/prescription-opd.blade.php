@@ -26,7 +26,7 @@
 </x-slot>
 
 
-<div class="flex flex-col py-5 mx-auto max-w-7xl">
+<div class="flex flex-col py-5 mx-auto max-w-screen-2xl">
     {{-- <div class="flex space-x-8 justify-normal">
         <div class="ml-3 form-control">
             <label class="input-group input-group-sm">

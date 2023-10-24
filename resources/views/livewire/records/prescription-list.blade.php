@@ -2,7 +2,7 @@
     <div class="text-sm breadcrumbs">
         <ul>
             <li class="font-bold">
-                <i class="mr-1 las la-map-marked la-lg"></i> {{Auth::user()->location->description}}
+                <i class="mr-1 las la-map-marked la-lg"></i> {{ session('pharm_location_name') }}
             </li>
             <li>
                 <i class="mr-1 las la-prescription-alt la-lg"></i> Prescriptions
@@ -12,7 +12,7 @@
 </x-slot>
 
 
-<div class="flex flex-col py-5 mx-auto max-w-7xl">
+<div class="flex flex-col py-5 mx-auto max-w-screen-2xl">
     <div class="flex space-x-8 justify-normal">
         <div class="form-control">
             <label class="input-group input-group-sm">
@@ -25,15 +25,15 @@
             </label>
         </div>
         <div class="ml-3 form-control">
-            @if($department == 'ward')
-            <label class="input-group input-group-sm">
-                <span class="text-sm">Ward</span>
-                <select class="p-0 pl-2 text-sm w-80 select select-bordered select-sm" wire:model="wardcode">
-                    @foreach ($wards as $ward)
-                        <option value="{{$ward->wardcode}}">{{$ward->wardname}} ({{$ward->wclcode}})</option>
-                    @endforeach
-                </select>
-            </label>
+            @if ($department == 'ward')
+                <label class="input-group input-group-sm">
+                    <span class="text-sm">Ward</span>
+                    <select class="p-0 pl-2 text-sm w-80 select select-bordered select-sm" wire:model="wardcode">
+                        @foreach ($wards as $ward)
+                            <option value="{{ $ward->wardcode }}">{{ $ward->wardname }} ({{ $ward->wclcode }})</option>
+                        @endforeach
+                    </select>
+                </label>
             @endif
         </div>
     </div>
@@ -55,28 +55,28 @@
             <tbody>
                 @forelse ($prescriptions as $rx)
                     @php
-                        if ($department == 'ward'){
+                        if ($department == 'ward') {
                             $log = $rx->adm;
                             $room = $log->room;
-                        }elseif ($department == 'opd'){
+                        } elseif ($department == 'opd') {
                             $log = $rx->opd;
-                        }else{
+                        } else {
                             $log = $rx->er;
                         }
                     @endphp
                     <tr>
-                        <td>{{$rx->enccode}}</td>
+                        <td>{{ $rx->enccode }}</td>
                         <td>
-                            {{$log->patient->fullname()}}
+                            {{ $log->patient->fullname() }}
                         </td>
                         <td>
-                            @if($department == 'ward')
+                            @if ($department == 'ward')
                                 <div class="flex-col">
                                     <div>
-                                        {{$room->ward->wardname}}
+                                        {{ $room->ward->wardname }}
                                     </div>
                                     <div>
-                                        {{$room->rmname}}
+                                        {{ $room->rmname }}
                                     </div>
                                 </div>
                             @elseif($department == 'opd')
@@ -91,7 +91,7 @@
             </tbody>
         </table>
         <div class="mt-2">
-            {{$prescriptions->links()}}
+            {{ $prescriptions->links() }}
         </div>
-      </div>
+    </div>
 </div>

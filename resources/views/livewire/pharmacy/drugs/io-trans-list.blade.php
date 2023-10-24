@@ -44,7 +44,7 @@
                 @forelse ($trans as $tran)
                     <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}"
                         @if ($tran->trans_stat == 'Requested') @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
-                        @if ($tran->trans_stat == 'Issued' and auth()->user()->location->description != 'Warehouse') onclick="cancel_issued({{ $tran->id }})" @endif>
+                        @if ($tran->trans_stat == 'Issued' and session('pharm_location_name') != 'Warehouse') onclick="cancel_issued({{ $tran->id }})" @endif>
                         <th>{{ $tran->trans_no }}</th>
                         <td>{{ $tran->created_at() }}</td>
                         <td>{{ $tran->location->description }}</td>
@@ -167,7 +167,7 @@
             $('#issueModal').click();
         })
 
-        Echo.private(`ioTrans.{{ auth()->user()->pharm_location_id }}`)
+        Echo.private(`ioTrans.{{ session('pharm_location_id') }}`)
             .listen('IoTransNewRequest', (e) => {
                 Livewire.emit('refreshComponent');
             });

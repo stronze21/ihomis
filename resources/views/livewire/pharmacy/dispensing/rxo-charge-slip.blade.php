@@ -26,11 +26,17 @@
                     </div>
                     <div>Patient's Name: <span class="font-semibold">{{ $rxo_header->patient->fullname() }}</span></div>
                     <div>Hosp Number: <span class="font-semibold">{{ $rxo_header->patient->hpercode }}</span></div>
-                    <div>Ward: <span
-                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? $prescription->adm_pat_room->ward->wardname : '' }}</span>
+                    <div>Ward:
+                        @if ($toecode == 'ADM' or $toecode == 'OPDAD' or $toecode == 'ERADM')
+                            <span class="font-semibold">{{ $wardname->wardname }}</span>
+                        @endif
+                        <span
+                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? $prescription->adm_pat_room->ward->wardname : 'N/A' }}
+                            / {{ $toecode }}</span>
                     </div>
+
                     <div>Ordering Physician: <span
-                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . $prescription->employee->fullname() : '' }}</span>
+                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . $prescription->employee->fullname() : 'N/A' }}</span>
                     </div>
                 </div>
             </div>
@@ -39,7 +45,7 @@
                     <tr class="border-b-2 border-b-black">
                         <th class="text-left">ITEM</th>
                         @if ($view_returns)
-                            <th class="w-20">R. QTY</th>
+                            <th class="text-left">R. QTY</th>
                         @endif
                         <th class="w-20 text-right">QTY</th>
                         <th class="w-20 text-right">UNIT COST</th>
@@ -48,17 +54,22 @@
                 </thead>
                 <tbody>
                     @foreach ($rxo as $item)
+                        @php
+                            $concat = implode(',', explode('_,', $item->dm->drug_concat));
+                        @endphp
                         <tr class="border-t border-black border-x">
-                            <td class="font-semibold text-wrap" colspan="4">{{ $item->dm->drug_concat }}</td>
+                            <td class="font-semibold text-wrap" colspan="4">{{ $concat }}</td>
+                        </tr>
+                        <tr class="border-black border-x">
+                            <td class="text-xs text-wrap" colspan="4">{{ $item->charge->chrgdesc }}</td>
                         </tr>
                         <tr class="border-b border-black border-x">
-                            <td class="text-wrap">{{ $item->charge->chrgdesc }}</td>
                             @if ($view_returns)
-                                <td class="text-center">{{ $item->returns->sum('qty') }}</td>
+                                <td class="text-right">{{ $item->returns->sum('qty') }}</td>
                             @endif
-                            <td align="right">{{ number_format($item->qtyissued, 0) }}</td>
-                            <td align="right">{{ $item->pchrgup }}</td>
-                            <td align="right">{{ number_format($item->pcchrgamt, 2) }}</td>
+                            <td class="text-right" colspan="2">{{ number_format($item->qtyissued, 0) }}</td>
+                            <td class="text-right">{{ $item->pchrgup }}</td>
+                            <td class="text-right">{{ number_format($item->pcchrgamt, 2) }}</td>
                         </tr>
                         @php
                             if ($view_returns) {
@@ -70,7 +81,7 @@
                 <tfoot>
                     <tr align="right" class="font-bold border border-t-2 border-black">
                         @if ($view_returns)
-                            <td>{{ $returned_qty }} Item/s Returned</td>
+                            <td class="text-right ">{{ $returned_qty }} Item/s Returned</td>
                         @endif
                         <td colspan="2">{{ number_format((float) $rxo->sum('qtyissued') ?? 0) }} ITEMS</td>
                         <td colspan="2">TOTAL {{ number_format((float) $rxo->sum('pcchrgamt'), 2) }}</td>
@@ -78,7 +89,8 @@
                 </tfoot>
             </table>
             <div class="flex flex-col py-0 my-0 text-left text-xs/4 whitespace-nowrap">
-                <div>Issued by: {{ $rxo_header->employee ? $rxo_header->employee->fullname() : $rxo_header->entry_by }}</div>
+                <div>Issued by: {{ $rxo_header->employee ? $rxo_header->employee->fullname() : $rxo_header->entry_by }}
+                </div>
                 <div><span>Time: {{ \Carbon\Carbon::create($rxo_header->dodate)->format('h:m A') }}</span></div>
                 <div><span>Verified by Nurse/N.A.: _________________________</span></div>
                 <div><span>Received by Patient/Watcher: ____________________</span></div>

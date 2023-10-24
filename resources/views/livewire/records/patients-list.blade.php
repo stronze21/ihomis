@@ -12,7 +12,7 @@
 </x-slot>
 
 
-<div class="flex flex-col py-5 mx-auto max-w-7xl">
+<div class="flex flex-col py-5 mx-auto max-w-screen-2xl">
     <div class="flex flex-col justify-between">
         <div class="py-3 mt-3">
             <div class="flex justify-evenly">

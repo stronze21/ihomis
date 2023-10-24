@@ -76,8 +76,8 @@ class IoTransList extends Component
             'dmdcomb' => $dmdcomb,
             'dmdctr' => $dmdctr,
             'requested_qty' => $this->requested_qty,
-            'requested_by' => auth()->user()->id,
-            'loc_code' => auth()->user()->pharm_location_id,
+            'requested_by' => session('user_id'),
+            'loc_code' => session('pharm_location_id'),
         ]);
 
         $this->alert('success', 'Request added!');
@@ -150,7 +150,7 @@ class IoTransList extends Component
                         'exp_date' => $stock->exp_date,
                         'qty' => $trans_qty,
                         'status' => 'Pending',
-                        'user_id' => auth()->user()->id,
+                        'user_id' => session('user_id'),
                         'retail_price' => $stock->retail_price,
                         'dmdprdte' => $stock->dmdprdte,
                     ]);
@@ -159,7 +159,7 @@ class IoTransList extends Component
                 }
             }
             $this->selected_request->issued_qty = $issued_qty;
-            $this->selected_request->issued_by = Auth::user()->id;
+            $this->selected_request->issued_by = session('user_id');
             $this->selected_request->trans_stat = 'Issued';
 
             $this->selected_request->save();

@@ -2,12 +2,16 @@
 
 namespace App\Http\Livewire\Pharmacy\Dispensing;
 
-use App\Models\Pharmacy\Dispensing\DrugOrder;
 use Livewire\Component;
+use App\Models\Hospital\Room;
+use App\Models\Hospital\Ward;
+use App\Models\Record\Admission\PatientRoom;
+use App\Models\Pharmacy\Dispensing\DrugOrder;
 
 class RxoChargeSlip extends Component
 {
     public $pcchrgcod, $view_returns = false, $returned_qty = 0;
+    public $wardname, $toecode;
 
     public function updatedViewReturns()
     {
@@ -30,6 +34,13 @@ class RxoChargeSlip extends Component
 
         $rxo_header = $rxo[0];
         $prescription = $rxo_header->prescriptions->first();
+
+        $this->toecode = $rxo[0]->toecode;
+
+        $patient_room = PatientRoom::where('enccode', $rxo[0]->enccode)->first();
+        if ($patient_room) {
+            $this->wardname = Ward::select('wardname')->where('wardcode', $patient_room->wardcode)->first();
+        }
 
         return view('livewire.pharmacy.dispensing.rxo-charge-slip', [
             'rxo_header' => $rxo_header,

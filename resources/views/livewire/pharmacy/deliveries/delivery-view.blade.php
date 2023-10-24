@@ -22,7 +22,7 @@
     $total_amount = 0.0;
 @endphp
 
-<div class="flex flex-col p-5 mx-auto mt-5 max-w-7xl">
+<div class="flex flex-col p-5 mx-auto mt-5 max-w-screen-2xl">
     <div class="p-4 mb-3 bg-white rounded-lg">
         <div class="flex justify-between">
             @if ($details->status == 'pending')

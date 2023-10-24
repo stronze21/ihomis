@@ -34,12 +34,12 @@ class Pusher extends Component
 
     public function mount()
     {
-        $this->user_id = Auth::user()->id;
+        $this->user_id = session('user_id');
     }
 
     public function notify_user()
     {
-        $user = User::find(Auth::user()->id);
+        $user = User::find(session('user_id'));
         UserUpdated::dispatch($user);
     }
 
@@ -48,7 +48,7 @@ class Pusher extends Component
         $io_tx = InOutTransaction::latest()->first();
         $warehouse = PharmLocation::find('1');
         // IoTransEvent::dispatch($warehouse);
-        $warehouse->notify(new IoTranNotification($io_tx, auth()->user()->id));
+        $warehouse->notify(new IoTranNotification($io_tx, session('user_id')));
         $this->alert('success', 'Dispatched');
     }
 }

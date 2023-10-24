@@ -2,7 +2,7 @@
     <div class="text-sm breadcrumbs">
         <ul>
             <li class="font-bold">
-                <i class="mr-1 las la-map-marked la-lg"></i> {{Auth::user()->location->description}}
+                <i class="mr-1 las la-map-marked la-lg"></i> {{ session('pharm_location_name') }}
             </li>
             <li class="font-bold">
                 <i class="mr-1 las la-map-marked la-lg"></i> Prescriptions
@@ -26,7 +26,7 @@
 </x-slot>
 
 
-<div class="flex flex-col py-5 mx-auto max-w-7xl">
+<div class="flex flex-col py-5 mx-auto max-w-screen-2xl">
     {{-- <div class="flex space-x-8 justify-normal">
         <div class="ml-3 form-control">
             <label class="input-group input-group-sm">
@@ -44,7 +44,8 @@
             <div class="form-control">
                 <label class="input-group">
                     <span class="whitespace-nowrap">Filter Date</span>
-                    <input type="date" class="w-full input input-sm input-bordered" max="{{date('Y-m-d')}}" wire:model.lazy="filter_date" />
+                    <input type="date" class="w-full input input-sm input-bordered" max="{{ date('Y-m-d') }}"
+                        wire:model.lazy="filter_date" />
                 </label>
             </div>
         </div>
@@ -68,23 +69,26 @@
                 </thead>
                 <tbody>
                     @forelse ($prescriptions as $rx)
-                        <tr wire:key="view-enctr-{{$rx->enccode}}-{{$loop->iteration}}" wire:click="view_enctr('{{$rx->enccode}}')" class="cursor-pointer hover">
+                        <tr wire:key="view-enctr-{{ $rx->enccode }}-{{ $loop->iteration }}"
+                            wire:click="view_enctr('{{ $rx->enccode }}')" class="cursor-pointer hover">
                             <td>
                                 <div class="flex-col">
-                                    <div>{{$rx->active_er->erdate_format1()}}</div>
-                                    <div>{{$rx->active_er->ertime_format1()}}</div>
+                                    <div>{{ $rx->active_er->erdate_format1() }}</div>
+                                    <div>{{ $rx->active_er->ertime_format1() }}</div>
                                 </div>
                             </td>
                             <td class="whitespace-nowrap">
                                 <div class="flex-col">
-                                    <div>{{$rx->active_er->patient->fullname()}}</div>
-                                    <div class="text-sm"><span class="badge badge-ghost badge-sm">{{$rx->active_er->hpercode}}</span></div>
+                                    <div>{{ $rx->active_er->patient->fullname() }}</div>
+                                    <div class="text-sm"><span
+                                            class="badge badge-ghost badge-sm">{{ $rx->active_er->hpercode }}</span>
+                                    </div>
                                 </div>
                             </td>
                             <td class="whitespace-nowrap">
                                 <div class="flex-col">
-                                    <div>{{$rx->active_er->provider->emp->fullname()}}</div>
-                                    <div>{{$rx->active_er->service_type->tsdesc}}</div>
+                                    <div>{{ $rx->active_er->provider->emp->fullname() }}</div>
+                                    <div>{{ $rx->active_er->service_type->tsdesc }}</div>
                                 </div>
                             </td>
                             <td>
@@ -94,20 +98,29 @@
                                     $or = $rx->active_or->count();
                                 @endphp
                                 <ul class="text-sm rounded-md menu menu-horizontal bg-base-200">
-                                    @if($basic)
-                                    <li>
-                                        <div class="tooltip" data-tip="BASIC"><i class="las la-2g la-prescription"></i><div class="badge badge-accent badge-xs">{{$basic}}</div></div>
-                                    </li>
+                                    @if ($basic)
+                                        <li>
+                                            <div class="tooltip" data-tip="BASIC"><i
+                                                    class="las la-2g la-prescription"></i>
+                                                <div class="badge badge-accent badge-xs">{{ $basic }}</div>
+                                            </div>
+                                        </li>
                                     @endif
-                                    @if($g24)
-                                    <li>
-                                        <div class="tooltip" data-tip="Good For 24 Hrs"><i class="las la-2g la-hourglass-start"></i><div class="badge badge-error badge-xs">{{$g24}}</div></div>
-                                    </li>
+                                    @if ($g24)
+                                        <li>
+                                            <div class="tooltip" data-tip="Good For 24 Hrs"><i
+                                                    class="las la-2g la-hourglass-start"></i>
+                                                <div class="badge badge-error badge-xs">{{ $g24 }}</div>
+                                            </div>
+                                        </li>
                                     @endif
-                                    @if($or)
-                                    <li>
-                                        <div class="tooltip" data-tip="For Operating Use"><i class="las la-2g la-syringe"></i><div class="badge badge-secondary badge-xs">{{$or}}</div></div>
-                                    </li>
+                                    @if ($or)
+                                        <li>
+                                            <div class="tooltip" data-tip="For Operating Use"><i
+                                                    class="las la-2g la-syringe"></i>
+                                                <div class="badge badge-secondary badge-xs">{{ $or }}</div>
+                                            </div>
+                                        </li>
                                     @endif
                                 </ul>
                             </td>
@@ -120,8 +133,8 @@
                 </tbody>
             </table>
             <div class="mt-2">
-                {{$prescriptions->links()}}
+                {{ $prescriptions->links() }}
             </div>
         </div>
-      </div>
+    </div>
 </div>

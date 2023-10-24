@@ -39,6 +39,10 @@ class JetstreamServiceProvider extends ServiceProvider
                 $user &&
                 Hash::check($request->password, $user->password)
             ) {
+                session(['user_id' => $user->id]);
+                session(['user_name' => $user->name]);
+                session(['user_email' => $user->email]);
+                session(['employeeid' => $user->employeeid]);
                 session(['pharm_location_id' => $user->pharm_location_id]);
                 session(['pharm_location_name' => $user->location->description]);
                 return $user;

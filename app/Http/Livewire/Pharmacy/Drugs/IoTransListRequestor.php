@@ -75,13 +75,13 @@ class IoTransListRequestor extends Component
             'dmdcomb' => $dmdcomb,
             'dmdctr' => $dmdctr,
             'requested_qty' => $this->requested_qty,
-            'requested_by' => auth()->user()->id,
-            'loc_code' => auth()->user()->pharm_location_id,
+            'requested_by' => session('user_id'),
+            'loc_code' => session('pharm_location_id'),
         ]);
 
         $warehouse = PharmLocation::find('1');
         IoTransNewRequest::dispatch($warehouse, $io_tx);
-        $warehouse->notify(new IoTranNotification($io_tx, auth()->user()->id));
+        $warehouse->notify(new IoTranNotification($io_tx, session('user_id')));
 
         $this->alert('success', 'Request added!');
     }
@@ -91,13 +91,13 @@ class IoTransListRequestor extends Component
         $io_tx = InOutTransaction::latest()->first();
         $warehouse = PharmLocation::find('1');
         IoTransNewRequest::dispatch($warehouse);
-        $warehouse->notify(new IoTranNotification($io_tx, auth()->user()->id));
+        $warehouse->notify(new IoTranNotification($io_tx, session('user_id')));
         $this->alert('success', 'Dispatched');
     }
 
     public function notify_user()
     {
-        $user = User::find(Auth::user()->id);
+        $user = User::find(session('user_id'));
         UserUpdated::dispatch($user);
     }
 

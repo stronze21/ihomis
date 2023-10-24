@@ -14,7 +14,7 @@
     </div>
 </x-slot>
 
-<div class="flex flex-col h-full min-h-screen py-5 mx-auto space-y-3 max-w-7xl">
+<div class="flex flex-col h-full min-h-screen py-5 mx-auto space-y-3 max-w-screen-2xl">
     <div class="flex space-x-2">
         <a href="{{ route('ref.manual.add') }}" class="btn btn-sm btn-primary"><i class="mr-2 las la-lg la-plus"></i>
             Add</a>

@@ -2,7 +2,7 @@
     <div class="text-sm breadcrumbs">
         <ul>
             <li class="font-bold">
-                <i class="mr-1 las la-map-marked la-lg"></i> {{Auth::user()->location->description}}
+                <i class="mr-1 las la-map-marked la-lg"></i> {{ session('pharm_location_name') }}
             </li>
             <li class="font-bold">
                 <i class="mr-1 las la-cog la-lg"></i>Settings
@@ -14,7 +14,7 @@
     </div>
 </x-slot>
 
-<div class="flex flex-col py-5 mx-auto max-w-7xl">
+<div class="flex flex-col py-5 mx-auto max-w-screen-2xl">
     <div class="flex justify-between">
         <div>
         </div>
@@ -38,14 +38,15 @@
                 </thead>
                 <tbody>
                     @forelse ($roles as $role)
-                    <tr class="cursor-pointer hover @if($selected_role && $role->id == $selected_role->id) active @endif" wire:key="select-role-{{$role->id}}" wire:click="select_role({{$role->id}})">
-                        <th>{{$role->name}}</th>
-                        <th>{{$role->guard_name}}</th>
-                    </tr>
+                        <tr class="cursor-pointer hover @if ($selected_role && $role->id == $selected_role->id) active @endif"
+                            wire:key="select-role-{{ $role->id }}" wire:click="select_role({{ $role->id }})">
+                            <th>{{ $role->name }}</th>
+                            <th>{{ $role->guard_name }}</th>
+                        </tr>
                     @empty
-                    <tr>
-                        <th class="text-center" colspan="2">No record found!</th>
-                    </tr>
+                        <tr>
+                            <th class="text-center" colspan="2">No record found!</th>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -59,13 +60,13 @@
                 </thead>
                 <tbody>
                     @forelse ($role_permissions as $rp)
-                    <tr class="cursor-pointer hover" onclick="remove_permission('{{$rp->name}}')">
-                        <th>{{$rp->name}}</th>
-                    </tr>
+                        <tr class="cursor-pointer hover" onclick="remove_permission('{{ $rp->name }}')">
+                            <th>{{ $rp->name }}</th>
+                        </tr>
                     @empty
-                    <tr>
-                        <th class="text-center">No record found!</th>
-                    </tr>
+                        <tr>
+                            <th class="text-center">No record found!</th>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -80,14 +81,14 @@
                 </thead>
                 <tbody>
                     @forelse ($permissions as $permission)
-                    <tr class="cursor-pointer hover" onclick="add_permission('{{$permission->name}}')">
-                        <th>{{$permission->name}}</th>
-                        <th>{{$permission->guard_name}}</th>
-                    </tr>
+                        <tr class="cursor-pointer hover" onclick="add_permission('{{ $permission->name }}')">
+                            <th>{{ $permission->name }}</th>
+                            <th>{{ $permission->guard_name }}</th>
+                        </tr>
                     @empty
-                    <tr>
-                        <th class="text-center" colspan="2">No record found!</th>
-                    </tr>
+                        <tr>
+                            <th class="text-center" colspan="2">No record found!</th>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -97,36 +98,34 @@
 
 
 @push('scripts')
-<script>
-    function add_permission(permission)
-    {
-        Swal.fire({
-            html: `
+    <script>
+        function add_permission(permission) {
+            Swal.fire({
+                html: `
                     <span class="font-bold"> Confirm add permission to role? </span>`,
-            showCancelButton: true,
-            confirmButtonText: `Confirm`,
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                Livewire.emit('add_permission', permission)
-            }
-        });
-    }
+                showCancelButton: true,
+                confirmButtonText: `Confirm`,
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('add_permission', permission)
+                }
+            });
+        }
 
-    function remove_permission(permission)
-    {
-        Swal.fire({
-            html: `
+        function remove_permission(permission) {
+            Swal.fire({
+                html: `
                     <span class="font-bold"> Confirm revocation of permission? </span>`,
-            showCancelButton: true,
-            confirmButtonText: `Confirm`,
-            confirmButtonColor: 'red',
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                Livewire.emit('remove_permission', permission)
-            }
-        });
-    }
-</script>
+                showCancelButton: true,
+                confirmButtonText: `Confirm`,
+                confirmButtonColor: 'red',
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('remove_permission', permission)
+                }
+            });
+        }
+    </script>
 @endpush

@@ -100,7 +100,7 @@ class EmergencyPurchases extends Component
         $new_ep = DrugEmergencyPurchase::create([
             'or_no' => $this->or_no,
             'pharmacy_name' => $this->pharmacy_name,
-            'user_id' => Auth::user()->id,
+            'user_id' => session('user_id'),
             'purchase_date' => $this->purchase_date,
             'dmdcomb' => $dm[0],
             'dmdctr' => $dm[1],
