@@ -44,6 +44,6 @@ class IoTransNewRequest implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('ioTrans.'.$this->location->id);
+        return new PrivateChannel('ioTrans.' . $this->location->id);
     }
 }

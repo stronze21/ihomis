@@ -2516,6 +2516,12 @@ html {
   right: auto;
   bottom: var(--tooltip-offset);
 }
+.alert-warning {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--wa) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--wac, var(--nc)) / var(--tw-text-opacity));
+}
 .alert-error {
   --tw-bg-opacity: 1;
   background-color: hsl(var(--er) / var(--tw-bg-opacity));
@@ -4588,6 +4594,9 @@ html {
 .mb-40 {
   margin-bottom: 10rem !important;
 }
+.mb-5 {
+  margin-bottom: 1.25rem !important;
+}
 .mb-6 {
   margin-bottom: 1.5rem !important;
 }
@@ -5243,6 +5252,9 @@ html {
 .bg-no-repeat {
   background-repeat: no-repeat !important;
 }
+.fill-primary {
+  fill: hsl(var(--p)) !important;
+}
 .stroke-current {
   stroke: currentColor !important;
 }
@@ -5430,6 +5442,10 @@ html {
 .text-xs\/4 {
   font-size: 0.75rem !important;
   line-height: 1rem !important;
+}
+.\!text-sm {
+  font-size: 0.875rem !important;
+  line-height: 1.25rem !important;
 }
 .font-bold {
   font-weight: 700 !important;

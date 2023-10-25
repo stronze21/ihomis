@@ -23,7 +23,7 @@ class RxoChargeSlip extends Component
         $pcchrgcod = $this->pcchrgcod;
 
         $rxo = DrugOrder::where('pcchrgcod', $pcchrgcod)
-            ->with('dm')->with('charge')->with('patient')
+            ->with('dm')->with('patient')
             ->with('prescriptions')
             ->latest('dodate');
 

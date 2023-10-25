@@ -58,10 +58,7 @@
                             $concat = implode(',', explode('_,', $item->dm->drug_concat));
                         @endphp
                         <tr class="border-t border-black border-x">
-                            <td class="font-semibold text-wrap" colspan="4">{{ $concat }}</td>
-                        </tr>
-                        <tr class="border-black border-x">
-                            <td class="text-xs text-wrap" colspan="4">{{ $item->charge->chrgdesc }}</td>
+                            <td class="!text-2xs font-semibold text-wrap" colspan="4">{{ $concat }}</td>
                         </tr>
                         <tr class="border-b border-black border-x">
                             @if ($view_returns)
