@@ -72,7 +72,9 @@
             <tbody>
                 @forelse ($stocks as $stk)
                     <tr class="hover"
-                        onclick="update_item({{ $stk->id }}, '{{ $stk->drug_concat() }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}', '{{ $stk->dmduprice }}', '{{ $stk->has_compounding }}', '{{ $stk->compounding_fee }}')">
+                        @can('update-stock-item')
+                            onclick="update_item({{ $stk->id }}, '{{ $stk->drug_concat() }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}', '{{ $stk->dmduprice }}', '{{ $stk->has_compounding }}', '{{ $stk->compounding_fee }}')"
+                        @endcan>
                         <th>{{ $stk->chrgdesc }}</th>
                         <td>{{ $stk->description }}</td>
                         <td>{{ $stk->updated_at }}</td>
