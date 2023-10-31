@@ -726,6 +726,8 @@
             $("#generic").val(search[0]);
             $("#generic").trigger('keyup');
             @this.rx_id = rx_id;
+            @this.rx_dmdcomb = rx_dmdcomb;
+            @this.rx_dmdctr = rx_dmdctr;
             @this.empid = empid;
 
             Swal.fire({

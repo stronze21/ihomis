@@ -299,7 +299,8 @@
 
         $(document).ready(function($) {
             $(".clickable-row").click(function() {
-                window.location = $(this).data("href");
+                let url = $(this).data("href");
+                $('<a href="' + url + '" target="blank"></a>')[0].click();
             });
         });
     </script>
