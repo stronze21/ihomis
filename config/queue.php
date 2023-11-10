@@ -35,6 +35,7 @@ return [
         ],
 
         'database' => [
+            'connection' => 'worker',
             'driver' => 'database',
             'table' => 'pharm_jobs',
             'queue' => 'default',

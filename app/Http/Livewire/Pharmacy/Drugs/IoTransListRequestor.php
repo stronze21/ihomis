@@ -145,7 +145,6 @@ class IoTransListRequestor extends Component
             ->where('status', 'Pending')
             ->latest('exp_date')
             ->get();
-
         if ($issued_items) {
             foreach ($issued_items as $item) {
 
@@ -157,7 +156,7 @@ class IoTransListRequestor extends Component
                     'exp_date' => $item->exp_date,
                     'retail_price' => $item->retail_price,
                     'dmdprdte' => $item->dmdprdte,
-                    'drug_concat' => $item->drug->drug_name(),
+                    'drug_concat' => $item->dm->drug_concat,
                 ]);
                 $stock->stock_bal += $item->qty;
                 $stock->beg_bal += $item->qty;
@@ -174,7 +173,7 @@ class IoTransListRequestor extends Component
         $txn->trans_stat = 'Received';
         $txn->save();
 
-        $this->alert('success', 'Transaction cancelled. All issued items has been returned to the warehouse!');
+        $this->alert('success', 'Transaction successful. All items received!');
         $this->reset();
     }
 }

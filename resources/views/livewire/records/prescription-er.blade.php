@@ -61,9 +61,12 @@
             <table class="table w-full mb-3 table-compact table-zebra">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Patient Name</th>
-                        <th>Department</th>
+                        <th class="cursor-pointer" onclick="sortTable(0)">Date <span class="ml-1"><i
+                                    class="las la-sort"></i></span></th>
+                        <th class="cursor-pointer" onclick="sortTable(1)">Patient Name <span class="ml-1"><i
+                                    class="las la-sort"></i></span></th>
+                        <th class="cursor-pointer" onclick="sortTable(2)">Department <span class="ml-1"><i
+                                    class="las la-sort"></i></span></th>
                         <th>Order Type</th>
                     </tr>
                 </thead>

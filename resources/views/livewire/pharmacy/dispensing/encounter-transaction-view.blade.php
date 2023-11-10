@@ -181,7 +181,7 @@
                                     if ($rxo->estatus == 'U') {
                                         $badge = '<span class="badge badge-sm badge-warning">Pending</span>';
                                     } elseif ($rxo->estatus == 'P') {
-                                        $badge = '<span class="badge badge-sm badge-primary">Charged</span>';
+                                        $badge = '<span class="badge badge-sm badge-secondary">Charged</span>';
                                     } elseif ($rxo->estatus == 'S') {
                                         $badge = '<span class="badge badge-sm badge-success">Issued</span>';
                                     }

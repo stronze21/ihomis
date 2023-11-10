@@ -8,10 +8,12 @@ use App\Models\References\ChargeCode;
 use App\Models\Pharmacy\PharmLocation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Awobaz\Compoships\Compoships;
 
 class InOutTransactionItem extends Model
 {
     use HasFactory;
+    use Compoships;
 
     protected $connection = 'hospital';
     protected $table = 'hospital.dbo.pharm_io_trans_items';
@@ -36,6 +38,11 @@ class InOutTransactionItem extends Model
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
             ->with('strength')->with('form')->with('route')->with('generic');
+    }
+
+    public function dm()
+    {
+        return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr']);
     }
 
     public function from()

@@ -64,7 +64,8 @@
                             @if ($view_returns)
                                 <td class="text-right">{{ $item->returns->sum('qty') }}</td>
                             @endif
-                            <td class="text-right" colspan="2">{{ number_format($item->qtyissued, 0) }}</td>
+                            <td class="text-right" colspan="2">
+                                {{ number_format($item->qtyissued ?? $item->pchrgqty, 0) }}</td>
                             <td class="text-right">{{ $item->pchrgup }}</td>
                             <td class="text-right">{{ number_format($item->pcchrgamt, 2) }}</td>
                         </tr>

@@ -13,7 +13,7 @@ class CreatePharmJobsTable extends Migration
      */
     public function up()
     {
-        Schema::create('pharm_jobs', function (Blueprint $table) {
+        Schema::connection('worker')->create('pharm_jobs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('queue')->index();
             $table->longText('payload');
