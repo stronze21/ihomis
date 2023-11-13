@@ -30,6 +30,7 @@ class DispenseIssueProcess implements ShouldQueue
      */
     public function __construct($selected_items, $toecode, $employeeid, $user_id)
     {
+        $this->onQueue('rxtx');
         $this->selected_items = $selected_items;
         $this->toecode = $toecode;
         $this->employeeid = $employeeid;

@@ -23,6 +23,7 @@ class LogIoTransIssue implements ShouldQueue
      */
     public function __construct($warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty)
     {
+        $this->onQueue('iotx');
         $this->warehouse_id = $warehouse_id;
         $this->dmdcomb = $dmdcomb;
         $this->dmdctr = $dmdctr;

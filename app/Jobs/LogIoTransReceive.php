@@ -23,6 +23,7 @@ class LogIoTransReceive implements ShouldQueue
      */
     public function __construct($to, $dmdcomb, $dmdctr, $chrgcode, $date_logged, $dmdprdte, $retail_price, $time_logged, $qty)
     {
+        $this->onQueue('iotx');
         $this->to = $to;
         $this->dmdcomb = $dmdcomb;
         $this->dmdctr = $dmdctr;

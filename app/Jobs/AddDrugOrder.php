@@ -26,6 +26,7 @@ class AddDrugOrder implements ShouldQueue
      */
     public function __construct($enccode, $hpercode, $order_qty, $unit_price, DrugStock $dm, $sc, $ems, $maip, $wholesale, $pay, $medicare, $service, $caf, $govt, $type, $employeeid)
     {
+        $this->onQueue('iotx');
         $this->enccode = $enccode;
         $this->hpercode = $hpercode;
         $this->order_qty = $order_qty;
@@ -125,6 +126,6 @@ class AddDrugOrder implements ShouldQueue
             ]);
         }
 
-        $this->dispatchBrowserEvent('name-updated');
+        // $this->dispatchBrowserEvent('name-updated');
     }
 }

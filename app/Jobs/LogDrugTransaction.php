@@ -23,6 +23,7 @@ class LogDrugTransaction implements ShouldQueue
      */
     public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty)
     {
+        $this->onQueue('stocklogger');
         $this->pharm_location_id = $pharm_location_id;
         $this->dmdcomb = $dmdcomb;
         $this->dmdctr = $dmdctr;
