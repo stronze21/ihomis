@@ -13,7 +13,7 @@ class CreateSystemTicketsTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mysql')->create('system_tickets', function (Blueprint $table) {
+        Schema::connection('worker')->create('system_tickets', function (Blueprint $table) {
             $table->id();
             $table->text('title');
             $table->text('description')->nullable();
