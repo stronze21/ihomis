@@ -31,6 +31,6 @@ class CreatePharmJobsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pharm_jobs');
+        Schema::connection('worker')->dropIfExists('pharm_jobs');
     }
 }

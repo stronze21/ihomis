@@ -30,6 +30,6 @@ class CreateSystemTicketCommentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('system_ticket_comments');
+        Schema::connection('worker')->dropIfExists('system_ticket_comments');
     }
 }

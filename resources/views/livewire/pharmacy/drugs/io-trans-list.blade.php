@@ -129,12 +129,11 @@
     <script>
         function issue_request() {
             Swal.fire({
-                title: 'Are you sure you want to cancel this transaction?',
+                title: 'Are you sure you want to issue items for this request?',
                 showCancelButton: true,
                 confirmButtonText: 'Continue',
-                confirmButtonColor: 'red',
+                confirmButtonColor: 'green',
                 html: `
-                    <i data-feather="alert-triangle" class="w-16 h-16 mx-auto mt-3 text-warning"></i>
                     <div class="mt-2 text-slate-500" id="inf">You are about to issue requested items. <br>This process cannot be undone. Continue?</div>
                 `,
             }).then((result) => {

@@ -30,6 +30,6 @@ class CreateSystemTicketCommentRepliesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('system_ticket_comment_replies');
+        Schema::connection('worker')->dropIfExists('system_ticket_comment_replies');
     }
 }

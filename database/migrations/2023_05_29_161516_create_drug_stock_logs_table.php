@@ -16,9 +16,9 @@ class CreateDrugStockLogsTable extends Migration
         Schema::create('pharm_drug_stock_logs', function (Blueprint $table) {
             $table->id();
             $table->integer('loc_code');
-            $table->string('dmdcomb',30);
-            $table->string('dmdctr',30);
-            $table->string('chrgcode',30);
+            $table->string('dmdcomb', 30);
+            $table->string('dmdctr', 30);
+            $table->string('chrgcode', 30);
             $table->date('date_logged');
             $table->dateTime('time_logged');
 

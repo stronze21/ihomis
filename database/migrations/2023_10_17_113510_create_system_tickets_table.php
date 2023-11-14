@@ -31,6 +31,6 @@ class CreateSystemTicketsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('system_tickets');
+        Schema::connection('worker')->dropIfExists('system_tickets');
     }
 }
