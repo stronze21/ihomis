@@ -265,16 +265,16 @@
                                         <span class="text-xs text-slate-600">{{ $stock->chrgdesc }}</span>
 
                                         @if (Carbon\Carbon::parse($stock->exp_date)->diffInDays(now(), false) >= 1 && $stock->stock_bal > 0)
-                                            <span class="badge badge-sm badge-danger">
+                                            <span class="badge badge-sm badge-danger">^
                                                 {{ Carbon\Carbon::create($stock->exp_date)->format('F j, Y') }}</span>
                                         @elseif (Carbon\Carbon::parse($stock->exp_date)->diffInDays(now(), false) > -168 && $stock->stock_bal > 0)
-                                            <span class="badge badge-sm badge-warning">
+                                            <span class="badge badge-sm badge-warning">^
                                                 {{ Carbon\Carbon::create($stock->exp_date)->format('F j, Y') }}</span>
                                         @elseif ($stock->stock_bal < 1)
-                                            <span class="badge badge-sm badge-ghost">
+                                            <span class="badge badge-sm badge-ghost">^
                                                 {{ Carbon\Carbon::create($stock->exp_date)->format('F j, Y') }}</span>
                                         @elseif (Carbon\Carbon::parse($stock->exp_date)->diffInDays(now(), false) <= -168)
-                                            <span class="badge badge-sm badge-success">
+                                            <span class="badge badge-sm badge-success">^
                                                 {{ Carbon\Carbon::create($stock->exp_date)->format('F j, Y') }}</span>
                                         @endif
 

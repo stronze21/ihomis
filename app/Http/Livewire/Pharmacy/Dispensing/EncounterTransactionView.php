@@ -6,6 +6,8 @@ use Livewire\Component;
 use App\Models\Hospital\Room;
 use App\Models\Hospital\Ward;
 use App\Models\Pharmacy\Drug;
+use App\Jobs\LogDrugOrderIssue;
+use App\Jobs\LogDrugStockIssue;
 use App\Jobs\DispenseIssueProcess;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -53,8 +55,6 @@ class EncounterTransactionView extends Component
 
     public $selected_remarks, $new_remarks;
 
-    public $stocks;
-
     public $patient;
     public $active_prescription;
     public $adm;
@@ -63,6 +63,8 @@ class EncounterTransactionView extends Component
     public $patient_room, $wardname, $rmname;
 
     public $rx_id, $rx_dmdcomb, $rx_dmdctr, $empid, $mss;
+
+    public $stock_changes = false;
 
     public function render()
     {
@@ -76,8 +78,17 @@ class EncounterTransactionView extends Component
                             WHERE hrxo.enccode = '".$enccode."'
                             ORDER BY dodate DESC");
 
+        $stocks = DB::select("SELECT pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, pharm_drug_stocks.loc_code, MAX(pharm_drug_stocks.dmdprdte) as dmdprdte, SUM(stock_bal) as stock_bal, MAX(id) as id, MIN(exp_date) as exp_date
+                                FROM hospital.dbo.pharm_drug_stocks
+                                INNER JOIN hcharge on hcharge.chrgcode = pharm_drug_stocks.chrgcode
+                                INNER JOIN hdmhdrprice on hdmhdrprice.dmdprdte = pharm_drug_stocks.dmdprdte
+                                WHERE loc_code = ?
+                                GROUP BY pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.loc_code
+                                ", [$this->location_id]);
+
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', compact(
             'rxos',
+            'stocks',
         ));
     }
 
@@ -114,13 +125,13 @@ class EncounterTransactionView extends Component
                 ->get();
         }
 
-        $this->stocks = DrugStock::join('hcharge', 'hcharge.chrgcode', 'pharm_drug_stocks.chrgcode')
-            ->join('hdmhdrprice', 'hdmhdrprice.dmdprdte', 'pharm_drug_stocks.dmdprdte')
-            ->where('loc_code', $this->location_id)
-            ->groupBy('pharm_drug_stocks.dmdcomb', 'pharm_drug_stocks.dmdctr', 'pharm_drug_stocks.chrgcode', 'hdmhdrprice.retail_price', 'dmselprice', 'drug_concat', 'hcharge.chrgdesc', 'pharm_drug_stocks.loc_code', 'pharm_drug_stocks.dmdprdte')
-            ->select('pharm_drug_stocks.dmdcomb', 'pharm_drug_stocks.dmdctr', 'drug_concat', 'hcharge.chrgdesc', 'pharm_drug_stocks.chrgcode', 'hdmhdrprice.retail_price', 'dmselprice', 'pharm_drug_stocks.loc_code', 'pharm_drug_stocks.dmdprdte')
-            ->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id, MIN(exp_date) as exp_date')
-            ->get();
+        // $this->stocks = DB::select("SELECT pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, pharm_drug_stocks.loc_code, MAX(pharm_drug_stocks.dmdprdte) as dmdprdte, SUM(stock_bal) as stock_bal, MAX(id) as id, MIN(exp_date) as exp_date
+        //                         FROM hospital.dbo.pharm_drug_stocks
+        //                         INNER JOIN hcharge on hcharge.chrgcode = pharm_drug_stocks.chrgcode
+        //                         INNER JOIN hdmhdrprice on hdmhdrprice.dmdprdte = pharm_drug_stocks.dmdprdte
+        //                         WHERE loc_code = ?
+        //                         GROUP BY pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.loc_code
+        //                         ", [$this->location_id]);
     }
 
     public function charge_items()
@@ -151,22 +162,54 @@ class EncounterTransactionView extends Component
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
         $cnt = 0;
 
-        $rxos = DB::table('hospital.dbo.hrxo')->select('dmdcomb', 'dmdctr', 'orderfrom', 'pchrgqty', 'docointkey')->whereIn('docointkey', $this->selected_items)
+        $rxos = DB::table('hospital.dbo.hrxo')->whereIn('docointkey', $this->selected_items)
             ->where('estatus', 'P')->get();
 
-        foreach ($rxos as $row) {
-            $drug = DB::select(
-                "SELECT SUM(stock_bal) as stock_bal FROM pharm_drug_stocks
-                            WHERE dmdcomb = ? AND dmdctr = ? AND chrgcode = ? AND loc_code = ?
-                            GROUP BY dmdcomb, dmdctr, chrgcode, loc_code",
-                [$row->dmdcomb, $row->dmdctr, $row->orderfrom, session('pharm_location_id')]
+        foreach ($rxos as $rxo) {
+            $stocks = DB::select(
+                "SELECT * FROM pharm_drug_stocks
+                            WHERE dmdcomb = ? AND dmdctr = ? AND chrgcode = ? AND loc_code = ? AND exp_date > ? AND stock_bal > 0
+                            ORDER BY exp_date ASC",
+                [$rxo->dmdcomb, $rxo->dmdctr, $rxo->orderfrom, session('pharm_location_id'), date('Y-m-d')]
             );
-            if ($drug) {
-                if ($drug[0]->stock_bal >= $row->pchrgqty) {
-                    $cnt = 1;
-                } else {
-                    return $this->alert('error', 'Insufficient Stock Balance.');
+            if ($stocks) {
+                $total_deduct = $rxo->pchrgqty;
+                $dmdcomb = $rxo->dmdcomb;
+                $dmdctr = $rxo->dmdctr;
+                $docointkey = $rxo->docointkey;
+                $loc_code = $rxo->loc_code;
+                $chrgcode = $rxo->orderfrom;
+                $unit_price = $rxo->pchrgup;
+                $pcchrgamt = $rxo->pcchrgamt;
+                $pcchrgcod = $rxo->pcchrgcod;
+                $tag = $rxo->tx_type;
+
+                foreach ($stocks as $stock) {
+                    $trans_qty = 0;
+                    if ($total_deduct) {
+                        if (!$rxo->ris) {
+                            if ($total_deduct > $stock->stock_bal) {
+                                $trans_qty = $stock->stock_bal;
+                                $total_deduct -= $stock->stock_bal;
+                                $stock_bal = 0;
+                            } else {
+                                $trans_qty = $total_deduct;
+                                $stock_bal = $stock->stock_bal - $total_deduct;
+                                $total_deduct = 0;
+                            }
+                            $cnt = DB::update(
+                                "UPDATE hospital.dbo.pharm_drug_stocks SET stock_bal = ? WHERE id = ?",
+                                [$stock_bal, $stock->id]
+                            );
+                        } else {
+                            $total_deduct = 0;
+                        }
+                        //TODO: Job for DrugStockIssue
+                        LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price);
+                        //TODO: Job for DrugStockLog
+                    }
                 }
+                        //TODO: Job for DrugOrderIssue
             } else {
                 return $this->alert('error', 'Insufficient Stock Balance.');
             }
@@ -179,7 +222,7 @@ class EncounterTransactionView extends Component
                     [$row2->pchrgqty, $row2->docointkey]
                 );
             }
-            DispenseIssueProcess::dispatch($this->selected_items, $this->toecode, session('employeeid'), session('user_id'));
+            LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris);
             $this->emit('refresh');
             $this->alert('success', 'Order issued successfully.');
         } else {
