@@ -85,17 +85,25 @@ return [
     |
     */
 
-    // 'failed' => [
-    //     'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
-    //     'database' => env('DB_CONNECTION', 'mysql'),
-    //     'table' => 'pharm_failed_jobs',
-    // ],
-
     'failed' => [
-        'driver' => 'database',
-        'connection' => 'worker',
+        'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
         'database' => 'worker',
         'table' => 'pharm_failed_jobs',
     ],
 
+    // 'failed' => [
+    //     'driver' => 'database',
+    //     'connection' => 'worker',
+    //     'database' => 'worker',
+    //     'table' => 'pharm_failed_jobs',
+    // ],
+
+    // 'failed' => [
+    //     'driver' => 'database',
+    //     'connection' => 'worker',
+    //     'database' => 'pharmacy',
+    //     'table' => 'pharm_failed_jobs',
+    // ],
+
 ];
+// env('DB_CONNECTION', 'mysql'),

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use App\Models\Pharmacy\Drugs\DrugStockLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
@@ -76,7 +77,7 @@ class LogDrugStockIssue implements ShouldQueue
             'pay' => $this->tag == 'pay' ? $this->trans_qty : false,
             'service' => $this->tag == 'service' ? $this->trans_qty : false,
             'caf' => $this->tag == 'caf' ? $this->trans_qty : false,
-            'ris' =>  $this->rxo->ris ? true : false,
+            'ris' =>  $this->ris ? true : false,
 
             'konsulta' => $this->tag == 'konsulta' ? $this->trans_qty : false,
             'pcso' => $this->tag == 'pcso' ? $this->trans_qty : false,
