@@ -68,15 +68,15 @@
                     <td class="text-xs border border-black">QTY.</td>
                     <td class="text-xs border border-black">Unit <br> Cost</td>
                     <td class="text-xs border border-black">Total <br> Cost</td>
-                    <td class="text-xs border border-black">SC/PWD</td>
                     <td class="text-xs border border-black">EMS</td>
                     <td class="text-xs border border-black">MAIP</td>
                     <td class="text-xs border border-black">W.S.</td>
                     <td class="text-xs border border-black">Pay</td>
-                    <td class="text-xs border border-black">Medicare</td>
                     <td class="text-xs border border-black">Service</td>
                     <td class="text-xs border border-black">CAF</td>
-                    <td class="text-xs border border-black">Gov't <br> Emp.</td>
+                    <td class="text-xs border border-black">PCSO</td>
+                    <td class="text-xs border border-black">PHIC</td>
+                    <td class="text-xs border border-black">Kon. <br> Pkg.</td>
                     <td class="text-xs border border-black">Returns</td>
                     <td class="text-xs border border-black">Issued <br> Total</td>
                     <td class="text-xs border border-black">Selling <br> Price</td>
@@ -109,15 +109,15 @@
                             {{ number_format($rxi->current_price->acquisition_cost, 2) }}</td>
                         <td class="text-xs text-right border border-black">
                             {{ number_format($rxi->available_amount(), 2) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->sc_pwd) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->ems) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->maip) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->wholesale) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->pay) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->medicare) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->service) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->caf) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->govt_emp) }}</td>
+                        <td class="text-xs text-right border border-black">{{ number_format($rxi->pcso) }}</td>
+                        <td class="text-xs text-right border border-black">{{ number_format($rxi->phic) }}</td>
+                        <td class="text-xs text-right border border-black">{{ number_format($rxi->konsulta) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->return_qty) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->issue_qty) }}</td>
                         <td class="text-xs text-right border border-black">
