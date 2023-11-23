@@ -2,11 +2,12 @@
 
 namespace App\Models\Record\Patients;
 
-use App\Models\Record\Encounters\EncounterLog;
 use Carbon\Carbon;
 use App\Models\Religion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Record\Patients\PatientMss;
+use App\Models\Record\Encounters\EncounterLog;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Patient extends Model
@@ -159,5 +160,10 @@ class Patient extends Model
 
         else
             return ' ';
+    }
+
+    public function mss()
+    {
+        return $this->belongsTo(PatientMss::class, 'enccode', 'enccode');
     }
 }

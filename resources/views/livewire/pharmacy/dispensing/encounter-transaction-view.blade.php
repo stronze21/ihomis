@@ -33,9 +33,6 @@
                         </div>
                         <div><button class="ml-2 btn btn-sm btn-primary" onclick="issue_order()"
                                 wire:loading.attr="disabled" wire:loading.class="btn-secondary">Issue</button></div>
-                        {{-- <div><button class="ml-2 btn btn-sm btn-danger" wire:click="reset_order()" wire:loading.attr="disabled" wire:loading.class="btn-secondary">Reset Order</button></div> --}}
-                        {{-- @if (session('employeeid') == '001783') --}}
-                        {{-- @endif --}}
                     </div>
                 </div>
                 <table class="w-full mb-40 text-sm table-compact">
@@ -76,6 +73,41 @@
                                     class="fw-bold">{{ \Carbon\Carbon::create($encounter->encdate)->format('F j, Y / g:i A') }}</span>
                             </td>
                         </tr>
+                        <tr>
+                            <td colspan="11" class="border border-black">Patient Classification:
+                                @php
+                                    $class="---";
+                                    if($mss){
+                                        switch ($mss->mssikey) {
+                                            case 'MSSA11111999':
+                                            case 'MSSB11111999':
+                                                $class = "Pay";
+                                                break;
+
+                                            case 'MSSC111111999':
+                                                $class = "PP1";
+                                                break;
+
+                                            case 'MSSC211111999':
+                                                $class = "PP2";
+                                                break;
+
+                                            case 'MSSC311111999':
+                                                $class = "PP3";
+                                                break;
+
+                                            case 'MSSD11111999':
+                                                $class = "Indigent";
+                                                break;
+
+                                            default:
+                                                $class = "---";
+                                        }
+                                    }
+                                @endphp
+                                <span class="uppercase">{{ $class }}</span>
+                            </td>
+                        </tr>
                         <tr class="border border-black">
                             <td></td>
                             <td></td>
@@ -114,7 +146,7 @@
                             @endphp
                             <tr class="border">
                                 <td class="w-10 text-center">
-                                    <input type="checkbox" class="checkbox" wire:model.defer="selected_items"
+                                    <input type="checkbox" class="checkbox{{ '-'.$rxo->pcchrgcod }}" wire:model.defer="selected_items"
                                         value="{{ $rxo->docointkey }}" />
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">
@@ -311,6 +343,11 @@
     <script>
         var data;
         $(document).ready(function() {
+            $('input:checkbox').change(function(){
+                if($(this).is(':checked')){
+                    $('.'+this.className).prop( "checked", true );
+                }
+            });
 
             $("#generic").on("keyup", function() {
                 var value = $(this).val().toLowerCase();
@@ -443,6 +480,7 @@
             })
         }
 
+
         function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available, exp_date) {
             Swal.fire({
                 html: `
@@ -474,63 +512,57 @@
                         <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
                             <div class="col-span-4 font-bold">TAG</div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="pay" name="radio" checked>
-                                <label class="cursor-pointer" for="pay">
-                                    <span class="label-text">PAY</span>
+                                <input class="toggle toggle-success" type="radio" id="na" name="radio" checked>
+                                <label class="cursor-pointer" for="na">
+                                    <span class="label-text">N/A</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="sc" name="radio">
-                                <label class="cursor-pointer" for="sc">
-                                    <span class="label-text">SC/PWD</span>
-                                </label>
-                            </div>
-                            <div class="col-span-2">
-                                <input class="toggle" type="radio" id="ems" name="radio">
+                                <input class="toggle toggle-success" type="radio" id="ems" name="radio">
                                 <label class="cursor-pointer" for="ems">
                                     <span class="label-text">EMS</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="maip" name="radio">
-                                <label class="cursor-pointer" for="maip">
-                                    <span class="label-text">MAIP</span>
+                                <input class="toggle toggle-success" type="radio" id="konsulta" name="radio">
+                                <label class="cursor-pointer" for="konsulta">
+                                    <span class="label-text">Konsulta Package</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="wholesale" name="radio">
+                                <input class="toggle toggle-success" type="radio" id="wholesale" name="radio">
                                 <label class="cursor-pointer" for="wholesale">
                                     <span class="label-text">WHOLESALE</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="medicare" name="radio">
-                                <label class="cursor-pointer" for="medicare">
-                                    <span class="label-text">MEDICARE</span>
-                                </label>
-                            </div>
-                            <div class="col-span-2">
-                                <input class="toggle" type="radio" id="service" name="radio">
-                                <label class="cursor-pointer" for="service">
-                                    <span class="label-text">SERVICE</span>
-                                </label>
-                            </div>
-                            <div class="col-span-2">
-                                <input class="toggle" type="radio" id="caf" name="radio">
+                                <input class="toggle toggle-success" type="radio" id="caf" name="radio">
                                 <label class="cursor-pointer" for="caf">
                                     <span class="label-text">CAF</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="govt" name="radio">
-                                <label class="cursor-pointer" for="govt">
-                                    <span class="label-text">Gov't Emp</span>
+                                <input class="toggle toggle-success" type="radio" id="maip" name="radio">
+                                <label class="cursor-pointer" for="maip">
+                                    <span class="label-text">MAIP</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="checkbox" id="is_ris" name="is_ris">
+                                <input class="toggle toggle-success" type="radio" id="is_ris" name="radio">
                                 <label class="cursor-pointer" for="is_ris">
                                     <span class="label-text">RIS</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="pcso" name="radio">
+                                <label class="cursor-pointer" for="pcso">
+                                    <span class="label-text">PCSO</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="phic" name="radio">
+                                <label class="cursor-pointer" for="phic">
+                                    <span class="label-text">PHIC</span>
                                 </label>
                             </div>
                         </div>
@@ -544,17 +576,15 @@
                     const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
                     const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
                     const total = Swal.getHtmlContainer().querySelector('#total')
-                    const sc = Swal.getHtmlContainer().querySelector('#sc')
                     const ems = Swal.getHtmlContainer().querySelector('#ems')
                     const maip = Swal.getHtmlContainer().querySelector('#maip')
                     const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
-                    const pay = Swal.getHtmlContainer().querySelector('#pay')
-                    const medicare = Swal.getHtmlContainer().querySelector('#medicare')
-                    const service = Swal.getHtmlContainer().querySelector('#service')
                     const caf = Swal.getHtmlContainer().querySelector('#caf')
-                    const govt = Swal.getHtmlContainer().querySelector('#govt')
                     const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
                     const remarks = Swal.getHtmlContainer().querySelector('#remarks')
+                    const konsulta = Swal.getHtmlContainer().querySelector('#konsulta')
+                    const pcso = Swal.getHtmlContainer().querySelector('#pcso')
+                    const phic = Swal.getHtmlContainer().querySelector('#phic')
 
                     order_qty.focus();
                     unit_price.value = up;
@@ -575,58 +605,6 @@
                         total.value = parseFloat(order_qty.value) * parseFloat(unit_price
                             .value)
                     })
-                    ems.addEventListener('change', () => {
-                        unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-                    maip.addEventListener('change', () => {
-                        unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-                    wholesale.addEventListener('change', () => {
-                        unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-                    pay.addEventListener('change', () => {
-                        unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-                    medicare.addEventListener('change', () => {
-                        unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-                    service.addEventListener('change', () => {
-                        unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-                    caf.addEventListener('change', () => {
-                        unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-                    govt.addEventListener('change', () => {
-                        unit_price.value = up;
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-
-                    sc.addEventListener('change', () => {
-                        // @this.set('unit_price',unit_price.value)
-                        if (sc.checked) {
-                            unit_price.value = unit_price.value - (unit_price.value * 0.20);
-                        } else {
-                            unit_price.value = up;
-                        }
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-
-                    })
                 }
             }).then((result) => {
                 /* Read more about isConfirmed, isDenied below */
@@ -634,15 +612,13 @@
                     @this.set('unit_price', unit_price.value)
                     @this.set('order_qty', order_qty.value)
 
-                    @this.set('sc', sc.checked);
                     @this.set('ems', ems.checked);
                     @this.set('maip', maip.checked);
                     @this.set('wholesale', wholesale.checked);
-                    @this.set('pay', pay.checked);
-                    @this.set('medicare', medicare.checked);
-                    @this.set('service', service.checked);
+                    @this.set('konsulta', konsulta.checked);
+                    @this.set('pcso', pcso.checked);
+                    @this.set('phic', phic.checked);
                     @this.set('caf', caf.checked);
-                    @this.set('govt', govt.checked);
                     @this.set('is_ris', is_ris.checked);
                     @this.set('remarks', remarks.value);
 
@@ -720,7 +696,7 @@
             });
         }
 
-        function select_rx_item(rx_id, drug, rx_qty, empid, dmdcomb, dmdctr) {
+        function select_rx_item(rx_id, drug, rx_qty, empid, rx_dmdcomb, rx_dmdctr) {
 
             var search = drug.split(",");
             $("#generic").val(search[0]);
@@ -862,7 +838,7 @@
                     @this.set('is_ris', rx_is_ris.checked);
                     @this.set('remarks', rx_remarks.value);
 
-                    Livewire.emit('add_prescribed_item', dmdcomb, dmdctr);
+                    Livewire.emit('add_prescribed_item', rx_dmdcomb, rx_dmdctr);
                 }
             });
         }

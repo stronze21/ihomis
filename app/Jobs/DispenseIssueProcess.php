@@ -13,7 +13,6 @@ use App\Models\Pharmacy\Dispensing\DrugOrder;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
-use App\Models\Record\Prescriptions\PrescriptionData;
 use App\Models\Record\Prescriptions\PrescriptionDataIssued;
 
 class DispenseIssueProcess implements ShouldQueue
@@ -50,18 +49,11 @@ class DispenseIssueProcess implements ShouldQueue
         foreach ($rxos as $rxo) {
 
             if ($rxo->prescription_data_id) {
-                $rx_data = PrescriptionData::find($rxo->prescription_data_id);
-
                 PrescriptionDataIssued::create([
-                    'presc_data_id' => $rx_data->id,
+                    'presc_data_id' => $rxo->prescription_data_id,
                     'docointkey' => $rxo->docointkey,
                     'qtyissued' => $rxo->pchrgqty,
                 ]);
-
-                $rx_data->stat = 'I';
-                // $rx_data->order_by = $rx_data->rx->empid;
-                // $rx_data->deptcode = $rx_data->rx->employee->deptcode;
-                $rx_data->save();
             }
 
             //START DEDUCT STOCK
@@ -121,16 +113,17 @@ class DispenseIssueProcess implements ShouldQueue
                         'toecode' => $this->toecode,
                         'pcchrgcod' => $pcchrgcod,
 
-                        'sc_pwd' => $tag == 'sc_pwd' ? $trans_qty : false,
                         'ems' => $tag == 'ems' ? $trans_qty : false,
                         'maip' => $tag == 'maip' ? $trans_qty : false,
                         'wholesale' => $tag == 'wholesale' ? $trans_qty : false,
                         'pay' => $tag == 'pay' ? $trans_qty : false,
-                        'medicare' => $tag == 'medicare' ? $trans_qty : false,
                         'service' => $tag == 'service' ? $trans_qty : false,
-                        'govt_emp' => $tag == 'govt_emp' ? $trans_qty : false,
                         'caf' => $tag == 'caf' ? $trans_qty : false,
                         'ris' =>  $rxo->ris ? true : false,
+
+                        'konsulta' => $tag == 'konsulta' ? $trans_qty : false,
+                        'pcso' => $tag == 'pcso' ? $trans_qty : false,
+                        'phic' => $tag == 'phic' ? $trans_qty : false,
 
                         'dmdprdte' => $stock->dmdprdte,
                     ]);
@@ -147,16 +140,24 @@ class DispenseIssueProcess implements ShouldQueue
                     $log->time_logged = now();
                     $log->issue_qty += $trans_qty;
 
-                    $log->sc_pwd += $issued_drug->sc_pwd;
+                    $log->wholesale += $issued_drug->wholesale;
                     $log->ems += $issued_drug->ems;
                     $log->maip += $issued_drug->maip;
-                    $log->wholesale += $issued_drug->wholesale;
-                    $log->pay += $issued_drug->pay;
-                    $log->medicare += $issued_drug->medicare;
-                    $log->service += $issued_drug->service;
-                    $log->govt_emp += $issued_drug->govt_emp;
                     $log->caf += $issued_drug->caf;
                     $log->ris += $issued_drug->ris ? 1 : 0;
+
+                    $log->pay += $issued_drug->pay;
+                    $log->service += $issued_drug->service;
+
+                    //removed columns
+                    // $log->sc_pwd += $issued_drug->sc_pwd;
+                    // $log->medicare += $issued_drug->medicare;
+                    // $log->govt_emp += $issued_drug->govt_emp;
+
+                    // added columns
+                    $log->konsulta += $issued_drug->konsulta;
+                    $log->pcso += $issued_drug->pcso;
+                    $log->phic += $issued_drug->phic;
 
                     $log->save();
 

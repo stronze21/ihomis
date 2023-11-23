@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Hospital\Room;
 use App\Models\Hospital\Ward;
 use App\Models\Pharmacy\Drug;
+use App\Jobs\DispenseIssueProcess;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\References\ChargeCode;
@@ -13,9 +14,10 @@ use Illuminate\Support\Facades\Crypt;
 use App\Models\Record\Patients\Patient;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Http\Controllers\SharedController;
-use App\Jobs\DispenseIssueProcess;
+use App\Models\Record\Patients\PatientMss;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
 use App\Models\Record\Admission\PatientRoom;
+use Illuminate\Database\Eloquent\Collection;
 use App\Models\Pharmacy\Dispensing\DrugOrder;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -27,7 +29,6 @@ use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
 use App\Models\Pharmacy\Dispensing\OrderChargeCode;
 use App\Models\Record\Prescriptions\PrescriptionData;
 use App\Models\Record\Prescriptions\PrescriptionDataIssued;
-use Illuminate\Database\Eloquent\Collection;
 
 class EncounterTransactionView extends Component
 {
@@ -40,7 +41,8 @@ class EncounterTransactionView extends Component
 
     public $order_qty, $unit_price, $return_qty, $docointkey;
     public $item_id;
-    public $sc, $ems, $maip, $wholesale, $pay, $medicare, $service, $caf, $govt, $type;
+    public $ems, $maip, $wholesale, $caf, $type, $konsulta, $pcso, $phic, $pay, $service;
+
     public $is_ris = false;
     public $remarks;
 
@@ -60,44 +62,19 @@ class EncounterTransactionView extends Component
 
     public $patient_room, $wardname, $rmname;
 
-    public $rx_id, $rx_dmdcomb, $rx_dmdctr, $empid;
-
-    // public function updatingChargeCode()
-    // {
-    //     $stocks = DrugStock::with('charge')->with('current_price')->has('current_price')
-    //         ->where('loc_code', $this->location_id)->groupBy('dmdcomb', 'dmdctr', 'chrgcode', 'dmdprdte', 'drug_concat')
-    //         ->select('dmdcomb', 'dmdctr', 'drug_concat', 'chrgcode', 'dmdprdte')
-    //         ->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id');
-    //     if ($this->charge_code) {
-    //         $stocks->whereIn('chrgcode', $this->charge_code);
-    //     }
-
-    //     $this->stocks = $stocks;
-
-    //     $this->emit('refresh');
-    // }
+    public $rx_id, $rx_dmdcomb, $rx_dmdctr, $empid, $mss;
 
     public function render()
     {
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-        // $rxos = DrugOrder::where('enccode', $enccode)->with('charge')->with('dm')->latest('dodate')->get();
 
-        // $rxos = DrugOrder::select('docointkey', 'pcchrgcod', 'dodate', 'pchrgqty', 'estatus', 'qtyissued', 'pchrgup', 'drug_concat', 'chrgdesc', 'remarks')
-        //     ->join('hdmhdr', function ($join) {
-        //         $join->on('hdmhdr.dmdcomb', 'hrxo.dmdcomb');
-        //         $join->on('hdmhdr.dmdctr', 'hrxo.dmdctr');
-        //     })
-        //     ->join('hcharge', 'orderfrom', 'chrgcode')
-        //     ->where('enccode', $enccode)
-        //     ->orderBy('dodate', 'DESC')
-        //     ->get();
-
-        $rxos = DB::select('SELECT docointkey, pcchrgcod, dodate, pchrgqty, estatus, qtyissued, pchrgup, pcchrgamt, drug_concat, chrgdesc, remarks
+        $rxos = DB::select("SELECT docointkey, pcchrgcod, dodate, pchrgqty, estatus, qtyissued, pchrgup, pcchrgamt, drug_concat, chrgdesc, remarks, mssikey
                             FROM hospital.dbo.hrxo
                             INNER JOIN hdmhdr ON hdmhdr.dmdcomb = hrxo.dmdcomb AND hdmhdr.dmdctr = hrxo.dmdctr
                             INNER JOIN hcharge ON orderfrom = chrgcode
-                            WHERE enccode = ?
-                            ORDER BY dodate DESC', [$enccode]);
+                            LEFT JOIN hpatmss ON hrxo.enccode = hpatmss.enccode
+                            WHERE hrxo.enccode = '".$enccode."'
+                            ORDER BY dodate DESC");
 
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', compact(
             'rxos',
@@ -116,6 +93,7 @@ class EncounterTransactionView extends Component
         //     ->with('patient')->with('rxo')->with('active_prescription')->with('adm')->first();
 
         $this->encounter = EncounterLog::where('enccode', $enccode)->first();
+        $this->mss = PatientMss::where('enccode', $enccode)->first();
         $this->patient = Patient::find($this->encounter->hpercode);
         $this->active_prescription = Prescription::where('enccode', $enccode)->with('employee')->with('data_active')->has('data_active')->get();
         $patient_room = PatientRoom::where('enccode', $enccode)->first();
@@ -143,37 +121,6 @@ class EncounterTransactionView extends Component
             ->select('pharm_drug_stocks.dmdcomb', 'pharm_drug_stocks.dmdctr', 'drug_concat', 'hcharge.chrgdesc', 'pharm_drug_stocks.chrgcode', 'hdmhdrprice.retail_price', 'dmselprice', 'pharm_drug_stocks.loc_code', 'pharm_drug_stocks.dmdprdte')
             ->selectRaw('SUM(stock_bal) as stock_bal, MAX(id) as id, MIN(exp_date) as exp_date')
             ->get();
-
-        // $this->stocks = DB::select(
-        //     'SELECT  [pharm_drug_stocks].[dmdcomb]
-        //             ,[pharm_drug_stocks].[dmdctr]
-        //             ,[drug_concat]
-        //             ,[hcharge].[chrgdesc]
-        //             ,[pharm_drug_stocks].[chrgcode]
-        //             ,[hdmhdrprice].[retail_price]
-        //             ,[dmselprice]
-        //             ,[pharm_drug_stocks].[loc_code]
-        //             ,[pharm_drug_stocks].[dmdprdte]
-        //             ,SUM(stock_bal) AS stock_bal
-        //             ,MAX(id)        AS id
-        //             ,MIN(exp_date)  AS exp_date
-        //     FROM [hospital].[dbo].[pharm_drug_stocks]
-        //     INNER JOIN [hcharge]
-        //     ON [hcharge].[chrgcode] = [pharm_drug_stocks].[chrgcode]
-        //     INNER JOIN [hdmhdrprice]
-        //     ON [hdmhdrprice].[dmdprdte] = [pharm_drug_stocks].[dmdprdte]
-        //     WHERE [loc_code] = :loc_code
-        //     GROUP BY  [pharm_drug_stocks].[dmdcomb]
-        //             ,[pharm_drug_stocks].[dmdctr]
-        //             ,[pharm_drug_stocks].[chrgcode]
-        //             ,[hdmhdrprice].[retail_price]
-        //             ,[dmselprice]
-        //             ,[drug_concat]
-        //             ,[hcharge].[chrgdesc]
-        //             ,[pharm_drug_stocks].[loc_code]
-        //             ,[pharm_drug_stocks].[dmdprdte]',
-        //     ['loc_code' => $this->location_id]
-        // );
     }
 
     public function charge_items()
@@ -567,9 +514,7 @@ class EncounterTransactionView extends Component
 
         $total_deduct = $this->order_qty;
 
-        if ($this->sc) {
-            $this->type = 'sc_pwd';
-        } else if ($this->ems) {
+        if ($this->ems) {
             $this->type = 'ems';
         } else if ($this->maip) {
             $this->type = 'maip';
@@ -577,14 +522,18 @@ class EncounterTransactionView extends Component
             $this->type = 'wholesale';
         } else if ($this->pay) {
             $this->type = 'pay';
-        } else if ($this->medicare) {
-            $this->type = 'medicare';
         } else if ($this->service) {
             $this->type = 'service';
         } else if ($this->caf) {
             $this->type = 'caf';
-        } else if ($this->govt) {
-            $this->type = 'govt';
+        } else if ($this->is_ris) {
+            $this->type = 'ris';
+        } else if ($this->pcso) {
+            $this->type = 'pcso';
+        } else if ($this->phic) {
+            $this->type = 'phic';
+        } else if ($this->konsulta) {
+            $this->type = 'konsulta';
         }
 
         if ($this->is_ris or $available >= $total_deduct) {
@@ -631,13 +580,18 @@ class EncounterTransactionView extends Component
                     $exp_date,
                     $loc_code,
                     $id,
-                    $this->remarks,
+                    $this->remarks ?? '',
                     $with_rx ? $rx_id : null,
                     $with_rx ? $empid : null,
                 ]
             );
+            if($with_rx){
+                DB::connection('webapp')->table('webapp.dbo.prescription_data')
+                ->where('id', $rx_id)
+                ->update(['stat' => 'I']);
+            }
 
-            $this->resetExcept('stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
+            $this->resetExcept('rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
             $this->emit('refresh');
             $this->alert('success', 'Item added.');
         } else {
@@ -647,21 +601,23 @@ class EncounterTransactionView extends Component
 
     public function delete_item()
     {
-        // $rxo = DrugOrder::whereIn('docointkey', $this->selected_items)
-        //     ->where('estatus', 'U')->get();
+        $has_delete = false;
+        $items = DrugOrder::whereIn('docointkey', $this->selected_items)
+            ->where('estatus', 'U')->get();
 
-        // $has_delete = false;
-
-        // foreach ($rxo as $order) {
-        //     $order->delete();
-        //     $has_delete = true;
-        // }
-        $has_delete = DB::table('hrxo')->whereIn('docointkey', $this->selected_items)
-            ->where('estatus', 'U')->delete();
+        foreach ($items as $item) {
+            if($item->prescription_data_id){
+                DB::connection('webapp')->table('webapp.dbo.prescription_data')
+                ->where('id', $item->prescription_data_id)
+                    ->update(['stat' => 'A']);
+            }
+            $item->delete();
+            $has_delete = true;
+        }
 
         $this->reset('selected_items');
 
-        if ($has_delete > 0) {
+        if ($has_delete) {
             $this->emit('refresh');
             $this->alert('success', 'Selected item/s deleted!');
         } else {
@@ -785,92 +741,95 @@ class EncounterTransactionView extends Component
 
         if ($dm) {
             $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-            DB::insert(
-                'INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
-                    rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,
-                    has_tag, tx_type, ris, pchrgqty, pchrgup, pcchrgamt, dodate, dotime, dodtepost, dotmepost, dmdprdte, exp_date, loc_code, item_id, remarks, prescription_data_id, prescribed_by)
-                VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?',
-                [
-                    '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $dm->chrgcode . $dm->dmdcomb . $dm->dmdctr,
-                    $enccode,
-                    $this->hpercode,
-                    '1',
-                    '1',
-                    $dm->dmdcomb,
-                    '1',
-                    'A',
-                    'N',
-                    'N',
-                    'N',
-                    $dm->dmdctr,
-                    'U',
-                    session('employeeid'),
-                    'NEWOR',
-                    'ACTIV',
-                    'PHARM',
-                    $dm->chrgcode,
-                    'c',
-                    $this->type ? true : false,
-                    $this->type,
-                    $this->is_ris ? true : false,
-                    $this->order_qty,
-                    $dm->current_price->dmselprice,
-                    $this->order_qty * $dm->current_price->dmselprice,
-                    now(),
-                    now(),
-                    now(),
-                    now(),
-                    $dm->dmdprdte,
-                    $dm->exp_date,
-                    $dm->loc_code,
-                    $dm->id,
-                    $this->remarks,
-                    $rx_id,
-                    $empid,
-                ]
-            );
+            // DB::insert(
+            //     "INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
+            //         rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,
+            //         has_tag, tx_type, ris, pchrgqty, pchrgup, pcchrgamt, dodate, dotime, dodtepost, dotmepost, dmdprdte, exp_date, loc_code, item_id, remarks, prescription_data_id, prescribed_by)
+            //     VALUES (
+            //         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            //         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            //         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?",
+            //     [
+            //         '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $dm->chrgcode . $dm->dmdcomb . $dm->dmdctr,
+            //         $enccode,
+            //         $this->hpercode,
+            //         '1',
+            //         '1',
+            //         $dm->dmdcomb,
+            //         '1',
+            //         'A',
+            //         'N',
+            //         'N',
+            //         'N',
+            //         $dm->dmdctr,
+            //         'U',
+            //         session('employeeid'),
+            //         'NEWOR',
+            //         'ACTIV',
+            //         'PHARM',
+            //         $dm->chrgcode,
+            //         'c',
+            //         $this->type ? true : false,
+            //         $this->type,
+            //         $this->is_ris ? true : false,
+            //         $this->order_qty,
+            //         $dm->current_price->dmselprice,
+            //         $this->order_qty * $dm->current_price->dmselprice,
+            //         now(),
+            //         now(),
+            //         now(),
+            //         now(),
+            //         $dm->dmdprdte,
+            //         $dm->exp_date,
+            //         $dm->loc_code,
+            //         $dm->id,
+            //         $this->remarks ?? '',
+            //         $rx_id,
+            //         $empid,
+            //     ]
+            // );
 
-            // DrugOrder::create([
-            //     'docointkey' => '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $dm->chrgcode . $dm->dmdcomb . $dm->dmdctr,
-            //     'enccode' => $enccode,
-            //     'hpercode' => $this->hpercode,
-            //     'rxooccid' => '1',
-            //     'rxoref' => '1',
-            //     'dmdcomb' => $dm->dmdcomb,
-            //     'repdayno1' => '1',
-            //     'rxostatus' => 'A',
-            //     'rxolock' => 'N',
-            //     'rxoupsw' => 'N',
-            //     'rxoconfd' => 'N',
-            //     'dmdctr' => $dm->dmdctr,
-            //     'estatus' => 'U',
-            //     'entryby' => session('employeeid'),
-            //     'ordcon' => 'NEWOR',
-            //     'orderupd' => 'ACTIV',
-            //     'locacode' => 'PHARM',
-            //     'orderfrom' => $dm->chrgcode,
-            //     'issuetype' => 'c',
-            //     'has_tag' => $this->type ? true : false, //added
-            //     'tx_type' => $this->type, //added
-            //     'ris' =>  $this->is_ris ? true : false,
-            //     'prescription_data_id' => $rx_id,
-            //     'prescribed_by' => $empid,
-            //     'pchrgqty' => $this->order_qty,
-            //     'pchrgup' => $dm->current_price->dmselprice,
-            //     'pcchrgamt' => $this->order_qty * $dm->current_price->dmselprice,
-            //     'dodate' => now(),
-            //     'dotime' => now(),
-            //     'dodtepost' => now(),
-            //     'dotmepost' => now(),
-            //     'dmdprdte' => $dm->dmdprdte,
-            //     'exp_date' => $dm->exp_date, //added
-            //     'loc_code' => $dm->loc_code, //added
-            //     'item_id' => $dm->id, //added
-            //     'remarks' => $this->remarks, //added
-            // ]);
+            DrugOrder::create([
+                'docointkey' => '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $dm->chrgcode . $dm->dmdcomb . $dm->dmdctr,
+                'enccode' => $enccode,
+                'hpercode' => $this->hpercode,
+                'rxooccid' => '1',
+                'rxoref' => '1',
+                'dmdcomb' => $dm->dmdcomb,
+                'repdayno1' => '1',
+                'rxostatus' => 'A',
+                'rxolock' => 'N',
+                'rxoupsw' => 'N',
+                'rxoconfd' => 'N',
+                'dmdctr' => $dm->dmdctr,
+                'estatus' => 'U',
+                'entryby' => session('employeeid'),
+                'ordcon' => 'NEWOR',
+                'orderupd' => 'ACTIV',
+                'locacode' => 'PHARM',
+                'orderfrom' => $dm->chrgcode,
+                'issuetype' => 'c',
+                'has_tag' => $this->type ? true : false, //added
+                'tx_type' => $this->type, //added
+                'ris' =>  $this->is_ris ? true : false,
+                'prescription_data_id' => $rx_id,
+                'prescribed_by' => $empid,
+                'pchrgqty' => $this->order_qty,
+                'pchrgup' => $dm->current_price->dmselprice,
+                'pcchrgamt' => $this->order_qty * $dm->current_price->dmselprice,
+                'dodate' => now(),
+                'dotime' => now(),
+                'dodtepost' => now(),
+                'dotmepost' => now(),
+                'dmdprdte' => $dm->dmdprdte,
+                'exp_date' => $dm->exp_date, //added
+                'loc_code' => $dm->loc_code, //added
+                'item_id' => $dm->id, //added
+                'remarks' => $this->remarks, //added
+            ]);
+            DB::connection('webapp')->table('webapp.dbo.prescription_data')
+            ->where('id', $rx_id)
+            ->update(['stat' => 'I']);
 
             $this->resetExcept('stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
             $this->emit('refresh');

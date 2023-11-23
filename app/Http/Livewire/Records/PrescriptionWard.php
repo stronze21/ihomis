@@ -51,6 +51,7 @@ class PrescriptionWard extends Component
             ->rightJoin(DB::raw('hospital.dbo.hroom room'), 'pat_room.rmintkey', 'room.rmintkey')
             ->rightJoin(DB::raw('hospital.dbo.hward ward'), 'pat_room.wardcode', 'ward.wardcode')
             ->rightJoin(DB::raw('hospital.dbo.hperson pt'), 'adm.hpercode', 'pt.hpercode')
+            ->leftJoin(DB::raw('hospital.dbo.hpatmss mss'), 'enctr.enccode', 'mss.enccode')
             ->select(
                 'adm.enccode',
                 'adm.admdate',
@@ -61,6 +62,7 @@ class PrescriptionWard extends Component
                 'pt.patsuffix',
                 'room.rmname',
                 'ward.wardname',
+                'mss.mssikey',
                 DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND (data.order_type = '' OR data.order_type IS NULL)) basic"),
                 DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND data.order_type = 'G24') g24"),
                 DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND data.order_type = 'OR') 'or'")

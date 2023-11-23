@@ -34,14 +34,14 @@ class CreateDrugStockLogsTable extends Migration
             $table->decimal('issue_qty', 12, 2)->nullable()->default(0);
             $table->decimal('return_qty', 12, 2)->nullable()->default(0);
 
-            $table->decimal('sc_pwd', 12, 2)->nullable()->default(0);
+            // $table->decimal('sc_pwd', 12, 2)->nullable()->default(0);
             $table->decimal('ems', 12, 2)->nullable()->default(0);
             $table->decimal('maip', 12, 2)->nullable()->default(0);
             $table->decimal('wholesale', 12, 2)->nullable()->default(0);
             $table->decimal('pay', 12, 2)->nullable()->default(0);
-            $table->decimal('medicare', 12, 2)->nullable()->default(0);
+            // $table->decimal('medicare', 12, 2)->nullable()->default(0);
             $table->decimal('service', 12, 2)->nullable()->default(0);
-            $table->decimal('govt_emp', 12, 2)->nullable()->default(0);
+            // $table->decimal('govt_emp', 12, 2)->nullable()->default(0);
             $table->decimal('caf', 12, 2)->nullable()->default(0);
 
             $table->timestamps();

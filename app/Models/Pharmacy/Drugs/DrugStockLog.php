@@ -38,17 +38,22 @@ class DrugStockLog extends Model
         'issue_qty', //nullable()->default(0);
         'return_qty', //nullable()->default(0);
 
-        'sc_pwd', //nullable()->default(0);
         'ems', //nullable()->default(0);
         'maip', //nullable()->default(0);
         'wholesale', //nullable()->default(0);
         'pay', //nullable()->default(0);
-        'medicare', //nullable()->default(0);
         'service', //nullable()->default(0);
-        'govt_emp', //nullable()->default(0);
         'caf', //nullable()->default(0);
         'dmdprdte',
         'ris',
+
+        'konsulta',
+        'phic',
+        'pcso',
+
+        // 'sc_pwd', //nullable()->default(0);
+        // 'medicare', //nullable()->default(0);
+        // 'govt_emp', //nullable()->default(0);
     ];
 
     public function charge()

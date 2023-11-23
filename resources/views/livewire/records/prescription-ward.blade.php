@@ -75,6 +75,7 @@
                                     class="las la-sort"></i></span></th>
                         <th class="cursor-pointer" onclick="sortTable(2)">Department <span class="ml-1"><i
                                     class="las la-sort"></i></span></th>
+                        <th>Patient Classification</th>
                         <th>Rx Tag</th>
                     </tr>
                 </thead>
@@ -104,6 +105,36 @@
                                     <div>{{ $rx->wardname }}</div>
                                     <div>{{ $rx->rmname }}</div>
                                 </div>
+                            </td>
+                            <td class="whitespace-nowrap">
+                                @php
+                                    switch ($rx->mssikey) {
+                                        case 'MSSA11111999':
+                                        case 'MSSB11111999':
+                                            $class = "Pay";
+                                            break;
+
+                                        case 'MSSC111111999':
+                                            $class = "PP1";
+                                            break;
+
+                                        case 'MSSC211111999':
+                                            $class = "PP2";
+                                            break;
+
+                                        case 'MSSC311111999':
+                                            $class = "PP3";
+                                            break;
+
+                                        case 'MSSD11111999':
+                                            $class = "Indigent";
+                                            break;
+
+                                        default:
+                                            $class = "---";
+                                    }
+                                    echo $class;
+                                @endphp
                             </td>
                             <td>
                                 @php

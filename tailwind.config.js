@@ -27,6 +27,7 @@ module.exports = {
         'textarea-bordered',
         'textarea-ghost',
         'input-bordered',
+        'toggle-success'
     ],
     important: true,
 
