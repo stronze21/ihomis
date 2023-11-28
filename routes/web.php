@@ -2,9 +2,12 @@
 
 use App\Http\Livewire\Pusher;
 use Illuminate\Support\Facades\Route;
+use App\Http\Livewire\Trash\SampleView;
+use App\Http\Livewire\References\Manual;
 use App\Http\Livewire\Records\PatientsList;
 use App\Http\Livewire\Records\PrescriptionEr;
 use App\Http\Livewire\Records\PrescriptionOpd;
+use App\Http\Livewire\References\CreateManual;
 use App\Http\Livewire\Pharmacy\Drugs\StockList;
 use App\Http\Livewire\Records\PrescriptionList;
 use App\Http\Livewire\Records\PrescriptionWard;
@@ -18,18 +21,16 @@ use App\Http\Livewire\Pharmacy\References\ListLocation;
 use App\Http\Livewire\Pharmacy\Dispensing\RxoChargeSlip;
 use App\Http\Livewire\Pharmacy\References\ListDrugHomis;
 use App\Http\Livewire\Pharmacy\Reports\DrugsChargeSlips;
+use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedWards;
 use App\Http\Livewire\Pharmacy\Drugs\IoTransListRequestor;
 use App\Http\Livewire\Pharmacy\Reports\ConssumptionReport;
+use App\Http\Livewire\Pharmacy\Reports\EmergencyPurchases;
 use App\Http\Livewire\References\Security\ListPermissions;
 use App\Http\Livewire\Pharmacy\Reports\DrugsTransactionLog;
-use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
-use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedWards;
-use App\Http\Livewire\Pharmacy\Reports\EmergencyPurchases;
 use App\Http\Livewire\Pharmacy\Reports\IoTransIssuedReport;
 use App\Http\Livewire\Pharmacy\Reports\IoTransReceivedReport;
-use App\Http\Livewire\References\CreateManual;
-use App\Http\Livewire\References\Manual;
-use App\Http\Livewire\Trash\SampleView;
+use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedDepartments;
+use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,6 +103,7 @@ Route::middleware([
         Route::get('/iotrans/issued', IoTransIssuedReport::class)->name('iotrans.issued');
         Route::get('/iotrans/received', IoTransReceivedReport::class)->name('iotrans.received');
         Route::get('/consumption/wards', DrugsIssuedWards::class)->name('consumption.wards');
+        Route::get('/consumption/departments', DrugsIssuedDepartments::class)->name('consumption.depts');
     });
 
     Route::get('/pusher', Pusher::class)->name('pusher');

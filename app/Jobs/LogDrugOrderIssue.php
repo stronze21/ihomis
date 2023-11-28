@@ -9,19 +9,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
+use App\Models\Record\Prescriptions\PrescriptionDataIssued;
 
 class LogDrugOrderIssue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris;
+    public $docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris, $prescription_data_id;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris)
+    public function __construct($docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris, $prescription_data_id)
     {
         $this->onQueue('rxo_issue_logger');
         $this->docointkey = $docointkey;
@@ -35,6 +36,7 @@ class LogDrugOrderIssue implements ShouldQueue
         $this->pcchrgcod = $pcchrgcod;
         $this->pchrgup = $pchrgup;
         $this->ris = $ris;
+        $this->prescription_data_id = $prescription_data_id;
     }
 
     /**
@@ -69,5 +71,13 @@ class LogDrugOrderIssue implements ShouldQueue
             'issuetype' => 'c', //c
             'ris' =>  $this->ris ? true : false,
         ]);
+
+        if ($this->prescription_data_id) {
+            PrescriptionDataIssued::create([
+                'presc_data_id' => $this->prescription_data_id,
+                'docointkey' => $this->docointkey,
+                'qtyissued' => $this->pchrgqty,
+            ]);
+        }
     }
 }
