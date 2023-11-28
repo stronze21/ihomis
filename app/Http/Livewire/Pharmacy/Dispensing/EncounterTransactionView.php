@@ -221,8 +221,8 @@ class EncounterTransactionView extends Component
                     "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND estatus = 'P'",
                     [$row2->pchrgqty, $row2->docointkey]
                 );
+                LogDrugOrderIssue::dispatch($row2->docointkey, $row2->enccode, $row2->hpercode, $row2->dmdcomb, $row2->dmdctr, $row2->pchrgqty, session('employeeid'), $row2->orderfrom, $row2->pcchrgcod, $row2->pchrgup, $row2->ris, $row2->prescription_data_id);
             }
-            LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id);
             $this->emit('refresh');
             $this->alert('success', 'Order issued successfully.');
         } else {
