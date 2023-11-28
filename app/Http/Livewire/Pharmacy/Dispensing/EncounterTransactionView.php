@@ -215,7 +215,7 @@ class EncounterTransactionView extends Component
             }
         }
 
-        if ($cnt == 1) {
+        if ($cnt == 1 || $cnt == 0) {
             foreach ($rxos as $row2) {
                 $cnt = DB::update(
                     "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND estatus = 'P'",

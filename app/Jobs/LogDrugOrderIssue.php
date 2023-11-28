@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -46,6 +47,16 @@ class LogDrugOrderIssue implements ShouldQueue
      */
     public function handle()
     {
+
+        if ($this->prescription_data_id) {
+            PrescriptionDataIssued::create([
+                'presc_data_id' => $this->prescription_data_id,
+                'docointkey' => $this->docointkey,
+                'qtyissued' => $this->pchrgqty,
+            ]);
+            Log::debug('MAYATTTT!!!');
+        }
+        Log::debug($this->prescription_data_id);
         DrugOrderIssue::updateOrCreate([
             'docointkey' => $this->docointkey,
             'enccode' => $this->enccode,
@@ -71,13 +82,5 @@ class LogDrugOrderIssue implements ShouldQueue
             'issuetype' => 'c', //c
             'ris' =>  $this->ris ? true : false,
         ]);
-
-        if ($this->prescription_data_id) {
-            PrescriptionDataIssued::create([
-                'presc_data_id' => $this->prescription_data_id,
-                'docointkey' => $this->docointkey,
-                'qtyissued' => $this->pchrgqty,
-            ]);
-        }
     }
 }
