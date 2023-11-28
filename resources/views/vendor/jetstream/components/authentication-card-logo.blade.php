@@ -1,5 +1,5 @@
 <div class="flex flex-col justify-center space-y-3">
-    <a href="/" class="mx-auto">
+    <a  rel="noopener noreferrer" href="/" class="mx-auto">
         <img src="{{asset('logo.png')}}" alt="MMMHMC Logo">
     </a>
 

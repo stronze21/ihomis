@@ -151,7 +151,7 @@
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">
                                     @if ($rxo->pcchrgcod)
-                                        <a class="font-semibold text-blue-600"
+                                        <a  rel="noopener noreferrer" class="font-semibold text-blue-600"
                                             href="{{ route('dispensing.rxo.chargeslip', $rxo->pcchrgcod) }}"
                                             target="_blank">{{ $rxo->pcchrgcod }}</a>
                                     @endif

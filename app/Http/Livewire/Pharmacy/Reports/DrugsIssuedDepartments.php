@@ -18,9 +18,13 @@ class DrugsIssuedDepartments extends Component
 
     public function render()
     {
-        $this->date_from = Carbon::parse($this->date_from)->startOfWeek()->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
-
+        $date_from = Carbon::parse($this->date_from)->startOfDay()->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_from)->endOfDay()->format('Y-m-d H:i:s');
+        // $this->date_from = Carbon::parse($this->date_from)->startOfWeek()->format('Y-m-d H:i:s');
+        // $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
+        if(!$this->deptcode){
+            $this->deptcode = null;
+        }
         $drugs_issued = DB::select("SELECT dept.deptname, drug.drug_concat, charge.chrgdesc, SUM(rxo.qty) as qty
                                     FROM hospital.dbo.hrxoissue rxo
                                     INNER JOIN hospital.dbo.hpatroom pat_room ON rxo.enccode = pat_room.enccode
@@ -35,7 +39,7 @@ class DrugsIssuedDepartments extends Component
                                     AND rxo.chrgcode LIKE ?
                                     GROUP BY dept.deptname, drug.drug_concat, charge.chrgdesc
                                     ORDER BY dept.deptname ASC
-                                    ", [$this->date_from, $this->date_to, $this->deptcode ?? '%%', $this->filter_charge ?? '%%']);
+                                    ", [$date_from, $date_to, $this->deptcode ?? '%%', $this->filter_charge ?? '%%']);
 
         return view('livewire.pharmacy.reports.drugs-issued-departments', compact(
             'drugs_issued',
@@ -47,8 +51,10 @@ class DrugsIssuedDepartments extends Component
         $this->locations = PharmLocation::all();
         $this->depts = Department::all();
         $this->location_id = session('pharm_location_id');
-        $this->date_from = Carbon::parse(now())->startOfWeek()->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse(now())->endOfWeek()->format('Y-m-d H:i:s');
+        $this->date_from = Carbon::parse(now())->startOfDay()->format('Y-m-d');
+        $this->date_to = Carbon::parse(now())->endOfDay()->format('Y-m-d');
+        // $this->date_from = Carbon::parse(now())->startOfWeek()->format('Y-m-d H:i:s');
+        // $this->date_to = Carbon::parse(now())->endOfWeek()->format('Y-m-d H:i:s');
         $this->charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
             ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'))

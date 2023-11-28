@@ -16,7 +16,7 @@
 
 <div class="flex flex-col h-full min-h-screen py-5 mx-auto space-y-3 max-w-screen-2xl">
     <div class="flex space-x-2">
-        <a href="{{ route('ref.manual.add') }}" class="btn btn-sm btn-primary"><i class="mr-2 las la-lg la-plus"></i>
+        <a  rel="noopener noreferrer" href="{{ route('ref.manual.add') }}" class="btn btn-sm btn-primary"><i class="mr-2 las la-lg la-plus"></i>
             Add</a>
     </div>
     <div class="flex flex-col w-full min-h-full p-5 space-y-5 bg-neutral">
@@ -42,7 +42,7 @@
             <div class="shadow-xl card card-side bg-base-100">
                 <div class="card-body">
                     <h2 class="card-title">No record found</h2>
-                    <a href="{{ route('ref.manual.add') }}" class="btn btn-sm btn-primary"><i
+                    <a  rel="noopener noreferrer" href="{{ route('ref.manual.add') }}" class="btn btn-sm btn-primary"><i
                             class="mr-2 las la-lg la-plus"></i>
                         Add</a>
                 </div>

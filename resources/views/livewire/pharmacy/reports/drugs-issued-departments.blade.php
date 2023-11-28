@@ -33,7 +33,7 @@
                         <label class="input-group">
                             <span>Department</span>
                             <select class="text-sm select select-bordered select-sm" wire:model="deptcode">
-                                <option value="All">All</option>
+                                <option value="">All</option>
                                 @foreach ($depts as $dept)
                                     <option value="{{ $dept->deptcode }}">{{ $dept->deptname }}</option>
                                 @endforeach
@@ -44,13 +44,13 @@
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
-                            <span>From</span>
-                            <input type="datetime-local" class="w-full input input-sm input-bordered"
-                                max="{{ $date_to }}" wire:model.lazy="date_from" />
+                            <span>Date</span>
+                            <input type="date" class="w-full input input-sm input-bordered"
+                                 wire:model.lazy="date_from" />
                         </label>
                     </div>
                 </div>
-                <div class="ml-2">
+                {{-- <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
                             <span>To</span>
@@ -58,7 +58,7 @@
                                 min="{{ $date_from }}" wire:model.lazy="date_to" />
                         </label>
                     </div>
-                </div>
+                </div> --}}
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">

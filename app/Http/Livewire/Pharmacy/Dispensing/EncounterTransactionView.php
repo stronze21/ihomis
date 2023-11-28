@@ -2,41 +2,35 @@
 
 namespace App\Http\Livewire\Pharmacy\Dispensing;
 
-use Livewire\Component;
-use App\Models\Hospital\Room;
-use App\Models\Hospital\Ward;
-use App\Models\Pharmacy\Drug;
 use App\Jobs\LogDrugOrderIssue;
 use App\Jobs\LogDrugStockIssue;
-use App\Jobs\DispenseIssueProcess;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use App\Models\References\ChargeCode;
-use Illuminate\Support\Facades\Crypt;
-use App\Models\Record\Patients\Patient;
-use App\Models\Pharmacy\Drugs\DrugStock;
-use App\Http\Controllers\SharedController;
-use App\Models\Record\Patients\PatientMss;
-use App\Models\Pharmacy\Drugs\DrugStockLog;
-use App\Models\Record\Admission\PatientRoom;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Hospital\Room;
+use App\Models\Hospital\Ward;
 use App\Models\Pharmacy\Dispensing\DrugOrder;
-use App\Models\Pharmacy\Drugs\DrugStockIssue;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
-use App\Models\Record\Encounters\AdmissionLog;
-use App\Models\Record\Encounters\EncounterLog;
-use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
 use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
 use App\Models\Pharmacy\Dispensing\OrderChargeCode;
+use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Models\Pharmacy\Drugs\DrugStockIssue;
+use App\Models\Pharmacy\Drugs\DrugStockLog;
+use App\Models\Record\Admission\PatientRoom;
+use App\Models\Record\Encounters\EncounterLog;
+use App\Models\Record\Patients\Patient;
+use App\Models\Record\Patients\PatientMss;
+use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Record\Prescriptions\PrescriptionData;
 use App\Models\Record\Prescriptions\PrescriptionDataIssued;
+use App\Models\References\ChargeCode;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Component;
 
 class EncounterTransactionView extends Component
 {
     use LivewireAlert;
 
-    protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'add_prescribed_item', 'refresh' => '$refresh', 'delete_item'];
+    protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'add_prescribed_item', 'delete_item'];
 
     public $generic, $charge_code = [];
     public $enccode, $location_id, $hpercode, $toecode;
@@ -75,7 +69,7 @@ class EncounterTransactionView extends Component
                             INNER JOIN hdmhdr ON hdmhdr.dmdcomb = hrxo.dmdcomb AND hdmhdr.dmdctr = hrxo.dmdctr
                             INNER JOIN hcharge ON orderfrom = chrgcode
                             LEFT JOIN hpatmss ON hrxo.enccode = hpatmss.enccode
-                            WHERE hrxo.enccode = '".$enccode."'
+                            WHERE hrxo.enccode = '" . $enccode . "'
                             ORDER BY dodate DESC");
 
         $stocks = DB::select("SELECT pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, pharm_drug_stocks.loc_code, MAX(pharm_drug_stocks.dmdprdte) as dmdprdte, SUM(stock_bal) as stock_bal, MAX(id) as id, MIN(exp_date) as exp_date
@@ -209,7 +203,7 @@ class EncounterTransactionView extends Component
                         //TODO: Job for DrugStockLog
                     }
                 }
-                        //TODO: Job for DrugOrderIssue
+                //TODO: Job for DrugOrderIssue
             } else {
                 return $this->alert('error', 'Insufficient Stock Balance.');
             }
@@ -316,9 +310,9 @@ class EncounterTransactionView extends Component
                             'loc_code' => $loc_code,
                             'chrgcode' => $chrgcode,
                             'exp_date' => $stock->exp_date,
-                            'qty' =>  $trans_qty,
-                            'pchrgup' =>  $unit_price,
-                            'pcchrgamt' =>  $pcchrgamt,
+                            'qty' => $trans_qty,
+                            'pchrgup' => $unit_price,
+                            'pcchrgamt' => $pcchrgamt,
                             'status' => 'Issued',
                             'user_id' => session('user_id'),
                             'hpercode' => $this->hpercode,
@@ -335,7 +329,7 @@ class EncounterTransactionView extends Component
                             'service' => $tag == 'service' ? $trans_qty : false,
                             'govt_emp' => $tag == 'govt_emp' ? $trans_qty : false,
                             'caf' => $tag == 'caf' ? $trans_qty : false,
-                            'ris' =>  $rxo->ris ? true : false,
+                            'ris' => $rxo->ris ? true : false,
 
                             'dmdprdte' => $stock->dmdprdte,
                         ]);
@@ -399,7 +393,7 @@ class EncounterTransactionView extends Component
                     'chrgcode' => $rxo->orderfrom,
                     'pchrgup' => $rxo->pchrgup,
                     'issuetype' => 'c', //c
-                    'ris' =>  $rxo->ris ? true : false,
+                    'ris' => $rxo->ris ? true : false,
                 ]);
                 //END RECORD ISSUED DRUG
 
@@ -476,9 +470,9 @@ class EncounterTransactionView extends Component
                     'loc_code' => $loc_code,
                     'chrgcode' => $chrgcode,
                     'exp_date' => $stock->exp_date,
-                    'qty' =>  $trans_qty,
-                    'pchrgup' =>  $unit_price,
-                    'pcchrgamt' =>  $pcchrgamt,
+                    'qty' => $trans_qty,
+                    'pchrgup' => $unit_price,
+                    'pcchrgamt' => $pcchrgamt,
                     'status' => 'Issued',
                     'user_id' => session('user_id'),
                     'hpercode' => $this->hpercode,
@@ -628,10 +622,10 @@ class EncounterTransactionView extends Component
                     $with_rx ? $empid : null,
                 ]
             );
-            if($with_rx){
+            if ($with_rx) {
                 DB::connection('webapp')->table('webapp.dbo.prescription_data')
-                ->where('id', $rx_id)
-                ->update(['stat' => 'I']);
+                    ->where('id', $rx_id)
+                    ->update(['stat' => 'I']);
             }
 
             $this->resetExcept('rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
@@ -649,9 +643,9 @@ class EncounterTransactionView extends Component
             ->where('estatus', 'U')->get();
 
         foreach ($items as $item) {
-            if($item->prescription_data_id){
+            if ($item->prescription_data_id) {
                 DB::connection('webapp')->table('webapp.dbo.prescription_data')
-                ->where('id', $item->prescription_data_id)
+                    ->where('id', $item->prescription_data_id)
                     ->update(['stat' => 'A']);
             }
             $item->delete();
@@ -729,13 +723,13 @@ class EncounterTransactionView extends Component
             $stock_issued->stock->stock_bal += $returned_qty;
 
             $log = DrugStockLog::firstOrNew([
-                'loc_code' =>  $stock_issued->stock->loc_code,
-                'dmdcomb' =>  $stock_issued->stock->dmdcomb,
-                'dmdctr' =>  $stock_issued->stock->dmdctr,
-                'chrgcode' =>  $stock_issued->stock->chrgcode,
+                'loc_code' => $stock_issued->stock->loc_code,
+                'dmdcomb' => $stock_issued->stock->dmdcomb,
+                'dmdctr' => $stock_issued->stock->dmdctr,
+                'chrgcode' => $stock_issued->stock->chrgcode,
                 'date_logged' => date('Y-m-d'),
-                'dmdprdte' =>  $stock_issued->stock->dmdprdte,
-                'unit_price' =>  $stock_issued->stock->retail_price,
+                'dmdprdte' => $stock_issued->stock->dmdprdte,
+                'unit_price' => $stock_issued->stock->retail_price,
             ]);
             $log->time_logged = now();
             $log->return_qty += $returned_qty;
@@ -781,7 +775,6 @@ class EncounterTransactionView extends Component
             ->orderBy('exp_date', 'ASC')
             ->first();
 
-
         if ($dm) {
             $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
 
@@ -807,7 +800,7 @@ class EncounterTransactionView extends Component
                 'issuetype' => 'c',
                 'has_tag' => $this->type ? true : false, //added
                 'tx_type' => $this->type, //added
-                'ris' =>  $this->is_ris ? true : false,
+                'ris' => $this->is_ris ? true : false,
                 'pchrgqty' => $this->order_qty,
                 'pchrgup' => $dm->current_price->dmselprice,
                 'pcchrgamt' => $this->order_qty * $dm->current_price->dmselprice,
@@ -824,8 +817,8 @@ class EncounterTransactionView extends Component
                 'prescribed_by' => $empid,
             ]);
             DB::connection('webapp')->table('webapp.dbo.prescription_data')
-            ->where('id', $rx_id)
-            ->update(['stat' => 'I']);
+                ->where('id', $rx_id)
+                ->update(['stat' => 'I']);
 
             $this->resetExcept('stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
             $this->emit('refresh');
