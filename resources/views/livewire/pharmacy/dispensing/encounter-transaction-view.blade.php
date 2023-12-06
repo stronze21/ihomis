@@ -717,7 +717,6 @@
                                 <input id="rx_order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
                             </div>
                         </div>
-
                         <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
                             <div class="col-span-4 font-bold">Fund Source</div>
                             <div class="col-span-4">
@@ -726,63 +725,57 @@
                             </div>
                             <div class="col-span-4 font-bold">TAG</div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_pay" name="radio" checked>
-                                <label class="cursor-pointer" for="pay">
-                                    <span class="label-text">PAY</span>
+                                <input class="toggle toggle-success" type="radio" id="rx_na" name="radio" checked>
+                                <label class="cursor-pointer" for="na">
+                                    <span class="label-text">N/A</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_sc" name="radio">
-                                <label class="cursor-pointer" for="sc">
-                                    <span class="label-text">SC/PWD</span>
-                                </label>
-                            </div>
-                            <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_ems" name="radio">
+                                <input class="toggle toggle-success" type="radio" id="rx_ems" name="radio">
                                 <label class="cursor-pointer" for="ems">
                                     <span class="label-text">EMS</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_maip" name="radio">
-                                <label class="cursor-pointer" for="maip">
-                                    <span class="label-text">MAIP</span>
+                                <input class="toggle toggle-success" type="radio" id="rx_konsulta" name="radio">
+                                <label class="cursor-pointer" for="konsulta">
+                                    <span class="label-text">Konsulta Package</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_wholesale" name="radio">
+                                <input class="toggle toggle-success" type="radio" id="rx_wholesale" name="radio">
                                 <label class="cursor-pointer" for="wholesale">
                                     <span class="label-text">WHOLESALE</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_medicare" name="radio">
-                                <label class="cursor-pointer" for="medicare">
-                                    <span class="label-text">MEDICARE</span>
-                                </label>
-                            </div>
-                            <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_service" name="radio">
-                                <label class="cursor-pointer" for="service">
-                                    <span class="label-text">SERVICE</span>
-                                </label>
-                            </div>
-                            <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_caf" name="radio">
+                                <input class="toggle toggle-success" type="radio" id="rx_caf" name="radio">
                                 <label class="cursor-pointer" for="caf">
                                     <span class="label-text">CAF</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="radio" id="rx_govt" name="radio">
-                                <label class="cursor-pointer" for="govt">
-                                    <span class="label-text">Gov't Emp</span>
+                                <input class="toggle toggle-success" type="radio" id="rx_maip" name="radio">
+                                <label class="cursor-pointer" for="maip">
+                                    <span class="label-text">MAIP</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
-                                <input class="toggle" type="checkbox" id="rx_is_ris" name="is_ris">
+                                <input class="toggle toggle-success" type="radio" id="rx_is_ris" name="radio">
                                 <label class="cursor-pointer" for="is_ris">
                                     <span class="label-text">RIS</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_pcso" name="radio">
+                                <label class="cursor-pointer" for="pcso">
+                                    <span class="label-text">PCSO</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_phic" name="radio">
+                                <label class="cursor-pointer" for="phic">
+                                    <span class="label-text">PHIC</span>
                                 </label>
                             </div>
                         </div>
@@ -826,15 +819,13 @@
                     @this.set('order_qty', rx_order_qty.value)
 
                     @this.set('rx_charge_code', rx_charge_code.value);
-                    @this.set('sc', rx_sc.checked);
                     @this.set('ems', rx_ems.checked);
                     @this.set('maip', rx_maip.checked);
                     @this.set('wholesale', rx_wholesale.checked);
-                    @this.set('pay', rx_pay.checked);
-                    @this.set('medicare', rx_medicare.checked);
-                    @this.set('service', rx_service.checked);
+                    @this.set('konsulta', rx_konsulta.checked);
+                    @this.set('pcso', rx_pcso.checked);
+                    @this.set('phic', rx_phic.checked);
                     @this.set('caf', rx_caf.checked);
-                    @this.set('govt', rx_govt.checked);
                     @this.set('is_ris', rx_is_ris.checked);
                     @this.set('remarks', rx_remarks.value);
 

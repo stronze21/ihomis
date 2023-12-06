@@ -747,10 +747,7 @@ class EncounterTransactionView extends Component
     {
         $rx_id = $this->rx_id;
         $empid = $this->empid;
-
-        if ($this->sc) {
-            $this->type = 'sc_pwd';
-        } else if ($this->ems) {
+        if ($this->ems) {
             $this->type = 'ems';
         } else if ($this->maip) {
             $this->type = 'maip';
@@ -758,15 +755,20 @@ class EncounterTransactionView extends Component
             $this->type = 'wholesale';
         } else if ($this->pay) {
             $this->type = 'pay';
-        } else if ($this->medicare) {
-            $this->type = 'medicare';
         } else if ($this->service) {
             $this->type = 'service';
         } else if ($this->caf) {
             $this->type = 'caf';
-        } else if ($this->govt) {
-            $this->type = 'govt';
+        } else if ($this->is_ris) {
+            $this->type = 'ris';
+        } else if ($this->pcso) {
+            $this->type = 'pcso';
+        } else if ($this->phic) {
+            $this->type = 'phic';
+        } else if ($this->konsulta) {
+            $this->type = 'konsulta';
         }
+
         $dm = DrugStock::where('dmdcomb', $dmdcomb)
             ->where('dmdctr', $dmdctr)
             ->where('chrgcode', $this->rx_charge_code)
@@ -827,6 +829,96 @@ class EncounterTransactionView extends Component
             $this->alert('error', 'Insufficient stock!');
         }
     }
+
+    // public function add_prescribed_item($dmdcomb, $dmdctr){
+
+
+    //     $total_deduct = $this->order_qty;
+
+    //     if ($this->ems) {
+    //         $this->type = 'ems';
+    //     } else if ($this->maip) {
+    //         $this->type = 'maip';
+    //     } else if ($this->wholesale) {
+    //         $this->type = 'wholesale';
+    //     } else if ($this->pay) {
+    //         $this->type = 'pay';
+    //     } else if ($this->service) {
+    //         $this->type = 'service';
+    //     } else if ($this->caf) {
+    //         $this->type = 'caf';
+    //     } else if ($this->is_ris) {
+    //         $this->type = 'ris';
+    //     } else if ($this->pcso) {
+    //         $this->type = 'pcso';
+    //     } else if ($this->phic) {
+    //         $this->type = 'phic';
+    //     } else if ($this->konsulta) {
+    //         $this->type = 'konsulta';
+    //     }
+
+    //     if ($this->is_ris or $available >= $total_deduct) {
+    //         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+    //         DB::insert(
+    //             'INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
+    //                 rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,
+    //                 has_tag, tx_type, ris, pchrgqty, pchrgup, pcchrgamt, dodate, dotime, dodtepost, dotmepost, dmdprdte, exp_date, loc_code, item_id, remarks, prescription_data_id, prescribed_by )
+    //             VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    //                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    //                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    //                     ?, ?, ?, ?, ?, ? )',
+    //             [
+    //                 '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $chrgcode . $dmdcomb . $dmdctr,
+    //                 $enccode,
+    //                 $this->hpercode,
+    //                 '1',
+    //                 '1',
+    //                 $dmdcomb,
+    //                 '1',
+    //                 'A',
+    //                 'N',
+    //                 'N',
+    //                 'N',
+    //                 $dmdctr,
+    //                 'U',
+    //                 session('employeeid'),
+    //                 'NEWOR',
+    //                 'ACTIV',
+    //                 'PHARM',
+    //                 $chrgcode,
+    //                 'c',
+    //                 $this->type ? true : false,
+    //                 $this->type,
+    //                 $this->is_ris ? true : false,
+    //                 $this->order_qty,
+    //                 $this->unit_price,
+    //                 $this->order_qty * $this->unit_price,
+    //                 now(),
+    //                 now(),
+    //                 now(),
+    //                 now(),
+    //                 $dmdprdte,
+    //                 $exp_date,
+    //                 $loc_code,
+    //                 $id,
+    //                 $this->remarks ?? '',
+    //                 $with_rx ? $rx_id : null,
+    //                 $with_rx ? $empid : null,
+    //             ]
+    //         );
+    //         if ($with_rx) {
+    //             DB::connection('webapp')->table('webapp.dbo.prescription_data')
+    //                 ->where('id', $rx_id)
+    //                 ->update(['stat' => 'I']);
+    //         }
+
+    //         $this->resetExcept('rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
+    //         $this->emit('refresh');
+    //         $this->alert('success', 'Item added.');
+    //     } else {
+    //         $this->alert('error', 'Insufficient stock!');
+    //     }
+    // }
 
     public function update_remarks()
     {
