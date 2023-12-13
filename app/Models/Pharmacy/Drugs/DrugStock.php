@@ -68,12 +68,12 @@ class DrugStock extends Model
     public function expiry()
     {
         if (Carbon::parse($this->exp_date)->diffInDays(now(), false) >= 1 && $this->stock_bal > 0) {
-            $badge = '<span class="badge badge-sm badge-danger">' . Carbon::create($this->exp_date)->format('F j, Y') . '</span>';
-        } elseif (Carbon::parse($this->exp_date)->diffInDays(now(), false) > -168 && $this->stock_bal > 0) {
+            $badge = '<span class="badge badge-sm badge-error">' . Carbon::create($this->exp_date)->format('F j, Y') . '</span>';
+        } elseif (Carbon::parse($this->exp_date)->diffInDays(now(), false) > -182.5 && $this->stock_bal > 0) {
             $badge = '<span class="badge badge-sm badge-warning">' . Carbon::create($this->exp_date)->format('F j, Y') . '</span>';
         } elseif ($this->stock_bal < 1) {
             $badge = '<span class="badge badge-sm badge-ghost">' . Carbon::create($this->exp_date)->format('F j, Y') . '</span>';
-        } elseif (Carbon::parse($this->exp_date)->diffInDays(now(), false) <= -168) {
+        } elseif (Carbon::parse($this->exp_date)->diffInDays(now(), false) <= -182.5) {
             $badge = '<span class="badge badge-sm badge-success">' . Carbon::create($this->exp_date)->format('F j, Y') . '</span>';
         }
 

@@ -54,9 +54,7 @@ class LogDrugOrderIssue implements ShouldQueue
                 'docointkey' => $this->docointkey,
                 'qtyissued' => $this->pchrgqty,
             ]);
-            Log::debug('MAYATTTT!!!');
         }
-        Log::debug($this->prescription_data_id);
         DrugOrderIssue::updateOrCreate([
             'docointkey' => $this->docointkey,
             'enccode' => $this->enccode,

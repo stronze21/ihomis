@@ -3,15 +3,16 @@
 namespace App\Http\Livewire\Pharmacy\Drugs;
 
 use App\Jobs\LogDrugTransaction;
-use Livewire\Component;
 use App\Models\Pharmacy\Drug;
 use App\Models\Pharmacy\DrugPrice;
-use Illuminate\Support\Facades\Auth;
-use App\Models\References\ChargeCode;
-use App\Models\Pharmacy\PharmLocation;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use App\Models\Pharmacy\PharmLocation;
+use App\Models\References\ChargeCode;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Component;
 
 class StockList extends Component
 {
@@ -82,6 +83,28 @@ class StockList extends Component
                 // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
                 return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
             })->get();
+
+
+        // $stocks = DrugStock::all();
+        // foreach ($stocks as $stock) {
+        //     $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
+
+        //     $log = DrugStockLog::firstOrNew([
+        //         'loc_code' =>  $stock->loc_code,
+        //         'dmdcomb' => $stock->dmdcomb,
+        //         'dmdctr' => $stock->dmdctr,
+        //         'chrgcode' => $stock->chrgcode,
+        //         'date_logged' => $date,
+        //         'dmdprdte' => $stock->dmdprdte,
+        //         'unit_cost' => $stock->current_price->dmduprice,
+        //         'unit_price' => $stock->retail_price,
+        //     ]);
+        //     $log->time_logged = now();
+        //     $log->beg_bal += $stock->stock_bal;
+        //     $stock->beg_bal = $stock->stock_bal;
+
+        //     $log->save();
+        // }
     }
 
     public function add_item_new()
@@ -175,7 +198,7 @@ class StockList extends Component
         $stock->dmdprdte = $dmdprdte;
 
         $stock->save();
-        LogDrugTransaction::dispatch(session('pharm_location_id'), $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty);
+        LogDrugTransaction::dispatch(session('pharm_location_id'), $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty, $stock->id);
 
         $this->resetExcept('location_id', 'drugs', 'locations', 'charge_codes');
         $this->alert('success', 'Item beginning balance has been saved!');
@@ -266,12 +289,13 @@ class StockList extends Component
             $old_log->save();
         }
 
+        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
         $log = DrugStockLog::firstOrNew([
             'loc_code' =>  session('pharm_location_id'),
             'dmdcomb' => $stock->dmdcomb,
             'dmdctr' => $stock->dmdctr,
             'chrgcode' => $stock->chrgcode,
-            'date_logged' => date('Y-m-d'),
+            'date_logged' => $date,
             'dmdprdte' => $new_price->dmdprdte,
             'unit_cost' => $unit_cost,
             'unit_price' => $retail_price,
@@ -340,12 +364,13 @@ class StockList extends Component
         }
         $stock->dmdprdte = $dmdprdte;
 
+        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
         $log = DrugStockLog::firstOrNew([
             'loc_code' =>  session('pharm_location_id'),
             'dmdcomb' => $stock->dmdcomb,
             'dmdctr' => $stock->dmdctr,
             'chrgcode' => $stock->chrgcode,
-            'date_logged' => date('Y-m-d'),
+            'date_logged' => $date,
             'dmdprdte' => $dmdprdte,
             'unit_cost' => $dmduprice,
             'unit_price' => $dmselprice,

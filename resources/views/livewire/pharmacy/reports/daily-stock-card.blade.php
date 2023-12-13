@@ -8,7 +8,7 @@
                 <i class="mr-1 las la-file-excel la-lg"></i> Report
             </li>
             <li>
-                <i class="mr-1 las la-clone la-lg"></i> Drug Issuance
+                <i class="mr-1 las la-folder la-lg"></i> Stock Card
             </li>
         </ul>
     </div>
@@ -31,11 +31,11 @@
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
-                            <span>Department</span>
-                            <select class="text-sm select select-bordered select-sm" wire:model="deptcode">
-                                <option value="">All</option>
-                                @foreach ($depts as $dept)
-                                    <option value="{{ $dept->deptcode }}">{{ $dept->deptname }}</option>
+                            <span>Location</span>
+                            <select class="text-sm select select-bordered select-sm" wire:model="location_id">
+                                <option value="">N/A</option>
+                                @foreach ($locations as $loc)
+                                    <option value="{{ $loc->id }}">{{ $loc->description }}</option>
                                 @endforeach
                             </select>
                         </label>
@@ -44,13 +44,13 @@
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
-                            <span>Date</span>
-                            <input type="date" class="w-full input input-sm input-bordered"
-                                wire:model.lazy="date_from" />
+                            <span>From</span>
+                            <input type="datetime-local" class="w-full input input-sm input-bordered"
+                                max="{{ $date_to }}" wire:model.lazy="date_from" />
                         </label>
                     </div>
                 </div>
-                {{-- <div class="ml-2">
+                <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
                             <span>To</span>
@@ -58,58 +58,54 @@
                                 min="{{ $date_from }}" wire:model.lazy="date_to" />
                         </label>
                     </div>
-                </div> --}}
-                <div class="ml-2">
-                    <div class="form-control">
-                        <label class="input-group">
-                            <span>Fund Source</span>
-                            <select class="select select-bordered select-sm" wire:model="filter_charge">
-                                <option></option>
-                                @foreach ($charge_codes as $charge)
-                                    <option value="{{ $charge->chrgcode }}">
-                                        {{ $charge->chrgdesc }}</option>
-                                @endforeach
-                            </select>
-                        </label>
-                    </div>
                 </div>
             </div>
         </div>
-        <table class="table bg-white shadow-md table-fixed table-compact" id="table">
-            <thead class="font-bold bg-gray-200">
+        <table class="table bg-white shadow-md table-fixed table-sm" id="table">
+            <thead class="font-bold text-center bg-gray-100">
                 <tr>
-                    <td class="text-sm text-center uppercase border">#</td>
-                    <td class="text-sm border">Department</td>
-                    <td class="text-sm border">Item Description</td>
-                    <td class="text-sm text-right border">TOTAL</td>
+                    <td class="text-sm uppercase border border-black" rowspan='2'>Date</td>
+                    <td class="text-sm border border-black" rowspan='2'>Reference</td>
+                    <td colspan="3" class="border border-black">Receipt</td>
+                    <td colspan="3" class="border border-black">Issued</td>
+                    <td colspan="3" class="border border-black">Balance</td>
+                    <td class="text-sm uppercase border border-black" rowspan='2'>Total</td>
+                    <td class="text-sm border border-black" rowspan='2'>Expiry Date</td>
+                </tr>
+                <tr>
+                    <td class="border border-black">Revolving</td>
+                    <td class="border border-black">Regular</td>
+                    <td class="border border-black">Others</td>
+                    <td class="border border-black">Revolving</td>
+                    <td class="border border-black">Regular</td>
+                    <td class="border border-black">Others</td>
+                    <td class="border border-black">Revolving</td>
+                    <td class="border border-black">Regular</td>
+                    <td class="border border-black">Others</td>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($drugs_issued as $rxi)
-                    @php
-                        $concat = implode(',', explode('_,', $rxi->drug_concat));
-                    @endphp
-                    <tr class="border border-black">
+                {{-- @forelse ($drugs_ordered as $rxo)
+                    <tr classs="border border-black">
                         <td class="text-sm text-right border">{{ $loop->iteration }}</td>
-                        <td class="text-sm border">{{ $rxi->deptname }}</td>
-                        <td class="text-sm border">
-                            <div class="flex flex-col">
-                                <div class="text-xs text-slate-500">
-                                    {{ $rxi->chrgdesc }}
-                                </div>
-                                <div class="text-sm font-bold">{{ $concat }}</div>
-                            </div>
-                        </td>
-                        <td class="text-sm text-right border">{{ $rxi->qty }}</td>
+                        <td class="text-sm border">{{ date('F j, Y H:i A', strtotime($rxo->dodate)) }}</td>
+                        <td class="text-sm border">{{ $rxo->hpercode }}</td>
+                        <td class="text-sm border">{{ $rxo->patient->fullname() }}</td>
+                        <td class="text-sm border">{{ $rxo->pcchrgcod }}</td>
+                        <td class="text-sm text-right border">{{ $rxo->total_qty }}</td>
+                        <td class="text-sm text-right border">{{ $rxo->total_amount }}</td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="22" class="font-bold text-center uppercase bg-red-400 border border-black">No
                             record found!</td>
                     </tr>
-                @endforelse
+                @endforelse --}}
             </tbody>
         </table>
+        <div class="mt-2">
+            {{-- {{ $drugs_ordered->links() }} --}}
+        </div>
     </div>
 
     <!-- Put this part before </body> tag -->
@@ -125,6 +121,7 @@
         </div>
     </div>
 </div>
+
 
 @push('scripts')
     <script>

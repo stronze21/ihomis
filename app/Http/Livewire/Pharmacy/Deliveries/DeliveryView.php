@@ -2,14 +2,15 @@
 
 namespace App\Http\Livewire\Pharmacy\Deliveries;
 
-use Livewire\Component;
-use App\Models\Pharmacy\Drug;
 use App\Models\Pharmacy\DeliveryDetail;
 use App\Models\Pharmacy\DeliveryItems;
+use App\Models\Pharmacy\Drug;
 use App\Models\Pharmacy\DrugPrice;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use Carbon\Carbon;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Component;
 
 class DeliveryView extends Component
 {
@@ -249,12 +250,14 @@ class DeliveryView extends Component
             $add_to->stock_bal = $add_to->stock_bal + $item->qty;
             $add_to->beg_bal = $add_to->beg_bal + $item->qty;
 
+            $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
+
             $log = DrugStockLog::firstOrNew([
                 'loc_code' => $item->pharm_location_id,
                 'dmdcomb' => $add_to->dmdcomb,
                 'dmdctr' => $add_to->dmdctr,
                 'chrgcode' => $add_to->chrgcode,
-                'date_logged' => date('Y-m-d'),
+                'date_logged' => $date,
                 'dmdprdte' => $item->dmdprdte,
                 'unit_cost' => $item->unit_price,
                 'unit_price' => $item->retail_price,

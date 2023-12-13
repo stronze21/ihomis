@@ -2,18 +2,19 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
+use App\Models\Pharmacy\Dispensing\DrugOrder;
+use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
 use App\Models\Pharmacy\Drugs\DrugStock;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use App\Models\Record\Prescriptions\PrescriptionDataIssued;
+use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Models\Pharmacy\Dispensing\DrugOrder;
-use App\Models\Pharmacy\Drugs\DrugStockIssue;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
-use App\Models\Record\Prescriptions\PrescriptionDataIssued;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 class DispenseIssueProcess implements ShouldQueue
 {
@@ -128,12 +129,13 @@ class DispenseIssueProcess implements ShouldQueue
                         'dmdprdte' => $stock->dmdprdte,
                     ]);
 
+                    $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
                     $log = DrugStockLog::firstOrNew([
                         'loc_code' => $stock->loc_code,
                         'dmdcomb' => $stock->dmdcomb,
                         'dmdctr' => $stock->dmdctr,
                         'chrgcode' => $stock->chrgcode,
-                        'date_logged' => date('Y-m-d'),
+                        'date_logged' => $date,
                         'dmdprdte' => $stock->dmdprdte,
                         'unit_price' => $stock->retail_price,
                     ]);

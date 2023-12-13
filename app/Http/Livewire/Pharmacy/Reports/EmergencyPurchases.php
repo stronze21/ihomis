@@ -2,15 +2,16 @@
 
 namespace App\Http\Livewire\Pharmacy\Reports;
 
-use Livewire\Component;
 use App\Models\Pharmacy\Drug;
 use App\Models\Pharmacy\DrugPrice;
-use Illuminate\Support\Facades\Auth;
-use App\Models\References\ChargeCode;
+use App\Models\Pharmacy\Drugs\DrugEmergencyPurchase;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use App\Models\References\ChargeCode;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
-use App\Models\Pharmacy\Drugs\DrugEmergencyPurchase;
+use Livewire\Component;
 
 class EmergencyPurchases extends Component
 {
@@ -159,12 +160,13 @@ class EmergencyPurchases extends Component
         $add_to->stock_bal = $add_to->stock_bal + $purchase->qty;
         $add_to->beg_bal = $add_to->beg_bal + $purchase->qty;
 
+        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
         $log = DrugStockLog::firstOrNew([
             'loc_code' => $purchase->pharm_location_id,
             'dmdcomb' => $add_to->dmdcomb,
             'dmdctr' => $add_to->dmdctr,
             'chrgcode' => $add_to->chrgcode,
-            'date_logged' => date('Y-m-d'),
+            'date_logged' => $date,
             'dmdprdte' => $purchase->dmdprdte,
             'unit_cost' => $purchase->unit_price,
             'unit_price' => $purchase->retail_price,

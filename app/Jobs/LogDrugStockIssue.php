@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Pharmacy\Drugs\DrugStockCard;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -9,6 +10,7 @@ use App\Models\Pharmacy\Drugs\DrugStockLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
+use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 class LogDrugStockIssue implements ShouldQueue
@@ -86,12 +88,14 @@ class LogDrugStockIssue implements ShouldQueue
             'dmdprdte' => $this->dmdprdte,
         ]);
 
+        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
+
         $log = DrugStockLog::firstOrNew([
             'loc_code' => $this->loc_code,
             'dmdcomb' => $this->dmdcomb,
             'dmdctr' => $this->dmdctr,
             'chrgcode' => $this->chrgcode,
-            'date_logged' => date('Y-m-d'),
+            'date_logged' => $date,
             'dmdprdte' => $this->dmdprdte,
             'unit_price' => $this->retail_price,
         ]);
@@ -113,5 +117,26 @@ class LogDrugStockIssue implements ShouldQueue
         $log->phic += $issued_drug->phic;
 
         $log->save();
+
+        $card = DrugStockCard::firstOrNew([
+            'stock_id' => $this->stock_id,
+            'stock_date' => $date,
+            'reference' => $this->pcchrgcod,
+        ]);
+
+        switch ($this->chrgcode) {
+            case 'DRUME': // Regular
+                $card->iss_regular += $this->trans_qty;
+                break;
+
+            case 'DRUMB': // Revolving
+                $card->iss_revolving += $this->trans_qty;
+                break;
+
+            default: //DRUMAA, DRUMAB, DRUMC, DRUMK, DRUMR, DRUMS
+                $card->iss_others += $this->trans_qty;
+        }
+
+        $card->save();
     }
 }

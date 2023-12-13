@@ -56,7 +56,8 @@
                     <td class="text-xs border border-black" colspan="2">Beg. Bal.</td>
                     <td class="text-xs border border-black" colspan="2">Total Purchases</td>
                     <td class="text-xs border border-black" colspan="3">Total Avail. For Sale</td>
-                    <td class="text-xs border border-black" colspan="15">Issuances</td>
+                    <td class="text-xs border border-black" colspan="1"></td>
+                    <td class="text-xs border border-black" colspan="14">Issuances</td>
                     <td class="text-xs border border-black" colspan="2">Ending Bal.</td>
                 </tr>
                 <tr class="text-center">
@@ -68,6 +69,7 @@
                     <td class="text-xs border border-black">QTY.</td>
                     <td class="text-xs border border-black">Unit <br> Cost</td>
                     <td class="text-xs border border-black">Total <br> Cost</td>
+                    <td class="text-xs border border-black">Returns</td>
                     <td class="text-xs border border-black">EMS</td>
                     <td class="text-xs border border-black">MAIP</td>
                     <td class="text-xs border border-black">W.S.</td>
@@ -77,7 +79,6 @@
                     <td class="text-xs border border-black">PCSO</td>
                     <td class="text-xs border border-black">PHIC</td>
                     <td class="text-xs border border-black">Kon. <br> Pkg.</td>
-                    <td class="text-xs border border-black">Returns</td>
                     <td class="text-xs border border-black">Issued <br> Total</td>
                     <td class="text-xs border border-black">Selling <br> Price</td>
                     <td class="text-xs border border-black">Total <br> Sales</td>
@@ -109,6 +110,7 @@
                             {{ number_format($rxi->current_price->acquisition_cost, 2) }}</td>
                         <td class="text-xs text-right border border-black">
                             {{ number_format($rxi->available_amount(), 2) }}</td>
+                        <td class="text-xs text-right border border-black">{{ number_format($rxi->return_qty) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->ems) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->maip) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->wholesale) }}</td>
@@ -118,7 +120,6 @@
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->pcso) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->phic) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->konsulta) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->return_qty) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->issue_qty) }}</td>
                         <td class="text-xs text-right border border-black">
                             {{ number_format($rxi->current_price->dmselprice, 2) }}</td>

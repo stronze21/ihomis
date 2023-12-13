@@ -76,32 +76,32 @@
                         <tr>
                             <td colspan="11" class="border border-black">Patient Classification:
                                 @php
-                                    $class="---";
-                                    if($mss){
+                                    $class = '---';
+                                    if ($mss) {
                                         switch ($mss->mssikey) {
                                             case 'MSSA11111999':
                                             case 'MSSB11111999':
-                                                $class = "Pay";
+                                                $class = 'Pay';
                                                 break;
 
                                             case 'MSSC111111999':
-                                                $class = "PP1";
+                                                $class = 'PP1';
                                                 break;
 
                                             case 'MSSC211111999':
-                                                $class = "PP2";
+                                                $class = 'PP2';
                                                 break;
 
                                             case 'MSSC311111999':
-                                                $class = "PP3";
+                                                $class = 'PP3';
                                                 break;
 
                                             case 'MSSD11111999':
-                                                $class = "Indigent";
+                                                $class = 'Indigent';
                                                 break;
 
                                             default:
-                                                $class = "---";
+                                                $class = '---';
                                         }
                                     }
                                 @endphp
@@ -146,12 +146,13 @@
                             @endphp
                             <tr class="border">
                                 <td class="w-10 text-center">
-                                    <input type="checkbox" class="checkbox{{ '-'.$rxo->pcchrgcod }}" wire:model.defer="selected_items"
-                                        value="{{ $rxo->docointkey }}" />
+                                    <input type="checkbox"
+                                        class="checkbox{{ '-' . ($rxo->pcchrgcod ?? $loop->iteration) }}"
+                                        wire:model.defer="selected_items" value="{{ $rxo->docointkey }}" />
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">
                                     @if ($rxo->pcchrgcod)
-                                        <a  rel="noopener noreferrer" class="font-semibold text-blue-600"
+                                        <a rel="noopener noreferrer" class="font-semibold text-blue-600"
                                             href="{{ route('dispensing.rxo.chargeslip', $rxo->pcchrgcod) }}"
                                             target="_blank">{{ $rxo->pcchrgcod }}</a>
                                     @endif
@@ -241,7 +242,7 @@
                 </div>
                 <div class="w-full">
                     <input type="text" placeholder="Type here" class="w-full input input-sm input-bordered"
-                        id="generic" />
+                        id="generic" wire:model.lazy="generic" />
                 </div>
             </div>
             <div class="mt-2 overflow-x-hidden overflow-y-auto max-h-96">
@@ -252,7 +253,7 @@
                             <td class="!text-right">Stock And Price</td>
                         </tr>
                     </thead>
-                    <tbody id="stockTableBody" wire:ignore>
+                    <tbody id="stockTableBody">
                         @foreach ($stocks as $key => $stock)
                             @php
                                 $concat = explode('_,', $stock->drug_concat);
@@ -343,9 +344,10 @@
     <script>
         var data;
         $(document).ready(function() {
-            $('input:checkbox').change(function(){
-                if($(this).is(':checked')){
-                    $('.'+this.className).prop( "checked", true );
+            $("#generic").trigger("change");
+            $('input:checkbox').change(function() {
+                if ($(this).is(':checked')) {
+                    $('.' + this.className).prop("checked", true);
                 }
             });
 
@@ -481,9 +483,10 @@
         }
 
 
-        function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available, exp_date) {
-            Swal.fire({
-                html: `
+        @if ($encounter->toecode == 'OPD')
+            function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available, exp_date) {
+                Swal.fire({
+                    html: `
                         <div class="text-xl font-bold">` + drug + `</div>
                         <div class="flex w-full space-x-3">
                             <div class="w-full mb-3 form-control">
@@ -514,7 +517,7 @@
                             <div class="col-span-2">
                                 <input class="toggle toggle-success" type="radio" id="na" name="radio" checked>
                                 <label class="cursor-pointer" for="na">
-                                    <span class="label-text">N/A</span>
+                                    <span class="label-text">PAY</span>
                                 </label>
                             </div>
                             <div class="col-span-2">
@@ -570,63 +573,335 @@
                             <textarea id="remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
                         </div>
                             `,
-                showCancelButton: true,
-                confirmButtonText: `Confirm`,
-                didOpen: () => {
-                    const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
-                    const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
-                    const total = Swal.getHtmlContainer().querySelector('#total')
-                    const ems = Swal.getHtmlContainer().querySelector('#ems')
-                    const maip = Swal.getHtmlContainer().querySelector('#maip')
-                    const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
-                    const caf = Swal.getHtmlContainer().querySelector('#caf')
-                    const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
-                    const remarks = Swal.getHtmlContainer().querySelector('#remarks')
-                    const konsulta = Swal.getHtmlContainer().querySelector('#konsulta')
-                    const pcso = Swal.getHtmlContainer().querySelector('#pcso')
-                    const phic = Swal.getHtmlContainer().querySelector('#phic')
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                    didOpen: () => {
+                        const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
+                        const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
+                        const total = Swal.getHtmlContainer().querySelector('#total')
+                        const ems = Swal.getHtmlContainer().querySelector('#ems')
+                        const maip = Swal.getHtmlContainer().querySelector('#maip')
+                        const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
+                        const caf = Swal.getHtmlContainer().querySelector('#caf')
+                        const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
+                        const remarks = Swal.getHtmlContainer().querySelector('#remarks')
+                        const konsulta = Swal.getHtmlContainer().querySelector('#konsulta')
+                        const pcso = Swal.getHtmlContainer().querySelector('#pcso')
+                        const phic = Swal.getHtmlContainer().querySelector('#phic')
 
-                    order_qty.focus();
-                    unit_price.value = up;
-                    total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+                        order_qty.focus();
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
 
-                    order_qty.addEventListener('input', () => {
-                        if (sc.checked) {
-                            unit_price.value = unit_price.value - (unit_price.value * 0.20);
-                        }
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
+                        order_qty.addEventListener('input', () => {
+                            if (sc.checked) {
+                                unit_price.value = unit_price.value - (unit_price.value * 0.20);
+                            }
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
+                        })
 
-                    unit_price.addEventListener('input', () => {
-                        if (sc.checked) {
-                            unit_price.value = unit_price.value - (unit_price.value * 0.20);
-                        }
-                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price
-                            .value)
-                    })
-                }
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                    @this.set('unit_price', unit_price.value)
-                    @this.set('order_qty', order_qty.value)
+                        unit_price.addEventListener('input', () => {
+                            if (sc.checked) {
+                                unit_price.value = unit_price.value - (unit_price.value * 0.20);
+                            }
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
+                        })
+                    }
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        @this.set('unit_price', unit_price.value)
+                        @this.set('order_qty', order_qty.value)
 
-                    @this.set('ems', ems.checked);
-                    @this.set('maip', maip.checked);
-                    @this.set('wholesale', wholesale.checked);
-                    @this.set('konsulta', konsulta.checked);
-                    @this.set('pcso', pcso.checked);
-                    @this.set('phic', phic.checked);
-                    @this.set('caf', caf.checked);
-                    @this.set('is_ris', is_ris.checked);
-                    @this.set('remarks', remarks.value);
+                        @this.set('ems', ems.checked);
+                        @this.set('maip', maip.checked);
+                        @this.set('wholesale', wholesale.checked);
+                        @this.set('konsulta', konsulta.checked);
+                        @this.set('pcso', pcso.checked);
+                        @this.set('phic', phic.checked);
+                        @this.set('caf', caf.checked);
+                        @this.set('is_ris', is_ris.checked);
+                        @this.set('remarks', remarks.value);
 
-                    Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
-                        available, exp_date)
-                }
-            });
-        }
+                        Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
+                            available, exp_date)
+                    }
+                });
+            }
+
+            function select_rx_item(rx_id, drug, rx_qty, empid, rx_dmdcomb, rx_dmdctr) {
+
+                var search = drug.split(",");
+                $("#generic").val(search[0]);
+                $("#generic").trigger('keyup');
+                @this.rx_id = rx_id;
+                @this.rx_dmdcomb = rx_dmdcomb;
+                @this.rx_dmdctr = rx_dmdctr;
+                @this.empid = empid;
+
+                Swal.fire({
+                    html: `
+                        <div class="text-xl font-bold">` + drug + `</div>
+                        <div class="flex w-full space-x-3">
+                            <div class="w-full mb-3 form-control">
+                                <label class="label">
+                                    <span class="label-text">Quantity</span>
+                                </label>
+                                <input id="rx_order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
+                            <div class="col-span-4 font-bold">Fund Source</div>
+                            <div class="col-span-4">
+                            <select id="rx_charge_code" class="w-full select select-bordered select-sm">
+                            </select>
+                            </div>
+                            <div class="col-span-4 font-bold">TAG</div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_na" name="radio" checked>
+                                <label class="cursor-pointer" for="na">
+                                    <span class="label-text">PAY</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_ems" name="radio">
+                                <label class="cursor-pointer" for="ems">
+                                    <span class="label-text">EMS</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_konsulta" name="radio">
+                                <label class="cursor-pointer" for="konsulta">
+                                    <span class="label-text">Konsulta Package</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_wholesale" name="radio">
+                                <label class="cursor-pointer" for="wholesale">
+                                    <span class="label-text">WHOLESALE</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_caf" name="radio">
+                                <label class="cursor-pointer" for="caf">
+                                    <span class="label-text">CAF</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_maip" name="radio">
+                                <label class="cursor-pointer" for="maip">
+                                    <span class="label-text">MAIP</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_is_ris" name="radio">
+                                <label class="cursor-pointer" for="is_ris">
+                                    <span class="label-text">RIS</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_pcso" name="radio">
+                                <label class="cursor-pointer" for="pcso">
+                                    <span class="label-text">PCSO</span>
+                                </label>
+                            </div>
+                            <div class="col-span-2">
+                                <input class="toggle toggle-success" type="radio" id="rx_phic" name="radio">
+                                <label class="cursor-pointer" for="phic">
+                                    <span class="label-text">PHIC</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="px-2 mt-2">
+                            <textarea id="rx_remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                    didOpen: () => {
+                        const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
+                        const rx_charge_code = Swal.getHtmlContainer().querySelector('#rx_charge_code')
+                        const rx_sc = Swal.getHtmlContainer().querySelector('#rx_sc')
+                        const rx_ems = Swal.getHtmlContainer().querySelector('#rx_ems')
+                        const rx_maip = Swal.getHtmlContainer().querySelector('#rx_maip')
+                        const rx_wholesale = Swal.getHtmlContainer().querySelector('#rx_wholesale')
+                        const rx_pay = Swal.getHtmlContainer().querySelector('#rx_pay')
+                        const rx_medicare = Swal.getHtmlContainer().querySelector('#rx_medicare')
+                        const rx_service = Swal.getHtmlContainer().querySelector('#rx_service')
+                        const rx_caf = Swal.getHtmlContainer().querySelector('#rx_caf')
+                        const rx_govt = Swal.getHtmlContainer().querySelector('#rx_govt')
+                        const rx_is_ris = Swal.getHtmlContainer().querySelector('#rx_is_ris')
+                        const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
+
+                        $.each(data, function(index, value) {
+                            if (index == 0) {
+                                rx_charge_code.options[rx_charge_code.options.length] = new Option(
+                                    value[
+                                        'text'], value['id'], true, true);
+                            } else {
+                                rx_charge_code.options[rx_charge_code.options.length] = new Option(
+                                    value[
+                                        'text'], value['id']);
+                            }
+                        });
+                        rx_order_qty.focus();
+                        rx_order_qty.value = rx_qty;
+
+                    }
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        @this.set('order_qty', rx_order_qty.value)
+
+                        @this.set('rx_charge_code', rx_charge_code.value);
+                        @this.set('ems', rx_ems.checked);
+                        @this.set('maip', rx_maip.checked);
+                        @this.set('wholesale', rx_wholesale.checked);
+                        @this.set('konsulta', rx_konsulta.checked);
+                        @this.set('pcso', rx_pcso.checked);
+                        @this.set('phic', rx_phic.checked);
+                        @this.set('caf', rx_caf.checked);
+                        @this.set('is_ris', rx_is_ris.checked);
+                        @this.set('remarks', rx_remarks.value);
+
+                        Livewire.emit('add_prescribed_item', rx_dmdcomb, rx_dmdctr);
+                    }
+                });
+            }
+        @else
+            function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available, exp_date) {
+                Swal.fire({
+                    html: `
+                    <div class="text-xl font-bold">` + drug + `</div>
+                    <div class="flex w-full space-x-3">
+                        <div class="w-full mb-3 form-control">
+                            <label class="label">
+                                <span class="label-text">Quantity</span>
+                            </label>
+                            <input id="order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+                        </div>
+                        <div class="w-full">
+                            <div class="w-full form-control">
+                                <label class="label">
+                                    <span class="label-text">Unit Price</span>
+                                </label>
+                                <input id="unit_price" type="number" step="0.01" class="w-full input input-bordered" />
+                            </div>
+
+                            <div class="w-full mb-3 form-control">
+                                <label class="label">
+                                    <span class="label-text">TOTAL</span>
+                                </label>
+                                <input id="total" type="number" step="0.01" class="w-full input input-bordered" readonly tabindex="-1" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-2 mt-2">
+                        <textarea id="remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
+                    </div>
+                `,
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                    didOpen: () => {
+                        const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
+                        const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
+                        const total = Swal.getHtmlContainer().querySelector('#total')
+
+                        order_qty.focus();
+                        unit_price.value = up;
+                        total.value = parseFloat(order_qty.value) * parseFloat(unit_price.value)
+
+                        order_qty.addEventListener('input', () => {
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
+                        })
+
+                        unit_price.addEventListener('input', () => {
+                            total.value = parseFloat(order_qty.value) * parseFloat(unit_price
+                                .value)
+                        })
+                    }
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        @this.set('unit_price', unit_price.value)
+                        @this.set('order_qty', order_qty.value)
+                        @this.set('remarks', remarks.value);
+
+                        Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
+                            available, exp_date)
+                    }
+                });
+            }
+
+            function select_rx_item(rx_id, drug, rx_qty, empid, rx_dmdcomb, rx_dmdctr) {
+
+                var search = drug.split(",");
+                $("#generic").val(search[0]);
+                $("#generic").trigger('keyup');
+                @this.rx_id = rx_id;
+                @this.rx_dmdcomb = rx_dmdcomb;
+                @this.rx_dmdctr = rx_dmdctr;
+                @this.empid = empid;
+
+                Swal.fire({
+                    html: `
+                        <div class="text-xl font-bold">` + drug + `</div>
+                        <div class="flex w-full space-x-3">
+                            <div class="w-full mb-3 form-control">
+                                <label class="label">
+                                    <span class="label-text">Quantity</span>
+                                </label>
+                                <input id="rx_order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
+                            <div class="col-span-4 font-bold">Fund Source</div>
+                            <div class="col-span-4">
+                                <select id="rx_charge_code" class="w-full select select-bordered select-sm">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="px-2 mt-2">
+                            <textarea id="rx_remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                    didOpen: () => {
+                        const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
+                        const rx_charge_code = Swal.getHtmlContainer().querySelector('#rx_charge_code')
+                        const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
+
+                        $.each(data, function(index, value) {
+                            if (index == 0) {
+                                rx_charge_code.options[rx_charge_code.options.length] = new Option(
+                                    value[
+                                        'text'], value['id'], true, true);
+                            } else {
+                                rx_charge_code.options[rx_charge_code.options.length] = new Option(
+                                    value[
+                                        'text'], value['id']);
+                            }
+                        });
+                        rx_order_qty.focus();
+                        rx_order_qty.value = rx_qty;
+
+                    }
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        @this.set('order_qty', rx_order_qty.value)
+                        @this.set('rx_charge_code', rx_charge_code.value);
+                        @this.set('remarks', rx_remarks.value);
+
+                        Livewire.emit('add_prescribed_item', rx_dmdcomb, rx_dmdctr);
+                    }
+                });
+            }
+        @endif
 
         function return_issued(docointkey, drug, up, or_qty) {
             Swal.fire({
@@ -696,239 +971,9 @@
             });
         }
 
-        function select_rx_item(rx_id, drug, rx_qty, empid, rx_dmdcomb, rx_dmdctr) {
-
-            var search = drug.split(",");
-            $("#generic").val(search[0]);
-            $("#generic").trigger('keyup');
-            @this.rx_id = rx_id;
-            @this.rx_dmdcomb = rx_dmdcomb;
-            @this.rx_dmdctr = rx_dmdctr;
-            @this.empid = empid;
-
-            Swal.fire({
-                html: `
-                        <div class="text-xl font-bold">` + drug + `</div>
-                        <div class="flex w-full space-x-3">
-                            <div class="w-full mb-3 form-control">
-                                <label class="label">
-                                    <span class="label-text">Quantity</span>
-                                </label>
-                                <input id="rx_order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
-                            <div class="col-span-4 font-bold">Fund Source</div>
-                            <div class="col-span-4">
-                            <select id="rx_charge_code" class="w-full select select-bordered select-sm">
-                            </select>
-                            </div>
-                            <div class="col-span-4 font-bold">TAG</div>
-                            <div class="col-span-4">
-                                <input class="toggle toggle-success" type="radio" id="rx_na" name="radio" checked>
-                                <label class="cursor-pointer" for="na">
-                                    <span class="label-text">INPATIENT</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="px-2 mt-2">
-                            <textarea id="rx_remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
-                        </div>
-                    `,
-                showCancelButton: true,
-                confirmButtonText: `Confirm`,
-                didOpen: () => {
-                    const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
-                    const rx_charge_code = Swal.getHtmlContainer().querySelector('#rx_charge_code')
-                    const rx_sc = Swal.getHtmlContainer().querySelector('#rx_sc')
-                    const rx_ems = Swal.getHtmlContainer().querySelector('#rx_ems')
-                    const rx_maip = Swal.getHtmlContainer().querySelector('#rx_maip')
-                    const rx_wholesale = Swal.getHtmlContainer().querySelector('#rx_wholesale')
-                    const rx_pay = Swal.getHtmlContainer().querySelector('#rx_pay')
-                    const rx_medicare = Swal.getHtmlContainer().querySelector('#rx_medicare')
-                    const rx_service = Swal.getHtmlContainer().querySelector('#rx_service')
-                    const rx_caf = Swal.getHtmlContainer().querySelector('#rx_caf')
-                    const rx_govt = Swal.getHtmlContainer().querySelector('#rx_govt')
-                    const rx_is_ris = Swal.getHtmlContainer().querySelector('#rx_is_ris')
-                    const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
-
-                    $.each(data, function(index, value) {
-                        if (index == 0) {
-                            rx_charge_code.options[rx_charge_code.options.length] = new Option(value[
-                                'text'], value['id'], true, true);
-                        } else {
-                            rx_charge_code.options[rx_charge_code.options.length] = new Option(value[
-                                'text'], value['id']);
-                        }
-                    });
-                    rx_order_qty.focus();
-                    rx_order_qty.value = rx_qty;
-
-                }
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                    @this.set('order_qty', rx_order_qty.value)
-
-                    @this.set('rx_charge_code', rx_charge_code.value);
-                    @this.set('ems', rx_ems.checked);
-                    @this.set('maip', rx_maip.checked);
-                    @this.set('wholesale', rx_wholesale.checked);
-                    @this.set('konsulta', rx_konsulta.checked);
-                    @this.set('pcso', rx_pcso.checked);
-                    @this.set('phic', rx_phic.checked);
-                    @this.set('caf', rx_caf.checked);
-                    @this.set('is_ris', rx_is_ris.checked);
-                    @this.set('remarks', rx_remarks.value);
-
-                    Livewire.emit('add_prescribed_item', rx_dmdcomb, rx_dmdctr);
-                }
-            });
-        }
-
         window.addEventListener('charged', event => {
             window.open('{{ url('/dispensing/encounter/charge') }}' + '/' +
                 event.detail.pcchrgcod, '_blank');
         });
     </script>
 @endpush
-
-
-{{--
-function select_rx_item(rx_id, drug, rx_qty, empid, rx_dmdcomb, rx_dmdctr) {
-
-    var search = drug.split(",");
-    $("#generic").val(search[0]);
-    $("#generic").trigger('keyup');
-    @this.rx_id = rx_id;
-    @this.rx_dmdcomb = rx_dmdcomb;
-    @this.rx_dmdctr = rx_dmdctr;
-    @this.empid = empid;
-
-    Swal.fire({
-        html: `
-                <div class="text-xl font-bold">` + drug + `</div>
-                <div class="flex w-full space-x-3">
-                    <div class="w-full mb-3 form-control">
-                        <label class="label">
-                            <span class="label-text">Quantity</span>
-                        </label>
-                        <input id="rx_order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
-                    </div>
-                </div>
-                <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
-                    <div class="col-span-4 font-bold">Fund Source</div>
-                    <div class="col-span-4">
-                    <select id="rx_charge_code" class="w-full select select-bordered select-sm">
-                    </select>
-                    </div>
-                    <div class="col-span-4 font-bold">TAG</div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_na" name="radio" checked>
-                        <label class="cursor-pointer" for="na">
-                            <span class="label-text">N/A</span>
-                        </label>
-                    </div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_ems" name="radio">
-                        <label class="cursor-pointer" for="ems">
-                            <span class="label-text">EMS</span>
-                        </label>
-                    </div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_konsulta" name="radio">
-                        <label class="cursor-pointer" for="konsulta">
-                            <span class="label-text">Konsulta Package</span>
-                        </label>
-                    </div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_wholesale" name="radio">
-                        <label class="cursor-pointer" for="wholesale">
-                            <span class="label-text">WHOLESALE</span>
-                        </label>
-                    </div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_caf" name="radio">
-                        <label class="cursor-pointer" for="caf">
-                            <span class="label-text">CAF</span>
-                        </label>
-                    </div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_maip" name="radio">
-                        <label class="cursor-pointer" for="maip">
-                            <span class="label-text">MAIP</span>
-                        </label>
-                    </div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_is_ris" name="radio">
-                        <label class="cursor-pointer" for="is_ris">
-                            <span class="label-text">RIS</span>
-                        </label>
-                    </div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_pcso" name="radio">
-                        <label class="cursor-pointer" for="pcso">
-                            <span class="label-text">PCSO</span>
-                        </label>
-                    </div>
-                    <div class="col-span-2">
-                        <input class="toggle toggle-success" type="radio" id="rx_phic" name="radio">
-                        <label class="cursor-pointer" for="phic">
-                            <span class="label-text">PHIC</span>
-                        </label>
-                    </div>
-                </div>
-                <div class="px-2 mt-2">
-                    <textarea id="rx_remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
-                </div>
-            `,
-        showCancelButton: true,
-        confirmButtonText: `Confirm`,
-        didOpen: () => {
-            const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
-            const rx_charge_code = Swal.getHtmlContainer().querySelector('#rx_charge_code')
-            const rx_sc = Swal.getHtmlContainer().querySelector('#rx_sc')
-            const rx_ems = Swal.getHtmlContainer().querySelector('#rx_ems')
-            const rx_maip = Swal.getHtmlContainer().querySelector('#rx_maip')
-            const rx_wholesale = Swal.getHtmlContainer().querySelector('#rx_wholesale')
-            const rx_pay = Swal.getHtmlContainer().querySelector('#rx_pay')
-            const rx_medicare = Swal.getHtmlContainer().querySelector('#rx_medicare')
-            const rx_service = Swal.getHtmlContainer().querySelector('#rx_service')
-            const rx_caf = Swal.getHtmlContainer().querySelector('#rx_caf')
-            const rx_govt = Swal.getHtmlContainer().querySelector('#rx_govt')
-            const rx_is_ris = Swal.getHtmlContainer().querySelector('#rx_is_ris')
-            const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
-
-            $.each(data, function(index, value) {
-                if (index == 0) {
-                    rx_charge_code.options[rx_charge_code.options.length] = new Option(value[
-                        'text'], value['id'], true, true);
-                } else {
-                    rx_charge_code.options[rx_charge_code.options.length] = new Option(value[
-                        'text'], value['id']);
-                }
-            });
-            rx_order_qty.focus();
-            rx_order_qty.value = rx_qty;
-
-        }
-    }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-            @this.set('order_qty', rx_order_qty.value)
-
-            @this.set('rx_charge_code', rx_charge_code.value);
-            @this.set('ems', rx_ems.checked);
-            @this.set('maip', rx_maip.checked);
-            @this.set('wholesale', rx_wholesale.checked);
-            @this.set('konsulta', rx_konsulta.checked);
-            @this.set('pcso', rx_pcso.checked);
-            @this.set('phic', rx_phic.checked);
-            @this.set('caf', rx_caf.checked);
-            @this.set('is_ris', rx_is_ris.checked);
-            @this.set('remarks', rx_remarks.value);
-
-            Livewire.emit('add_prescribed_item', rx_dmdcomb, rx_dmdctr);
-        }
-    });
-} --}}

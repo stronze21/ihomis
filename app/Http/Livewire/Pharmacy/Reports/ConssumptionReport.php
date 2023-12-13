@@ -13,7 +13,7 @@ use App\Models\Pharmacy\Drugs\DrugStockIssue;
 
 class ConssumptionReport extends Component
 {
-    public $month, $filter_charge = 'DRUMB,*Drugs and Meds (Revolving) Satellite';
+    public $month, $filter_charge = 'DRUME,Drugs and Medicines (Regular)';
     public $date_from, $date_to;
     public $location_id;
 
@@ -45,25 +45,23 @@ class ConssumptionReport extends Component
 
         $drugs_issued = DrugStockLog::from('pharm_drug_stock_logs as pdsl')
             ->selectRaw("chrgcode, pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
-                                        SUM(pdsl.purchased) as purchased,
-                                        SUM(pdsl.beg_bal) as beg_bal,
-                                        SUM(pdsl.ems) as ems,
-                                        SUM(pdsl.maip) as maip,
-                                        SUM(pdsl.wholesale) as wholesale,
-                                        SUM(pdsl.pay) as pay,
-                                        SUM(pdsl.service) as service,
-                                        SUM(pdsl.konsulta) as konsulta,
-                                        SUM(pdsl.pcso) as pcso,
-                                        SUM(pdsl.phic) as phic,
-                                        SUM(pdsl.caf) as caf,
-                                        SUM(pdsl.issue_qty) as issue_qty,
-                                        SUM(pdsl.return_qty) as return_qty
+                                        pdsl.purchased as purchased,
+                                        pdsl.beg_bal as beg_bal,
+                                        pdsl.ems as ems,
+                                        pdsl.maip as maip,
+                                        pdsl.wholesale as wholesale,
+                                        pdsl.pay as pay,
+                                        pdsl.service as service,
+                                        pdsl.konsulta as konsulta,
+                                        pdsl.pcso as pcso,
+                                        pdsl.phic as phic,
+                                        pdsl.caf as caf,
+                                        pdsl.issue_qty as issue_qty,
+                                        pdsl.return_qty as return_qty
                                         ")
             ->where('chrgcode', $filter_charge[0])
-            ->whereBetween('time_logged', [$date_from, $date_to])
+            ->where('date_logged', $date_from)
             ->with('charge')->with('drug')
-            ->groupBy('pdsl.dmdcomb', 'pdsl.dmdctr', 'pdsl.chrgcode')
-            ->groupBy('pdsl.dmdprdte')
             ->get();
 
         $locations = PharmLocation::all();
@@ -71,7 +69,7 @@ class ConssumptionReport extends Component
         return view('livewire.pharmacy.reports.conssumption-report', [
             'charge_codes' => $charge_codes,
             // 'charges' => $charges,
-            'current_charge' => $filter_charge[1],
+            'current_charge' => $filter_charge[0],
             'drugs_issued' => $drugs_issued,
             'locations' => $locations,
         ]);

@@ -5,7 +5,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="flex items-center shrink-0">
-                    <a  rel="noopener noreferrer" href="{{ route('dashboard') }}">
+                    <a rel="noopener noreferrer" href="{{ route('dashboard') }}">
                         <x-jet-application-mark class="block w-auto h-9" />
                     </a>
                 </div>
@@ -76,6 +76,9 @@
 
                             <x-slot name="content">
 
+                                <x-jet-dropdown-link href="{{ route('reports.stkcrd') }}">
+                                    {{ __('Stock Card') }}
+                                </x-jet-dropdown-link>
                                 <x-jet-dropdown-link href="{{ route('reports.consumption') }}">
                                     {{ __('Consumption Report') }}
                                 </x-jet-dropdown-link>

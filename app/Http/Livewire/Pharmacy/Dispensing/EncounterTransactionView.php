@@ -21,6 +21,7 @@ use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Record\Prescriptions\PrescriptionData;
 use App\Models\Record\Prescriptions\PrescriptionDataIssued;
 use App\Models\References\ChargeCode;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
@@ -37,7 +38,7 @@ class EncounterTransactionView extends Component
 
     public $order_qty, $unit_price, $return_qty, $docointkey;
     public $item_id;
-    public $ems, $maip, $wholesale, $caf, $type, $konsulta, $pcso, $phic, $pay, $service;
+    public $ems, $maip, $wholesale, $caf, $type = 'pay', $konsulta, $pcso, $phic, $pay, $service;
 
     public $is_ris = false;
     public $remarks;
@@ -77,8 +78,11 @@ class EncounterTransactionView extends Component
                                 INNER JOIN hcharge on hcharge.chrgcode = pharm_drug_stocks.chrgcode
                                 INNER JOIN hdmhdrprice on hdmhdrprice.dmdprdte = pharm_drug_stocks.dmdprdte
                                 WHERE loc_code = ?
+                                AND drug_concat LIKE ?
                                 GROUP BY pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.loc_code
-                                ", [$this->location_id]);
+                                ", [$this->location_id, $this->generic . '%']);
+
+        $this->dispatchBrowserEvent('issued');
 
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', compact(
             'rxos',
@@ -217,8 +221,8 @@ class EncounterTransactionView extends Component
                 );
                 LogDrugOrderIssue::dispatch($row2->docointkey, $row2->enccode, $row2->hpercode, $row2->dmdcomb, $row2->dmdctr, $row2->pchrgqty, session('employeeid'), $row2->orderfrom, $row2->pcchrgcod, $row2->pchrgup, $row2->ris, $row2->prescription_data_id);
             }
-            $this->emit('refresh');
             $this->alert('success', 'Order issued successfully.');
+            // return redirect()->route('dispensing.view.enctr', ['enccode' => $this->enccode]);
         } else {
             $this->alert('error', 'No item to issue.');
         }
@@ -334,12 +338,13 @@ class EncounterTransactionView extends Component
                             'dmdprdte' => $stock->dmdprdte,
                         ]);
 
+                        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
                         $log = DrugStockLog::firstOrNew([
                             'loc_code' => $stock->loc_code,
                             'dmdcomb' => $stock->dmdcomb,
                             'dmdctr' => $stock->dmdctr,
                             'chrgcode' => $stock->chrgcode,
-                            'date_logged' => date('Y-m-d'),
+                            'date_logged' => $date,
                             'dmdprdte' => $stock->dmdprdte,
                             'unit_price' => $stock->retail_price,
                         ]);
@@ -493,12 +498,13 @@ class EncounterTransactionView extends Component
                     'dmdprdte' => $stock->dmdprdte,
                 ]);
 
+                $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
                 $log = DrugStockLog::firstOrNew([
                     'loc_code' => $stock->loc_code,
                     'dmdcomb' => $stock->dmdcomb,
                     'dmdctr' => $stock->dmdctr,
                     'chrgcode' => $stock->chrgcode,
-                    'date_logged' => date('Y-m-d'),
+                    'date_logged' => $date,
                     'dmdprdte' => $stock->dmdprdte,
                     'unit_price' => $stock->retail_price,
                 ]);
@@ -557,8 +563,6 @@ class EncounterTransactionView extends Component
             $this->type = 'maip';
         } else if ($this->wholesale) {
             $this->type = 'wholesale';
-        } else if ($this->pay) {
-            $this->type = 'pay';
         } else if ($this->service) {
             $this->type = 'service';
         } else if ($this->caf) {
@@ -571,6 +575,8 @@ class EncounterTransactionView extends Component
             $this->type = 'phic';
         } else if ($this->konsulta) {
             $this->type = 'konsulta';
+        } else {
+            $this->type = 'pay';
         }
 
         if ($this->is_ris or $available >= $total_deduct) {
@@ -628,7 +634,7 @@ class EncounterTransactionView extends Component
                     ->update(['stat' => 'I']);
             }
 
-            $this->resetExcept('rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
+            $this->resetExcept('generic', 'rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
             $this->emit('refresh');
             $this->alert('success', 'Item added.');
         } else {
@@ -721,13 +727,14 @@ class EncounterTransactionView extends Component
             }
             //Return QTY to DrugStock table
             $stock_issued->stock->stock_bal += $returned_qty;
+            $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
 
             $log = DrugStockLog::firstOrNew([
                 'loc_code' => $stock_issued->stock->loc_code,
                 'dmdcomb' => $stock_issued->stock->dmdcomb,
                 'dmdctr' => $stock_issued->stock->dmdctr,
                 'chrgcode' => $stock_issued->stock->chrgcode,
-                'date_logged' => date('Y-m-d'),
+                'date_logged' => $date,
                 'dmdprdte' => $stock_issued->stock->dmdprdte,
                 'unit_price' => $stock_issued->stock->retail_price,
             ]);
@@ -753,8 +760,6 @@ class EncounterTransactionView extends Component
             $this->type = 'maip';
         } else if ($this->wholesale) {
             $this->type = 'wholesale';
-        } else if ($this->pay) {
-            $this->type = 'pay';
         } else if ($this->service) {
             $this->type = 'service';
         } else if ($this->caf) {
@@ -767,6 +772,8 @@ class EncounterTransactionView extends Component
             $this->type = 'phic';
         } else if ($this->konsulta) {
             $this->type = 'konsulta';
+        } else {
+            $this->type = 'pay';
         }
 
         $dm = DrugStock::where('dmdcomb', $dmdcomb)
@@ -822,7 +829,7 @@ class EncounterTransactionView extends Component
                 ->where('id', $rx_id)
                 ->update(['stat' => 'I']);
 
-            $this->resetExcept('stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
+            $this->resetExcept('generic', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
             $this->emit('refresh');
             $this->alert('success', 'Item added.');
         } else {
@@ -912,7 +919,7 @@ class EncounterTransactionView extends Component
     //                 ->update(['stat' => 'I']);
     //         }
 
-    //         $this->resetExcept('rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
+    //         $this->resetExcept('generic', 'rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
     //         $this->emit('refresh');
     //         $this->alert('success', 'Item added.');
     //     } else {

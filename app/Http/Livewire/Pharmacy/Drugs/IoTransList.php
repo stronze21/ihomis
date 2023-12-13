@@ -195,13 +195,14 @@ class IoTransList extends Component
 
             $item->status = 'Cancelled';
             $item->save();
+            $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
 
             $log = DrugStockLog::firstOrNew([
                 'loc_code' => $from_stock->loc_code,
                 'dmdcomb' => $item->dmdcomb,
                 'dmdctr' => $item->dmdctr,
                 'chrgcode' => $item->chrgcode,
-                'date_logged' => date('Y-m-d'),
+                'date_logged' => $date,
                 'dmdprdte' => $from_stock->dmdprdte,
                 'unit_price' => $from_stock->retail_price,
             ]);

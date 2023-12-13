@@ -31,6 +31,8 @@ use App\Http\Livewire\Pharmacy\Reports\IoTransIssuedReport;
 use App\Http\Livewire\Pharmacy\Reports\IoTransReceivedReport;
 use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedDepartments;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
+use App\Http\Livewire\Pharmacy\Drugs\StockPullOutList;
+use App\Http\Livewire\Pharmacy\Reports\DailyStockCard;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +69,7 @@ Route::middleware([
 
     Route::name('dmd.')->prefix('drugsandmedicine')->group(function () {
         Route::get('/stocks', StockList::class)->name('stk');
+        Route::get('/stocks/for-pull-out', StockPullOutList::class)->name('stk.pullout');
     });
 
     Route::name('iotrans.')->prefix('iotrans')->group(function () {
@@ -95,6 +98,7 @@ Route::middleware([
     });
 
     Route::name('reports.')->prefix('/reports')->group(function () {
+        Route::get('/stock-card', DailyStockCard::class)->name('stkcrd');
         Route::get('/issuance/log', DrugsTransactionLog::class)->name('issuance.log');
         Route::get('/issuance/all', DrugsIssued::class)->name('issuance.all');
         Route::get('/issuance/returns', DrugsReturned::class)->name('issuance.returns');
