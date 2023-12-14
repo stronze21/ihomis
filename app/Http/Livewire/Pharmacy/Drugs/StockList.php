@@ -13,10 +13,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class StockList extends Component
 {
     use LivewireAlert;
+    use WithPagination;
 
     protected $listeners = ['add_item', 'refresh' => '$refresh', 'add_item_new', 'update_item_new'];
 
@@ -28,6 +30,11 @@ class StockList extends Component
     public $item_id;
 
     public $drugs, $locations, $charge_codes;
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -42,6 +49,7 @@ class StockList extends Component
             ->join('pharm_locations', 'pharm_locations.id', 'pharm_drug_stocks.loc_code')
             ->where('drug_concat', 'LIKE', '%' . $this->search . '%')
             ->where('loc_code', $this->location_id)
+            ->where('stock_bal', '>', 0)
             ->select(
                 'pharm_drug_stocks.dmdcomb',
                 'pharm_drug_stocks.dmdctr',

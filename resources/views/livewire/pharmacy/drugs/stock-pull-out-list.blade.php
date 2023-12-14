@@ -15,8 +15,8 @@
     <div class="flex justify-end">
         <div class="flex">
             <div class="mt-auto">
-                <button class="btn btn-sm btn-primary" onclick="add_item()" wire:loading.attr="disabled">Add
-                    Item</button>
+                <button class="btn btn-sm btn-warning" onclick="pull_out()">Pull-out
+                    Items</button>
             </div>
             @can('filter-stocks-location')
                 <div class="ml-3 form-control">
@@ -47,6 +47,7 @@
         <table class="table w-full table-compact">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Source of Fund</th>
                     <th>Balance as of</th>
                     <th>Generic</th>
@@ -60,10 +61,12 @@
             </thead>
             <tbody>
                 @forelse ($stocks as $stk)
-                    <tr class="hover"
-                        @can('update-stock-item')
-                            onclick="update_item({{ $stk->id }}, '{{ $stk->drug_concat() }}', '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}', '{{ $stk->dmduprice }}', '{{ $stk->has_compounding }}', '{{ $stk->compounding_fee }}')"
-                        @endcan>
+                    <tr class="cursor-pointer hover" id="tr{{ '-' . $stk->id }}"
+                        onclick="check(`{{ '-' . $stk->id }}`)">
+                        <td class="w-10 text-center">
+                            <input type="checkbox" class="checkbox{{ '-' . $stk->id }}" wire:model="selected_items"
+                                value="{{ $stk->id }}" id="checkbox{{ '-' . $stk->id }}" checked="false" />
+                        </td>
                         <th>{{ $stk->chrgdesc }}</th>
                         <td>{{ $stk->updated_at }}</td>
                         <td class="font-bold">{{ $stk->drug_concat() }}</td>
@@ -83,3 +86,60 @@
         </table>
     </div>
 </div>
+
+@push('scripts')
+    <script>
+        function check(element) {
+            var checkBox = document.getElementById('checkbox' + element);
+            var tR = document.getElementById('tr' + element);
+
+            if (checkBox.checked == false) {
+                checkBox.click();
+                tR.classList.toggle("active");
+            } else {
+                checkBox.click();
+                tR.classList.toggle("active");
+            }
+        }
+
+
+        function pull_out() {
+            Swal.fire({
+                html: `
+                    <span class="text-xl font-bold"> Pullout Selected Items </span>
+                    <div class="w-full form-control">
+                        <label class="label" for="pullout_date">
+                            <span class="label-text">Pullout Date</span>
+                        </label>
+                        <input id="pullout_date" type="date" value="{{ date('Y-m-d') }}" class="w-full input input-bordered" />
+                    </div>
+                    <div class="w-full form-control">
+                        <label class="label" for="suppcode">
+                            <span class="label-text">Supplier</span>
+                        </label>
+                        <select class="select select-bordered" id="suppcode">
+                            <option disabled selected>Choose supplier</option>
+                            @foreach ($suppliers as $supplier)
+                                <option value="{{ $supplier->suppcode }}">{{ $supplier->suppname }}</option>
+                            @endforeach
+                        </select>
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: `Save`,
+                didOpen: () => {
+                    const pullout_date = Swal.getHtmlContainer().querySelector('#pullout_date');
+                    const si_no = Swal.getHtmlContainer().querySelector('#si_no');
+
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    @this.set('pullout_date', pullout_date.value);
+                    @this.set('suppcode', suppcode.value);
+
+                    Livewire.emit('pull_out');
+                }
+            });
+        }
+    </script>
+@endpush

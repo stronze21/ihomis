@@ -23,13 +23,18 @@
         {{-- <div>
             <button class="btn btn-sm btn-primary" onclick="">Add Delivery</button>
         </div> --}}
-        <div class="flex">
+        <div class="flex space-x-3">
             <div class="mt-auto">
-                <button class="btn btn-sm btn-primary" onclick="add_item()" wire:loading.attr="disabled">Add
+                <a href="{{ route('dmd.stk.pullout') }}" class="btn btn-sm btn-secondary"><i
+                        class="mr-1 las la-lg la-file"></i> For Pull Out List</a>
+            </div>
+            <div class="mt-auto">
+                <button class="btn btn-sm btn-primary" onclick="add_item()" wire:loading.attr="disabled"><i
+                        class="mr-1 las la-lg la-plus"></i>Add
                     Item</button>
             </div>
             @can('filter-stocks-location')
-                <div class="ml-3 form-control">
+                <div class="form-control">
                     <label class="label">
                         <span class="label-text">Current Location</span>
                     </label>
@@ -41,7 +46,7 @@
                     </select>
                 </div>
             @endcan
-            <div class="ml-3 form-control">
+            <div class="form-control">
                 <label class="label">
                     <span class="label-text">Seach generic name</span>
                 </label>

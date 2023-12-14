@@ -2,19 +2,58 @@
 
 namespace App\Http\Livewire\Pharmacy\Drugs;
 
-use App\Models\Pharmacy\Drugs\DrugStock;
-use App\Models\Pharmacy\PharmLocation;
-use App\Models\References\ChargeCode;
 use Carbon\Carbon;
 use Livewire\Component;
+use App\Models\References\Supplier;
+use App\Models\References\ChargeCode;
+use App\Models\Pharmacy\PharmLocation;
+use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Models\Pharmacy\Drugs\PullOut;
+use App\Models\Pharmacy\Drugs\PullOutItem;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
 class StockPullOutList extends Component
 {
+
+    use LivewireAlert;
+
+    protected $listeners = ['pull_out'];
+
     public $search, $location_id, $below_date;
     public $locations, $charge_codes;
+    public $selected_items = [], $pullout_date, $suppcode;
+
+    public function pull_out()
+    {
+        $this->validate([
+            'selected_items' => ['required', 'array'],
+            'suppcode' => ['required', 'string'],
+            'pullout_date' => ['required', 'date'],
+        ]);
+
+        $detail = PullOut::create([
+            'pullout_date' => $this->pullout_date,
+            'suppcode' => $this->suppcode,
+            'pharm_location_id' => $this->location_id,
+        ]);
+
+        foreach ($this->selected_items as $item) {
+            $stock = DrugStock::find($item);
+            PullOutItem::create([
+                'detail_id' => $detail->id,
+                'stock_id' => $stock->id,
+                'pullout_qty' => $stock->stock_bal,
+            ]);
+            $stock->stock_bal -= $stock->stock_bal;
+            $stock->save();
+        }
+
+        $this->alert('success', 'Items pulled out successfully');
+    }
 
     public function render()
     {
+        $suppliers = Supplier::all();
 
         $stocks = DrugStock::join('hcharge', 'hcharge.chrgcode', 'pharm_drug_stocks.chrgcode')
             ->join('hdmhdrprice', 'hdmhdrprice.dmdprdte', 'pharm_drug_stocks.dmdprdte')
@@ -46,6 +85,7 @@ class StockPullOutList extends Component
 
         return view('livewire.pharmacy.drugs.stock-pull-out-list', compact(
             'stocks',
+            'suppliers',
         ));
     }
 
