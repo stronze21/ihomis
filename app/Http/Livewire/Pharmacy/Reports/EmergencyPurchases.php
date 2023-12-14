@@ -12,10 +12,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class EmergencyPurchases extends Component
 {
     use LivewireAlert;
+    use WithPagination;
 
     protected $listeners = ['new_ep', 'refresh' => 'reset_page', 'push', 'cancel_purchase'];
 

@@ -4,9 +4,13 @@ namespace App\Http\Livewire\Pharmacy\Reports;
 
 use Livewire\Component;
 use App\Models\Pharmacy\Drugs\InOutTransaction;
+use Livewire\WithPagination;
 
 class IoTransIssuedReport extends Component
 {
+
+    use WithPagination;
+
     public function render()
     {
         $trans = InOutTransaction::where('trans_stat', 'Issued')
