@@ -119,7 +119,10 @@ class LogDrugStockIssue implements ShouldQueue
         $log->save();
 
         $card = DrugStockCard::firstOrNew([
-            'stock_id' => $this->stock_id,
+            'loc_code' => $this->loc_code,
+            'dmdcomb' => $this->dmdcomb,
+            'dmdctr' => $this->dmdctr,
+            'exp_date' => $this->exp_date,
             'stock_date' => $date,
             'reference' => $this->pcchrgcod,
         ]);
@@ -127,14 +130,17 @@ class LogDrugStockIssue implements ShouldQueue
         switch ($this->chrgcode) {
             case 'DRUME': // Regular
                 $card->iss_regular += $this->trans_qty;
+                $card->bal_regular -= $this->trans_qty;
                 break;
 
             case 'DRUMB': // Revolving
                 $card->iss_revolving += $this->trans_qty;
+                $card->bal_revolving -= $this->trans_qty;
                 break;
 
             default: //DRUMAA, DRUMAB, DRUMC, DRUMK, DRUMR, DRUMS
                 $card->iss_others += $this->trans_qty;
+                $card->bal_others -= $this->trans_qty;
         }
 
         $card->save();

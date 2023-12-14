@@ -15,7 +15,11 @@ class CreateDrugStockCardsTable extends Migration
     {
         Schema::connection('worker')->create('pharm_drug_stock_cards', function (Blueprint $table) {
             $table->id();
-            $table->string('stock_id');
+            $table->string('loc_code', 30);
+            $table->string('dmdcomb', 30);
+            $table->string('dmdctr', 30);
+            $table->string('drug_concat');
+            $table->date('exp_date');
             $table->date('stock_date');
             $table->string('reference')->nullable();
             $table->decimal('rec_revolving')->nullable();

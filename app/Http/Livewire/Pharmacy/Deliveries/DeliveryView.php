@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Pharmacy\Deliveries;
 
+use App\Jobs\LogDrugDelivery;
 use App\Models\Pharmacy\DeliveryDetail;
 use App\Models\Pharmacy\DeliveryItems;
 use App\Models\Pharmacy\Drug;
@@ -268,7 +269,7 @@ class DeliveryView extends Component
 
             $log->save();
             $add_to->save();
-
+            LogDrugDelivery::dispatch($item->pharm_location_id, $add_to->dmdcomb, $add_to->dmdctr, $add_to->exp_date, $add_to->chrgcode, $item->qty);
             $updated = true;
         }
         if ($updated) {

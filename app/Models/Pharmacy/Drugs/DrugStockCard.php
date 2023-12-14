@@ -13,7 +13,11 @@ class DrugStockCard extends Model
     protected $table = 'pharm_drug_stock_cards';
 
     protected $fillable = [
-        'stock_id',
+        'loc_code',
+        'dmdcomb',
+        'dmdctr',
+        'drug_concat',
+        'exp_date',
         'stock_date',
         'reference',
         'rec_revolving',

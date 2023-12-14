@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Pharmacy\Drugs\DrugStockCard;
-use App\Models\Pharmacy\Drugs\DrugStockLog;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,31 +11,24 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class LogIoTransReceive implements ShouldQueue
+class LogDrugDelivery implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public $to, $dmdcomb, $dmdctr, $chrgcode, $date_logged, $dmdprdte, $retail_price, $time_logged, $qty, $stock_id, $exp_date;
-
+    public $pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($to, $dmdcomb, $dmdctr, $chrgcode, $date_logged, $dmdprdte, $retail_price, $time_logged, $qty, $stock_id, $exp_date)
+    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty)
     {
-        $this->onQueue('iotx');
-        $this->to = $to;
+        $this->onQueue('rx_delivery');
+        $this->pharm_location_id = $pharm_location_id;
         $this->dmdcomb = $dmdcomb;
         $this->dmdctr = $dmdctr;
-        $this->chrgcode = $chrgcode;
-        $this->date_logged = $date_logged;
-        $this->dmdprdte = $dmdprdte;
-        $this->retail_price = $retail_price;
-        $this->time_logged = $time_logged;
-        $this->qty = $qty;
-        $this->stock_id = $stock_id;
         $this->exp_date = $exp_date;
+        $this->chrgcode = $chrgcode;
+        $this->qty = $qty;
     }
 
     /**
@@ -45,38 +38,30 @@ class LogIoTransReceive implements ShouldQueue
      */
     public function handle()
     {
-        $log = DrugStockLog::firstOrNew([
-            'loc_code' => $this->to,
-            'dmdcomb' => $this->dmdcomb,
-            'dmdctr' => $this->dmdctr,
-            'chrgcode' => $this->chrgcode,
-            'date_logged' => $this->date_logged,
-            'dmdprdte' => $this->dmdprdte,
-            'unit_price' => $this->retail_price,
-        ]);
-        $log->time_logged = $this->time_logged;
-        $log->received += $this->qty;
-        $log->save();
+        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
 
         $card = DrugStockCard::firstOrNew([
-            'loc_code' => $this->to,
+            'loc_code' => $this->pharm_location_id,
             'dmdcomb' => $this->dmdcomb,
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
-            'stock_date' => $this->date_logged,
+            'stock_date' => $date,
         ]);
 
         switch ($this->chrgcode) {
             case 'DRUME': // Regular
                 $card->rec_regular += $this->qty;
+                $card->bal_regular += $this->qty;
                 break;
 
             case 'DRUMB': // Revolving
                 $card->rec_revolving += $this->qty;
+                $card->bal_regular += $this->qty;
                 break;
 
             default: //DRUMAA, DRUMAB, DRUMC, DRUMK, DRUMR, DRUMS
                 $card->rec_others += $this->qty;
+                $card->bal_regular += $this->qty;
         }
 
         $card->save();

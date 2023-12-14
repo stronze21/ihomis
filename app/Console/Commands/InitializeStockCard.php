@@ -41,14 +41,33 @@ class InitializeStockCard extends Command
     public function handle()
     {
 
-        $stocks = DrugStock::select('id', 'stock_bal')->where('stock_bal', '>', 0)->get();
+        $stocks = DrugStock::select('id', 'stock_bal', 'dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode', 'loc_code')->where('stock_bal', '>', 0)->get();
 
         foreach ($stocks as $stock) {
-            DrugStockCard::firstOrCreate([
-                'stock_id' => $stock->id,
+            $card = DrugStockCard::firstOrCreate([
+                'loc_code' => $stock->loc_code,
+                'dmdcomb' => $stock->dmdcomb,
+                'dmdctr' => $stock->dmdctr,
+                'drug_concat' => $stock->drug_concat(),
+                'exp_date' => $stock->exp_date,
                 'stock_date' => date('Y-m-d'),
                 'reference' => $stock->stock_bal,
             ]);
+
+            switch ($stock->chrgcode) {
+                case 'DRUME': // Regular
+                    $card->bal_regular += $stock->stock_bal;
+                    break;
+
+                case 'DRUMB': // Revolving
+                    $card->bal_revolving += $stock->stock_bal;
+                    break;
+
+                default: //DRUMAA, DRUMAB, DRUMC, DRUMK, DRUMR, DRUMS
+                    $card->bal_others += $stock->stock_bal;
+            }
+
+            $card->save();
         }
 
         return 'Stock card reference value captured';

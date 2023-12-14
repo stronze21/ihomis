@@ -16,14 +16,14 @@ class LogDrugTransaction implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id;
+    protected $pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id)
+    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date)
     {
         $this->onQueue('stocklogger');
         $this->pharm_location_id = $pharm_location_id;
@@ -36,6 +36,7 @@ class LogDrugTransaction implements ShouldQueue
         $this->retail_price = $retail_price;
         $this->qty = $qty;
         $this->stock_id = $stock_id;
+        $this->exp_date = $exp_date;
     }
 
     /**
@@ -63,21 +64,27 @@ class LogDrugTransaction implements ShouldQueue
         $log->save();
 
         $card = DrugStockCard::firstOrNew([
-            'stock_id' => $this->stock_id,
+            'loc_code' => $this->pharm_location_id,
+            'dmdcomb' => $this->dmdcomb,
+            'dmdctr' => $this->dmdctr,
+            'exp_date' => $this->exp_date,
             'stock_date' => $date,
         ]);
 
         switch ($this->chrgcode) {
             case 'DRUME': // Regular
                 $card->rec_regular += $this->qty;
+                $card->bal_regular += $this->qty;
                 break;
 
             case 'DRUMB': // Revolving
                 $card->rec_revolving += $this->qty;
+                $card->bal_regular += $this->qty;
                 break;
 
             default: //DRUMAA, DRUMAB, DRUMC, DRUMK, DRUMR, DRUMS
                 $card->rec_others += $this->qty;
+                $card->bal_regular += $this->qty;
         }
 
         $card->save();

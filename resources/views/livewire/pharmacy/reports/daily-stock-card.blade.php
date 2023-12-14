@@ -44,18 +44,9 @@
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
-                            <span>From</span>
-                            <input type="datetime-local" class="w-full input input-sm input-bordered"
-                                max="{{ $date_to }}" wire:model.lazy="date_from" />
-                        </label>
-                    </div>
-                </div>
-                <div class="ml-2">
-                    <div class="form-control">
-                        <label class="input-group">
-                            <span>To</span>
-                            <input type="datetime-local" class="w-full input input-sm input-bordered"
-                                min="{{ $date_from }}" wire:model.lazy="date_to" />
+                            <span>Date</span>
+                            <input type="date" class="w-full input input-sm input-bordered"
+                                wire:model.lazy="date_from" />
                         </label>
                     </div>
                 </div>
@@ -64,6 +55,7 @@
         <table class="table bg-white shadow-md table-fixed table-sm" id="table">
             <thead class="font-bold text-center bg-gray-100">
                 <tr>
+                    <td class="text-sm uppercase border border-black" rowspan='2'>Drug</td>
                     <td class="text-sm uppercase border border-black" rowspan='2'>Date</td>
                     <td class="text-sm border border-black" rowspan='2'>Reference</td>
                     <td colspan="3" class="border border-black">Receipt</td>
@@ -85,22 +77,36 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- @forelse ($drugs_ordered as $rxo)
+                @forelse ($cards as $card)
+                    @php
+                        $ref = $card->reference;
+                        $receipt = $card->rec_revolving + $card->rec_regular + $card->rec_others;
+                        $issued = $card->iss_revolving + $card->iss_regular + $card->iss_others;
+                        $balance = $card->bal_revolving + $card->bal_regular + $card->bal_others;
+                        $total = $ref + $receipt - $issued;
+                    @endphp
                     <tr classs="border border-black">
-                        <td class="text-sm text-right border">{{ $loop->iteration }}</td>
-                        <td class="text-sm border">{{ date('F j, Y H:i A', strtotime($rxo->dodate)) }}</td>
-                        <td class="text-sm border">{{ $rxo->hpercode }}</td>
-                        <td class="text-sm border">{{ $rxo->patient->fullname() }}</td>
-                        <td class="text-sm border">{{ $rxo->pcchrgcod }}</td>
-                        <td class="text-sm text-right border">{{ $rxo->total_qty }}</td>
-                        <td class="text-sm text-right border">{{ $rxo->total_amount }}</td>
+                        <td class="text-sm border">{{ $card->drug_concat }}</td>
+                        <td class="text-sm text-right border">{{ $card->stock_date }}</td>
+                        <td class="text-sm text-right border">{{ $card->reference }}</td>
+                        <td class="text-sm border">{{ $card->rec_revolving }}</td>
+                        <td class="text-sm border">{{ $card->rec_regular }}</td>
+                        <td class="text-sm border">{{ $card->rec_others }}</td>
+                        <td class="text-sm border">{{ $card->iss_revolving }}</td>
+                        <td class="text-sm border">{{ $card->iss_regular }}</td>
+                        <td class="text-sm border">{{ $card->iss_others }}</td>
+                        <td class="text-sm border">{{ $card->bal_revolving }}</td>
+                        <td class="text-sm border">{{ $card->bal_regular }}</td>
+                        <td class="text-sm border">{{ $card->bal_others }}</td>
+                        <td class="text-sm text-right border">{{ $total }}</td>
+                        <td class="text-sm border">{{ $card->exp_date }}</td>
                     </tr>
                 @empty
                     <tr>
                         <td colspan="22" class="font-bold text-center uppercase bg-red-400 border border-black">No
                             record found!</td>
                     </tr>
-                @endforelse --}}
+                @endforelse
             </tbody>
         </table>
         <div class="mt-2">
