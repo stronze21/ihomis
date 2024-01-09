@@ -59,25 +59,15 @@ class LogIoTransReceive implements ShouldQueue
         $log->save();
 
         $card = DrugStockCard::firstOrNew([
+            'chrgcode' => $this->chrgcode,
             'loc_code' => $this->to,
             'dmdcomb' => $this->dmdcomb,
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
             'stock_date' => $this->date_logged,
         ]);
-
-        switch ($this->chrgcode) {
-            case 'DRUME': // Regular
-                $card->rec_regular += $this->qty;
-                break;
-
-            case 'DRUMB': // Revolving
-                $card->rec_revolving += $this->qty;
-                break;
-
-            default: //DRUMAA, DRUMAB, DRUMC, DRUMK, DRUMR, DRUMS
-                $card->rec_others += $this->qty;
-        }
+        $card->rec += $this->qty;
+        $card->bal += $this->qty;
 
         $card->save();
     }

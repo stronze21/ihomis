@@ -18,19 +18,14 @@ class CreateDrugStockCardsTable extends Migration
             $table->string('loc_code', 30);
             $table->string('dmdcomb', 30);
             $table->string('dmdctr', 30);
+            $table->string('chrgcode', 30);
             $table->string('drug_concat');
             $table->date('exp_date');
             $table->date('stock_date');
             $table->string('reference')->nullable();
-            $table->decimal('rec_revolving')->nullable();
-            $table->decimal('rec_regular')->nullable();
-            $table->decimal('rec_others')->nullable();
-            $table->decimal('iss_revolving')->nullable();
-            $table->decimal('iss_regular')->nullable();
-            $table->decimal('iss_others')->nullable();
-            $table->decimal('bal_revolving')->nullable();
-            $table->decimal('bal_regular')->nullable();
-            $table->decimal('bal_others')->nullable();
+            $table->decimal('rec')->nullable();
+            $table->decimal('iss')->nullable();
+            $table->decimal('bal')->nullable();
             $table->timestamps();
         });
     }

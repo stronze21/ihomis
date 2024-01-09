@@ -16,19 +16,14 @@ class DrugStockCard extends Model
         'loc_code',
         'dmdcomb',
         'dmdctr',
+        'chrgcode',
         'drug_concat',
         'exp_date',
         'stock_date',
         'reference',
-        'rec_revolving',
-        'rec_regular',
-        'rec_others',
-        'iss_revolving',
-        'iss_regular',
-        'iss_others',
-        'bal_revolving',
-        'bal_regular',
-        'bal_others',
+        'rec',
+        'iss',
+        'bal',
     ];
 
     public function stock()

@@ -21,7 +21,31 @@
 <div class="max-w-screen">
     <div class="flex flex-col px-2 py-5 overflow-auto">
         <div class="flex justify-between my-2">
-            <div class="flex justify-between">
+            <div class="flex justify-between space-x-2">
+                <div class="form-control">
+                    <label class="input-group">
+                        <span>Drug</span>
+                        <select class="text-sm select select-bordered select-sm" wire:model="selected_drug">
+                            <option value="">N/A</option>
+                            @foreach ($drugs as $stock_item)
+                                <option value="{{ $stock_item->dmdcomb }},{{ $stock_item->dmdctr }}">
+                                    {{ $stock_item->drug_concat }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                </div>
+                <div class="form-control">
+                    <label class="input-group">
+                        <span class="whitespace-nowrap">Fund Source</span>
+                        <select class="text-sm select select-bordered select-sm" wire:model="selected_fund">
+                            <option value="">N/A</option>
+                            @foreach ($fund_sources as $fund)
+                                <option value="{{ $fund->chrgcode }},{{ $fund->chrgdesc }}">
+                                    {{ $fund->chrgdesc }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                </div>
             </div>
             <div class="flex justify-end">
                 <div class="ml-2">
@@ -55,25 +79,17 @@
         <table class="table bg-white shadow-md table-fixed table-sm" id="table">
             <thead class="font-bold text-center bg-gray-100">
                 <tr>
-                    <td class="text-sm uppercase border border-black" rowspan='2'>Drug</td>
-                    <td class="text-sm uppercase border border-black" rowspan='2'>Date</td>
-                    <td class="text-sm border border-black" rowspan='2'>Reference</td>
-                    <td colspan="3" class="border border-black">Receipt</td>
-                    <td colspan="3" class="border border-black">Issued</td>
-                    <td colspan="3" class="border border-black">Balance</td>
-                    <td class="text-sm uppercase border border-black" rowspan='2'>Total</td>
-                    <td class="text-sm border border-black" rowspan='2'>Expiry Date</td>
+                    <td colspan="8" class="border border-black">{{ $chrgdesc }}</td>
                 </tr>
                 <tr>
-                    <td class="border border-black">Revolving</td>
-                    <td class="border border-black">Regular</td>
-                    <td class="border border-black">Others</td>
-                    <td class="border border-black">Revolving</td>
-                    <td class="border border-black">Regular</td>
-                    <td class="border border-black">Others</td>
-                    <td class="border border-black">Revolving</td>
-                    <td class="border border-black">Regular</td>
-                    <td class="border border-black">Others</td>
+                    <td class="text-sm uppercase border border-black">Drug</td>
+                    <td class="text-sm uppercase border border-black">Date</td>
+                    <td class="text-sm border border-black">Reference</td>
+                    <td class="border border-black">Receipt</td>
+                    <td class="border border-black">Issued</td>
+                    <td class="border border-black">Balance</td>
+                    <td class="text-sm uppercase border border-black">Total</td>
+                    <td class="text-sm border border-black">Expiry Date</td>
                 </tr>
             </thead>
             <tbody>
@@ -86,18 +102,17 @@
                         $total = $ref + $receipt - $issued;
                     @endphp
                     <tr classs="border border-black">
-                        <td class="text-sm border">{{ $card->drug_concat }}</td>
+                        <td class="text-sm border">
+                            <div class="flex flex-col">
+                                <div>{{ $card->drug_concat }}</div>
+                                <div class="text-xs text-slate-600">{{ $card->chrgcode ?? '' }}</div>
+                            </div>
+                        </td>
                         <td class="text-sm text-right border">{{ $card->stock_date }}</td>
                         <td class="text-sm text-right border">{{ $card->reference }}</td>
-                        <td class="text-sm border">{{ $card->rec_revolving }}</td>
-                        <td class="text-sm border">{{ $card->rec_regular }}</td>
-                        <td class="text-sm border">{{ $card->rec_others }}</td>
-                        <td class="text-sm border">{{ $card->iss_revolving }}</td>
-                        <td class="text-sm border">{{ $card->iss_regular }}</td>
-                        <td class="text-sm border">{{ $card->iss_others }}</td>
-                        <td class="text-sm border">{{ $card->bal_revolving }}</td>
-                        <td class="text-sm border">{{ $card->bal_regular }}</td>
-                        <td class="text-sm border">{{ $card->bal_others }}</td>
+                        <td class="text-sm border">{{ $card->rec }}</td>
+                        <td class="text-sm border">{{ $card->iss }}</td>
+                        <td class="text-sm border">{{ $card->bal }}</td>
                         <td class="text-sm text-right border">{{ $total }}</td>
                         <td class="text-sm border">{{ $card->exp_date }}</td>
                     </tr>

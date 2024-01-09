@@ -24,10 +24,12 @@
             <button class="btn btn-sm btn-primary" onclick="">Add Delivery</button>
         </div> --}}
         <div class="flex space-x-3">
-            <div class="mt-auto">
-                <a href="{{ route('dmd.stk.pullout') }}" class="btn btn-sm btn-secondary"><i
-                        class="mr-1 las la-lg la-file"></i> For Pull Out List</a>
-            </div>
+            @can('pull-out-items')
+                <div class="mt-auto">
+                    <a href="{{ route('dmd.stk.pullout') }}" class="btn btn-sm btn-secondary"><i
+                            class="mr-1 las la-lg la-file"></i> For Pull Out List</a>
+                </div>
+            @endcan
             <div class="mt-auto">
                 <button class="btn btn-sm btn-primary" onclick="add_item()" wire:loading.attr="disabled"><i
                         class="mr-1 las la-lg la-plus"></i>Add

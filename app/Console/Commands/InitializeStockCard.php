@@ -45,6 +45,7 @@ class InitializeStockCard extends Command
 
         foreach ($stocks as $stock) {
             $card = DrugStockCard::firstOrCreate([
+                'chrgcode' => $stock->chrgcode,
                 'loc_code' => $stock->loc_code,
                 'dmdcomb' => $stock->dmdcomb,
                 'dmdctr' => $stock->dmdctr,
@@ -52,22 +53,8 @@ class InitializeStockCard extends Command
                 'exp_date' => $stock->exp_date,
                 'stock_date' => date('Y-m-d'),
                 'reference' => $stock->stock_bal,
+                'bal' => $stock->stock_bal,
             ]);
-
-            switch ($stock->chrgcode) {
-                case 'DRUME': // Regular
-                    $card->bal_regular += $stock->stock_bal;
-                    break;
-
-                case 'DRUMB': // Revolving
-                    $card->bal_revolving += $stock->stock_bal;
-                    break;
-
-                default: //DRUMAA, DRUMAB, DRUMC, DRUMK, DRUMR, DRUMS
-                    $card->bal_others += $stock->stock_bal;
-            }
-
-            $card->save();
         }
 
         return 'Stock card reference value captured';
