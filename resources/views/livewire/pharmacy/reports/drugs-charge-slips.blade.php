@@ -28,7 +28,7 @@
                     <button onclick="ExportToExcel('xlsx')" class="btn btn-sm btn-info"><i
                             class="las la-lg la-file-excel"></i> Export</button>
                 </div>
-                <div class="ml-2">
+                {{-- <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
                             <span>Location</span>
@@ -40,7 +40,7 @@
                             </select>
                         </label>
                     </div>
-                </div>
+                </div> --}}
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">

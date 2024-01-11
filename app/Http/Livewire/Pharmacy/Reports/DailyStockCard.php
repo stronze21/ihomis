@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Pharmacy\Reports;
 
+use App\Models\Pharmacy\Drug;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockCard;
 use App\Models\Pharmacy\PharmLocation;
@@ -12,7 +13,7 @@ use Livewire\Component;
 
 class DailyStockCard extends Component
 {
-    public $date_from, $location_id, $drugs, $dmdcomb, $dmdctr, $fund_sources, $selected_drug, $selected_fund, $chrgcode, $chrgdesc;
+    public $date_from, $date_to, $location_id, $drugs, $dmdcomb, $dmdctr, $fund_sources, $selected_drug, $selected_fund, $chrgcode, $chrgdesc;
 
 
     public function updatedSelectedDrug()
@@ -37,7 +38,7 @@ class DailyStockCard extends Component
         $cards = DrugStockCard::select(DB::raw('SUM(rec) as rec, SUM(iss) as iss, SUM(bal) as bal'), 'drug_concat', 'exp_date', 'stock_date', 'reference', 'chrgcode')
             ->where('dmdcomb', $this->dmdcomb)
             ->where('dmdctr', $this->dmdctr)
-            ->where('stock_date', $this->date_from)
+            ->whereBetween('stock_date', [$this->date_from, $this->date_to])
             ->where('loc_code', $this->location_id);
 
         if ($this->selected_fund) {
@@ -47,6 +48,7 @@ class DailyStockCard extends Component
         $cards = $cards->groupBy('dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode')
             ->orderBy('drug_concat', 'ASC')
             ->orderBy('exp_date', 'ASC')
+            ->with('charge')
             ->get();
 
         return view('livewire.pharmacy.reports.daily-stock-card', compact(
@@ -58,11 +60,13 @@ class DailyStockCard extends Component
     public function mount()
     {
         $this->location_id = session('pharm_location_id');
-        $this->date_from = Carbon::parse(now())->format('Y-m-d');
-        $this->drugs =  DrugStockCard::where('stock_date', $this->date_from)
-            ->where('loc_code', $this->location_id)
-            ->groupBy('dmdcomb', 'dmdctr', 'drug_concat', 'chrgcode')
-            ->get();
+        $this->date_from = Carbon::parse(now())->subDays(2)->format('Y-m-d');
+        $this->date_to = Carbon::parse(now())->format('Y-m-d');
+
+        $this->drugs = Drug::where('dmdstat', 'A')
+            ->whereHas('sub', function ($query) {
+                return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
+            })->get();
 
         $this->fund_sources = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')

@@ -2,6 +2,8 @@
 
 namespace App\Models\Pharmacy\Drugs;
 
+use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Models\References\ChargeCode;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,5 +31,10 @@ class DrugStockCard extends Model
     public function stock()
     {
         return $this->belongsTo(DrugStock::class, 'stock_id', 'id');
+    }
+
+    public function charge()
+    {
+        return $this->belongsTo(ChargeCode::class, 'chrgcode', 'chrgcode');
     }
 }

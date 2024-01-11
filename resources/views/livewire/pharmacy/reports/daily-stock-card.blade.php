@@ -29,7 +29,7 @@
                             <option value="">N/A</option>
                             @foreach ($drugs as $stock_item)
                                 <option value="{{ $stock_item->dmdcomb }},{{ $stock_item->dmdctr }}">
-                                    {{ $stock_item->drug_concat }}</option>
+                                    {{ $stock_item->drug_concat() }}</option>
                             @endforeach
                         </select>
                     </label>
@@ -52,7 +52,7 @@
                     <button onclick="ExportToExcel('xlsx')" class="btn btn-sm btn-info"><i
                             class="las la-lg la-file-excel"></i> Export</button>
                 </div>
-                <div class="ml-2">
+                {{-- <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
                             <span>Location</span>
@@ -64,13 +64,22 @@
                             </select>
                         </label>
                     </div>
+                </div> --}}
+                <div class="ml-2">
+                    <div class="form-control">
+                        <label class="input-group">
+                            <span>From</span>
+                            <input type="date" class="w-full input input-sm input-bordered"
+                                wire:model.lazy="date_from" />
+                        </label>
+                    </div>
                 </div>
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
-                            <span>Date</span>
+                            <span>To</span>
                             <input type="date" class="w-full input input-sm input-bordered"
-                                wire:model.lazy="date_from" />
+                                wire:model.lazy="date_to" />
                         </label>
                     </div>
                 </div>
@@ -105,7 +114,7 @@
                         <td class="text-sm border">
                             <div class="flex flex-col">
                                 <div>{{ $card->drug_concat }}</div>
-                                <div class="text-xs text-slate-600">{{ $card->chrgcode ?? '' }}</div>
+                                <div class="text-xs text-slate-600">{{ $card->charge->chrgdesc ?? '' }}</div>
                             </div>
                         </td>
                         <td class="text-sm text-right border">{{ $card->stock_date }}</td>

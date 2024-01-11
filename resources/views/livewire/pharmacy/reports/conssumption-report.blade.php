@@ -28,7 +28,7 @@
             <div class="ml-2">
                 <div class="form-control">
                     <label class="input-group">
-                        <span>From</span>
+                        <span>Month & Year</span>
                         <input type="month" class="w-full input input-sm input-bordered"
                             wire:model.lazy="date_from" />
                     </label>
