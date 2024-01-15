@@ -111,27 +111,27 @@
                                     switch ($rx->mssikey) {
                                         case 'MSSA11111999':
                                         case 'MSSB11111999':
-                                            $class = "Pay";
+                                            $class = 'Pay';
                                             break;
 
                                         case 'MSSC111111999':
-                                            $class = "PP1";
+                                            $class = 'PP1';
                                             break;
 
                                         case 'MSSC211111999':
-                                            $class = "PP2";
+                                            $class = 'PP2';
                                             break;
 
                                         case 'MSSC311111999':
-                                            $class = "PP3";
+                                            $class = 'PP3';
                                             break;
 
                                         case 'MSSD11111999':
-                                            $class = "Indigent";
+                                            $class = 'Indigent';
                                             break;
 
                                         default:
-                                            $class = "---";
+                                            $class = '---';
                                     }
                                     echo $class;
                                 @endphp

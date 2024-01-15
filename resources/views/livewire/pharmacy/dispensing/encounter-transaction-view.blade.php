@@ -39,7 +39,7 @@
                     <thead class="sticky font-bold bg-gray-200" wire:ignore>
                         <tr>
                             <td colspan="4" class="w-1/3 border border-black"><span>Hospital #: </span> <span
-                                    class="fw-bold">{{ $patient->hpercode }}</span></td>
+                                    class="fw-bold">{{ $patient->hpercode ?? $patient->id }}</span></td>
                             <td colspan="7" class="w-2/3 border border-black">
                                 <span>Diagnosis: </span>
                                 <div class="text-xs font-light">
@@ -146,8 +146,7 @@
                             @endphp
                             <tr class="border">
                                 <td class="w-10 text-center">
-                                    <input type="checkbox"
-                                        class="checkbox{{ '-' . ($rxo->pcchrgcod ?? $loop->iteration) }}"
+                                    <input type="checkbox" class="checkbox{{ '-' . ($rxo->pcchrgcod ?? 'blank') }}"
                                         wire:model.defer="selected_items" value="{{ $rxo->docointkey }}" />
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">

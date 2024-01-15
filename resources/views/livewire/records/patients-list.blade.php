@@ -20,29 +20,38 @@
                     <label class="input-group input-group-sm">
                         <span class="text-sm whitespace-nowrap">Hospital #</span>
                         <input type="text" placeholder="Search" class="input input-bordered input-sm"
-                            wire:model.lazy="searchhpercode" />
+                            wire:model.defer="searchhpercode" />
                     </label>
                 </div>
                 <div class="ml-3 form-control">
                     <label class="input-group input-group-sm">
                         <span class="text-sm whitespace-nowrap">First Name</span>
                         <input type="text" placeholder="Search" class="input input-bordered input-sm"
-                            wire:model.lazy="searchpatfirst" />
+                            wire:model.defer="searchpatfirst" />
                     </label>
                 </div>
                 <div class="ml-3 form-control">
                     <label class="input-group input-group-sm">
                         <span class="text-sm whitespace-nowrap">Middle Name</span>
                         <input type="text" placeholder="Search" class="input input-bordered input-sm"
-                            wire:model.lazy="searchpatmiddle" />
+                            wire:model.defer="searchpatmiddle" />
                     </label>
                 </div>
                 <div class="ml-3 form-control">
                     <label class="input-group input-group-sm">
                         <span class="text-sm whitespace-nowrap">Last Name</span>
                         <input type="text" placeholder="Search" class="input input-bordered input-sm"
-                            wire:model.lazy="searchpatlast" />
+                            wire:model.defer="searchpatlast" />
                     </label>
+                </div>
+                <div class="ml-3 form-control">
+                    <button id="refreshBtn" class="btn btn-sm btn-info" wire:click="$refresh"
+                        wire:loading.attr="disabled">Search</button>
+                </div>
+                <div class="ml-3 form-control">
+                    <button id="newPatBtn" class="btn btn-sm btn-warning" wire:click.prefetch="new_pat()"
+                        wire:loading.attr="disabled">New
+                        Patient</button>
                 </div>
             </div>
         </div>
@@ -63,7 +72,7 @@
             <tbody>
                 @forelse ($patients as $patient)
                     <tr wire:key="select-patient-{{ $patient->hpercode }}-{{ $loop->iteration }}"
-                        wire:click="select_patient('{{ $patient->hpercode }}')" style="cursor: pointer">
+                        wire:click.prefetch="select_patient('{{ $patient->hpercode }}')" style="cursor: pointer">
                         <td>{{ $patient->hpercode }}</td>
                         <td>{{ $patient->fullname() }}</td>
                         <td>{{ $patient->patsex }}</td>
@@ -95,3 +104,32 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    $('#refreshBtn').click();
+                }
+            });
+
+            document.addEventListener('keydown', e => {
+                if (e.ctrlKey && e.keyCode == 84) {
+                    console.log('wow')
+                    e.preventDefault();
+                    $('#newPatBtn').click();
+                }
+            });
+            $(window).keydown(function(event) {
+                if (event.ctrlKey && event.keyCode == 84) {
+                    console.log("Hey! Ctrl+T event captured!");
+                    event.preventDefault();
+                }
+                if (event.ctrlKey && event.keyCode == 83) {
+                    console.log("Hey! Ctrl+S event captured!");
+                    event.preventDefault();
+                }
+            });
+        </script>
+    @endpush

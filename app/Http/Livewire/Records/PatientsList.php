@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Records;
 
+use App\Models\Pharmacy\TemporaryPatient;
 use App\Models\Record\Encounters\EncounterLog;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -52,18 +53,18 @@ class PatientsList extends Component
 
     public function render()
     {
-        $patients = Patient::query()->selectRaw('hpercode, patlast, patfirst, patmiddle, patsex, patbdate, patbplace, patcstat');
+        $patients = Patient::selectRaw('hpercode, patlast, patfirst, patmiddle, patsex, patbdate, patbplace, patcstat');
 
         if ($this->searchpatlast || $this->searchpatlast != '')
-            $patients->where('patlast', 'LIKE', '%' . $this->searchpatlast . '%');
+            $patients = $patients->where('patlast', 'LIKE', $this->searchpatlast);
         if ($this->searchpatmiddle || $this->searchpatmiddle != '')
-            $patients->where('patmiddle', 'LIKE', '%' . $this->searchpatmiddle . '%');
+            $patients = $patients->where('patmiddle', 'LIKE', $this->searchpatmiddle);
         if ($this->searchpatfirst || $this->searchpatfirst != '')
-            $patients->where('patfirst', 'LIKE', '%' . $this->searchpatfirst . '%');
+            $patients = $patients->where('patfirst', 'LIKE', $this->searchpatfirst . '%');
         if ($this->searchhpercode || $this->searchhpercode != '')
-            $patients->where('hpercode', 'LIKE', '%' . $this->searchhpercode . '%');
+            $patients = $patients->where('hpercode', $this->searchhpercode);
         if ($this->searchpatdob || $this->searchpatdob != '')
-            $patients->where(DB::raw('CONVERT(date, patbdate)'), '=', $this->searchpatdob);
+            $patients = $patients->where(DB::raw('CONVERT(date, patbdate)'), '=', $this->searchpatdob);
 
         $patients = $patients->orderBy('patlast');
 
@@ -148,5 +149,36 @@ class PatientsList extends Component
         }
 
         return redirect()->route('dispensing.view.enctr', ['enccode' => $enccode]);
+    }
+
+    public function new_pat()
+    {
+        $this->validate([
+            'searchpatfirst' => ['required', 'string', 'max:255'],
+            'searchpatmiddle' => ['nullable', 'string', 'max:255'],
+            'searchpatlast' => ['required', 'string', 'max:255'],
+        ]);
+        $prefix = 'W' . date('Y');
+        $count = Patient::where('hpercode', 'LIKE', $prefix . '%')->count();
+        $hpercode = $prefix . sprintf('%07d', $count + 1);
+
+        $patient = Patient::firstOrCreate([
+            'hpercode' => $hpercode,
+            'hpatkey' => $hpercode,
+            'hpatcode' => $hpercode,
+            'patsex' => 'M',
+            'hfhudcode' => '0000040',
+            'patstat' => 'A',
+            'patlock' => 'N',
+            'confdl' => 'N',
+            'updsw' => 'U',
+            'datemod' => now(),
+            'patfirst' => $this->searchpatfirst,
+            'patmiddle' => $this->searchpatmiddle,
+            'patlast' => $this->searchpatlast,
+        ]);
+
+        $this->hpercode = $hpercode;
+        $this->walk_in();
     }
 }

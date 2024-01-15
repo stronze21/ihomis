@@ -33,6 +33,7 @@ use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedDepartments;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 use App\Http\Livewire\Pharmacy\Drugs\StockPullOutList;
 use App\Http\Livewire\Pharmacy\Reports\DailyStockCard;
+use App\Http\Livewire\Records\PatientRegister;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +60,7 @@ Route::middleware([
     })->name('dashboard');
 
     Route::get('/patients', PatientsList::class)->name('patients.list');
+    Route::get('/patients/register', PatientRegister::class)->name('patients.new');
     Route::get('/prescriptions', PrescriptionList::class)->name('rx.list');
 
     Route::name('rx.')->prefix('prescriptions')->group(function () {

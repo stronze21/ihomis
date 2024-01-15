@@ -3,11 +3,12 @@
 namespace App\Models\Record\Patients;
 
 use Carbon\Carbon;
-use App\Models\Religion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Record\Patients\PatientMss;
 use App\Models\Record\Encounters\EncounterLog;
+use App\Models\References\Religion;
+use App\Record\Patients\Models\PatientAddress;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Patient extends Model
@@ -17,7 +18,7 @@ class Patient extends Model
     protected $connection = 'hospital';
     protected $table = 'hospital.dbo.hperson', $primaryKey = 'hpercode', $keyType = 'string';
     public $incrementing = false;
-    public $timestamps = false ;
+    public $timestamps = false;
 
     protected $fillable = [
         'hpatkey', 'hfhudcode', 'hpercode', 'hpatcode', 'hspocode', //patient contact number
@@ -35,11 +36,11 @@ class Patient extends Model
         'spemptel', 'fattel', 'mottel', 'mssno', 'srcitizen', 'picname', 's_dec', 'hsmokingcs', 'hospperson',
         'radcasenum', 'kmc', 'kmc_stat', 'renal', 'renal_stat', 'ems', 'ems_type', 'kmc_id', 'kmc_rem', 'kmc_date',
         'hperson_verified',
-        ];
+    ];
 
     public function fullname()
     {
-        return $this->patlast.', '.$this->patsuffix.' '.$this->patfirst.' '.mb_substr($this->patmiddle, 0, 1).'.';
+        return $this->patlast . ', ' . $this->patsuffix . ' ' . $this->patfirst . ' ' . mb_substr($this->patmiddle, 0, 1) . '.';
     }
 
     public function age()
@@ -65,14 +66,27 @@ class Patient extends Model
     public function csstat()
     {
         $stat = $this->patcstat;
-        switch($stat){
-		    case 'S': $stat = 'Single'; break;
-		    case 'M': $stat = 'Married'; break;
-		    case 'D': $stat = 'Divorced'; break;
-		    case 'X': $stat = 'Separated'; break;
-		    case 'W': $stat = 'Widow/Widower'; break;
-		    case 'N': $stat = 'Not Applicable'; break;
-		    default: $stat = '...';
+        switch ($stat) {
+            case 'S':
+                $stat = 'Single';
+                break;
+            case 'M':
+                $stat = 'Married';
+                break;
+            case 'D':
+                $stat = 'Divorced';
+                break;
+            case 'X':
+                $stat = 'Separated';
+                break;
+            case 'W':
+                $stat = 'Widow/Widower';
+                break;
+            case 'N':
+                $stat = 'Not Applicable';
+                break;
+            default:
+                $stat = '...';
         }
 
         return $stat;
@@ -81,11 +95,18 @@ class Patient extends Model
     public function empstat()
     {
         $stat = $this->patempstat;
-        switch($stat){
-		    case 'EMPLO': $stat = 'Employed'; break;
-		    case 'SELFE': $stat = 'Self-employed'; break;
-		    case 'UNEMP': $stat = 'Unemployed'; break;
-		    default: $stat = 'N/A';
+        switch ($stat) {
+            case 'EMPLO':
+                $stat = 'Employed';
+                break;
+            case 'SELFE':
+                $stat = 'Self-employed';
+                break;
+            case 'UNEMP':
+                $stat = 'Unemployed';
+                break;
+            default:
+                $stat = 'N/A';
         }
 
         return $stat;
@@ -106,19 +127,19 @@ class Patient extends Model
     public function active_encounter()
     {
         $enctr = $this->hasMany(EncounterLog::class, 'hpercode', 'hpercode')
-                                            ->where('encstat', 'A')
-                                            ->where('toecode', '<>', 'WALKN')
-                                            ->where('toecode', '<>', '32')
-                                            ->where('enclock', 'N');
+            ->where('encstat', 'A')
+            ->where('toecode', '<>', 'WALKN')
+            ->where('toecode', '<>', '32')
+            ->where('enclock', 'N');
 
         $this_enctr = $enctr->latest('encdate')->take(1)->first();
-        if($this_enctr){
+        if ($this_enctr) {
             $toecode = $this_enctr->toecode;
-            if($toecode == 'OPD'){
+            if ($toecode == 'OPD') {
                 $enctr = $enctr->with('opd')->whereRelation('opd', 'opdstat', 'A');
-            }elseif($toecode == 'ER' OR $toecode == 'ERADM'){
+            } elseif ($toecode == 'ER' or $toecode == 'ERADM') {
                 $enctr = $enctr->with('er')->whereRelation('er', 'erstat', 'A');
-            }elseif($toecode == 'ADM' OR $toecode == 'OPDAD'){
+            } elseif ($toecode == 'ADM' or $toecode == 'OPDAD') {
                 $enctr = $enctr->with('adm')->whereRelation('adm', 'admstat', 'A');
             }
         }
@@ -129,11 +150,11 @@ class Patient extends Model
     public function latest_encounter()
     {
         return $this->hasMany(EncounterLog::class, 'hpercode', 'hpercode')
-                        ->where('encstat', 'A')
-                        ->where('toecode', '<>', 'WALKN')
-                        ->where('toecode', '<>', '32')
-                        ->where('enclock', 'N')
-                        ->latest('encdate');
+            ->where('encstat', 'A')
+            ->where('toecode', '<>', 'WALKN')
+            ->where('toecode', '<>', '32')
+            ->where('enclock', 'N')
+            ->latest('encdate');
     }
 
     public function admission()
@@ -155,8 +176,8 @@ class Patient extends Model
 		INNER JOIN hprov ON hprov.provcode = haddr.provcode
 		WHERE haddr.hpercode='$hpercode'");
 
-        if($address)
-            return $address[0]->bgyname.' '.$address[0]->ctyname.', '.$address[0]->provname;
+        if ($address)
+            return $address[0]->bgyname . ' ' . $address[0]->ctyname . ', ' . $address[0]->provname;
 
         else
             return ' ';

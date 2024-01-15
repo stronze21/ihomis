@@ -44,9 +44,18 @@
                 <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
-                            <span>Date</span>
+                            <span>From</span>
                             <input type="date" class="w-full input input-sm input-bordered"
                                 wire:model.lazy="date_from" />
+                        </label>
+                    </div>
+                </div>
+                <div class="ml-2">
+                    <div class="form-control">
+                        <label class="input-group">
+                            <span>To</span>
+                            <input type="date" class="w-full input input-sm input-bordered"
+                                wire:model.lazy="date_to" />
                         </label>
                     </div>
                 </div>

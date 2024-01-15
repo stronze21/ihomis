@@ -69,7 +69,7 @@ class ConssumptionReport extends Component
         return view('livewire.pharmacy.reports.conssumption-report', [
             'charge_codes' => $charge_codes,
             // 'charges' => $charges,
-            'current_charge' => $filter_charge[0],
+            'current_charge' => $filter_charge[1],
             'drugs_issued' => $drugs_issued,
             'locations' => $locations,
         ]);
