@@ -47,7 +47,7 @@ class EncounterTransactionView extends Component
     public $encounter;
 
     public $selected_items = [];
-
+    public $marked_items = false;
     public $selected_remarks, $new_remarks;
 
     public $patient;
@@ -213,7 +213,7 @@ class EncounterTransactionView extends Component
             }
         }
 
-        if ($cnt == 1 || $cnt == 0) {
+        if ($cnt == 1) {
             foreach ($rxos as $row2) {
                 $cnt = DB::update(
                     "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND estatus = 'P'",

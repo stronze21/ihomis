@@ -18,21 +18,29 @@
     <div class="grid grid-cols-12 gap-4">
         <div class="col-span-12 xl:col-span-8">
             <div class="flex flex-col max-h-screen p-1 overflow-scroll">
-                <div class="flex justify-between my-3">
+                <div class="flex justify-between mb-3">
                     @if ($errors->first())
                         <div class="shadow-lg max-w-fit alert alert-error">
                             <i class="mr-2 las la-lg la-exclamation-triangle"></i> {{ $errors->first() }}
                         </div>
                     @endif
                     <div class="flex ml-auto">
-                        <div><button class="ml-2 btn btn-sm btn-error" onclick="delete_item()"
-                                wire:loading.attr="disabled" wire:loading.class="btn-secondary">Delete Item/s</button>
+                        <div class="flex flex-col text-center">
+                            <button id="delBtn" class="ml-2 btn btn-sm btn-error" onclick="delete_item()"
+                                wire:loading.attr="disabled" wire:loading.class="btn-secondary">
+                                Delete Item/s </button>
+                            <span class="text-xs text-info-content">Ctrl + x</span>
                         </div>
-                        <div><button class="ml-2 btn btn-sm btn-warning" onclick="charge_items()"
+                        <div class="flex flex-col text-center">
+                            <button id="chrgBtn" class="ml-2 btn btn-sm btn-warning" onclick="charge_items()"
                                 wire:loading.attr="disabled" wire:loading.class="btn-secondary">Charge Slip</button>
+                            <span class="text-xs text-info-content">Ctrl + C</span>
                         </div>
-                        <div><button class="ml-2 btn btn-sm btn-primary" onclick="issue_order()"
-                                wire:loading.attr="disabled" wire:loading.class="btn-secondary">Issue</button></div>
+                        <div class="flex flex-col text-center">
+                            <button id="issBtn" class="ml-2 btn btn-sm btn-primary" onclick="issue_order()"
+                                wire:loading.attr="disabled" wire:loading.class="btn-secondary">Issue</button>
+                            <span class="text-xs text-info-content">Ctrl + I</span>
+                        </div>
                     </div>
                 </div>
                 <table class="w-full mb-40 text-sm table-compact">
@@ -341,6 +349,37 @@
 </div>
 @push('scripts')
     <script>
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key == 'c') {
+                e.preventDefault();
+                $('#chrgBtn').click();
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key == 'x') {
+                e.preventDefault();
+                $('#delBtn').click();
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key == 'i') {
+                e.preventDefault();
+                $('#issBtn').click();
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key == 'a') {
+                e.preventDefault();
+                $('.checkbox-blank').prop("checked", true);
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.altKey && e.key == 'a') {
+                e.preventDefault();
+                $('.checkbox-blank').prop("checked", false);
+            }
+        });
+
         var data;
         $(document).ready(function() {
             $("#generic").trigger("change");
@@ -471,7 +510,7 @@
                 confirmButtonText: 'Continue',
                 html: `
                         <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
-                        <div class="mt-2 text-slate-500" id="inf">Issue all chared items. Continue?</div>
+                        <div class="mt-2 text-slate-500" id="inf">Issue all charged items. Continue?</div>
                     `,
             }).then((result) => {
                 /* Read more about isConfirmed, isDenied below */

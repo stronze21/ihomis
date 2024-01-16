@@ -29,6 +29,9 @@
                         <input type="text" placeholder="Search" class="input input-bordered input-sm"
                             wire:model.defer="searchpatfirst" />
                     </label>
+                    @error('searchpatfirst')
+                        <small class="text-error">{{ $message }}</small>
+                    @enderror
                 </div>
                 <div class="ml-3 form-control">
                     <label class="input-group input-group-sm">
@@ -36,6 +39,9 @@
                         <input type="text" placeholder="Search" class="input input-bordered input-sm"
                             wire:model.defer="searchpatmiddle" />
                     </label>
+                    @error('searchpatmiddle')
+                        <small class="text-error">{{ $message }}</small>
+                    @enderror
                 </div>
                 <div class="ml-3 form-control">
                     <label class="input-group input-group-sm">
@@ -43,6 +49,9 @@
                         <input type="text" placeholder="Search" class="input input-bordered input-sm"
                             wire:model.defer="searchpatlast" />
                     </label>
+                    @error('searchpatlast')
+                        <small class="text-error">{{ $message }}</small>
+                    @enderror
                 </div>
                 <div class="ml-3 form-control">
                     <button id="refreshBtn" class="btn btn-sm btn-info" wire:click="$refresh"
@@ -115,20 +124,10 @@
             });
 
             document.addEventListener('keydown', e => {
-                if (e.ctrlKey && e.keyCode == 84) {
+                if (e.ctrlKey && e.key == 'c') {
                     console.log('wow')
                     e.preventDefault();
                     $('#newPatBtn').click();
-                }
-            });
-            $(window).keydown(function(event) {
-                if (event.ctrlKey && event.keyCode == 84) {
-                    console.log("Hey! Ctrl+T event captured!");
-                    event.preventDefault();
-                }
-                if (event.ctrlKey && event.keyCode == 83) {
-                    console.log("Hey! Ctrl+S event captured!");
-                    event.preventDefault();
                 }
             });
         </script>
