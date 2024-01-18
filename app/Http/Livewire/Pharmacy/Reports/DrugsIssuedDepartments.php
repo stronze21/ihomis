@@ -38,7 +38,7 @@ class DrugsIssuedDepartments extends Component
                                     AND dept.deptcode LIKE ?
                                     AND rxo.chrgcode LIKE ?
                                     GROUP BY dept.deptname, drug.drug_concat, charge.chrgdesc
-                                    ORDER BY dept.deptname ASC
+                                    ORDER BY dept.deptname ASC, drug.drug_concat ASC
                                     ", [$date_from, $date_to, $this->deptcode ?? '%%', $this->filter_charge ?? '%%']);
 
         return view('livewire.pharmacy.reports.drugs-issued-departments', compact(

@@ -91,26 +91,62 @@
             </thead>
             <tbody>
                 @forelse ($drugs_issued as $rxi)
+                    @php
+                        $available = $rxi->beg_bal + $rxi->purchased;
+                        $unit_cost = $rxi->acquisition_cost;
+                        $available_amount = ($rxi->beg_bal + $rxi->purchased) * $unit_cost;
+                        $total_sales = $rxi->issue_qty * $rxi->dmselprice;
+                        $total_qty_issued = $rxi->issue_qty;
+                        $total_cogs = $total_qty_issued * $unit_cost;
+
+                        $unit_sales_cost = $total_qty_issued * $unit_cost;
+                        $unit_sales = $total_qty_issued * $rxi->dmselprice;
+                        $total_profit = $unit_sales - $unit_sales_cost;
+
+                        $beg_bal = $rxi->beg_bal;
+                        $purchased = $rxi->purchased;
+                        $issued = $rxi->issue_qty;
+
+                        $ending_balance = $beg_bal + $purchased - $issued;
+                    @endphp
+                    {{-- @php
+                        $available = $rxi->beg_bal + $rxi->purchased;
+                        $unit_cost = $rxi->acquisition_cost;
+                        $available_amount = ($rxi->beg_bal + $rxi->purchased) * $unit_cost;
+                        $total_sales = $rxi->issue_qty * $rxi->dmselprice;
+                        $total_qty_issued = $rxi->issue_qty;
+                        $total_cogs = $total_qty_issued * $unit_cost;
+
+                        $unit_sales_cost = $total_qty_issued * $unit_cost;
+                        $unit_sales = $total_qty_issued * $rxi->dmselprice;
+                        $total_profit = $unit_sales - $unit_sales_cost;
+
+                        $beg_bal = $rxi->beg_bal;
+                        $purchased = $rxi->purchased;
+                        $issued = $rxi->issue_qty;
+
+                        $ending_balance = $beg_bal + $purchased - $issued;
+                    @endphp --}}
                     <tr classs="border border-black">
                         <td class="text-xs border border-black">
                             <div class="flex flex-col">
-                                <div class="text-sm font-bold">{{ $rxi->drug->generic->gendesc }}</div>
+                                <div class="text-sm font-bold">{{ $rxi->gendesc }}</div>
                                 <div class="ml-10 text-xs text-slate-800">
-                                    {{ $rxi->drug->dmdnost }}{{ $rxi->drug->strength->stredesc ?? '' }}
-                                    {{ $rxi->drug->form->formdesc ?? '' }}</div>
+                                    {{ $rxi->dmdnost }}{{ $rxi->stredesc ?? '' }}
+                                    {{ $rxi->formdesc ?? '' }}</div>
                             </div>
                         </td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->beg_bal) }}</td>
                         <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->beg_bal * $rxi->current_price->acquisition_cost, 2) }}</td>
+                            {{ number_format($rxi->beg_bal * $rxi->acquisition_cost, 2) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->purchased) }}</td>
                         <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->purchased * $rxi->current_price->acquisition_cost, 2) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->available()) }}</td>
+                            {{ number_format($rxi->purchased * $rxi->acquisition_cost, 2) }}</td>
+                        <td class="text-xs text-right border border-black">{{ number_format($available) }}</td>
                         <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->current_price->acquisition_cost, 2) }}</td>
+                            {{ number_format($rxi->acquisition_cost, 2) }}</td>
                         <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->available_amount(), 2) }}</td>
+                            {{ number_format($available_amount, 2) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->return_qty) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->ems) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->maip) }}</td>
@@ -123,18 +159,18 @@
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->konsulta) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->issue_qty) }}</td>
                         <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->current_price->dmselprice, 2) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->total_sales(), 2) }}
+                            {{ number_format($rxi->dmselprice, 2) }}</td>
+                        <td class="text-xs text-right border border-black">{{ number_format($total_sales, 2) }}
                         </td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->total_cogs(), 2) }}
-                        </td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->total_profit(), 2) }}
+                        <td class="text-xs text-right border border-black">{{ number_format($total_cogs, 2) }}
                         </td>
                         <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->ending_balance(), 2) }}</td>
+                            {{ number_format($total_profit, 2) }}
+                        </td>
                         <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->ending_balance() * $rxi->current_price->acquisition_cost, 2) }}</td>
+                            {{ number_format($ending_balance, 2) }}</td>
+                        <td class="text-xs text-right border border-black">
+                            {{ number_format($ending_balance * $rxi->acquisition_cost, 2) }}</td>
                     </tr>
                 @empty
                     <tr>

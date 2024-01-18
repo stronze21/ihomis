@@ -2,14 +2,15 @@
 
 namespace App\Http\Livewire\Pharmacy\Reports;
 
-use Carbon\Carbon;
-use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
-use App\Models\References\ChargeCode;
-use App\Models\Pharmacy\PharmLocation;
 use App\Models\Pharmacy\Drugs\DrugStock;
-use App\Models\Pharmacy\Drugs\DrugStockLog;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
+use App\Models\Pharmacy\Drugs\DrugStockLog;
+use App\Models\Pharmacy\PharmLocation;
+use App\Models\References\ChargeCode;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Livewire\Component;
 
 class ConssumptionReport extends Component
 {
@@ -43,8 +44,28 @@ class ConssumptionReport extends Component
         //                             ->groupBy('pds.dmdcomb', 'pds.dmdctr', 'pds.chrgcode', 'pds.retail_price')
         //                             ->get();
 
-        $drugs_issued = DrugStockLog::from('pharm_drug_stock_logs as pdsl')
-            ->selectRaw("chrgcode, pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
+        // $drugs_issued = DrugStockLog::from('pharm_drug_stock_logs as pdsl')
+        //     ->selectRaw("chrgcode, pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
+        //                                 pdsl.purchased as purchased,
+        //                                 pdsl.beg_bal as beg_bal,
+        //                                 pdsl.ems as ems,
+        //                                 pdsl.maip as maip,
+        //                                 pdsl.wholesale as wholesale,
+        //                                 pdsl.pay as pay,
+        //                                 pdsl.service as service,
+        //                                 pdsl.konsulta as konsulta,
+        //                                 pdsl.pcso as pcso,
+        //                                 pdsl.phic as phic,
+        //                                 pdsl.caf as caf,
+        //                                 pdsl.issue_qty as issue_qty,
+        //                                 pdsl.return_qty as return_qty
+        //                                 ")
+        //     ->where('chrgcode', $filter_charge[0])
+        //     ->where('date_logged', $date_from)
+        //     ->with('charge')->with('drug')
+        //     ->get();
+
+        $drugs_issued = DB::select('SELECT pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
                                         pdsl.purchased as purchased,
                                         pdsl.beg_bal as beg_bal,
                                         pdsl.ems as ems,
@@ -57,12 +78,22 @@ class ConssumptionReport extends Component
                                         pdsl.phic as phic,
                                         pdsl.caf as caf,
                                         pdsl.issue_qty as issue_qty,
-                                        pdsl.return_qty as return_qty
-                                        ")
-            ->where('chrgcode', $filter_charge[0])
-            ->where('date_logged', $date_from)
-            ->with('charge')->with('drug')
-            ->get();
+                                        pdsl.return_qty as return_qty,
+                                        stre.stredesc,
+                                        frm.formdesc,
+                                        gen.gendesc,
+                                        drug.dmdnost,
+                                        price.acquisition_cost,
+                                        price.dmselprice
+                                    FROM [pharm_drug_stock_logs] as [pdsl]
+                                    INNER JOIN hdmhdr as drug ON pdsl.dmdcomb = drug.dmdcomb AND pdsl.dmdctr = drug.dmdctr
+                                    INNER JOIN hdruggrp as grp ON drug.grpcode = grp.grpcode
+                                    INNER JOIN hgen as gen ON grp.gencode = gen.gencode
+                                    INNER JOIN hstre as stre ON drug.strecode = stre.strecode
+                                    INNER JOIN hform as frm ON drug.formcode = frm.formcode
+                                    INNER JOIN hdmhdrprice as price ON pdsl.dmdprdte = price.dmdprdte
+                                    WHERE [chrgcode] = ? and [date_logged] = ?
+                                    ORDER BY gen.gendesc ASC', [$filter_charge[0], $date_from]);
 
         $locations = PharmLocation::all();
 

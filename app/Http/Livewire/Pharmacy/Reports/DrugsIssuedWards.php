@@ -32,7 +32,7 @@ class DrugsIssuedWards extends Component
                                     AND ward.wardcode LIKE ?
                                     AND rxo.chrgcode LIKE ?
                                     GROUP BY ward.wardname, drug.drug_concat, charge.chrgdesc
-                                    ORDER BY ward.wardname ASC
+                                    ORDER BY ward.wardname ASC, drug.drug_concat ASC
                                     ", [$this->date_from, $this->date_to, $this->wardcode ?? '%%', $this->filter_charge ?? '%%']);
 
         return view('livewire.pharmacy.reports.drugs-issued-wards', compact(
