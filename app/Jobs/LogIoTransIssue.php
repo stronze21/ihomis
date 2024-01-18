@@ -16,13 +16,13 @@ class LogIoTransIssue implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 
-    protected $warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty;
+    protected $warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty)
+    public function __construct($warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date)
     {
         $this->onQueue('iotx');
         $this->warehouse_id = $warehouse_id;
@@ -34,6 +34,7 @@ class LogIoTransIssue implements ShouldQueue
         $this->dmdprdte = $dmdprdte;
         $this->trans_time = $trans_time;
         $this->qty = $qty;
+        $this->exp_date = $exp_date;
     }
 
     /**
@@ -55,5 +56,18 @@ class LogIoTransIssue implements ShouldQueue
         $log->time_logged = $this->trans_time;
         $log->transferred += $this->qty;
         $log->save();
+
+        $card = DrugStockCard::firstOrNew([
+            'chrgcode' => $this->chrgcode,
+            'loc_code' => $this->warehouse_id,
+            'dmdcomb' => $this->dmdcomb,
+            'dmdctr' => $this->dmdctr,
+            'exp_date' => $this->exp_date,
+            'stock_date' => $this->trans_date,
+        ]);
+        $card->iss += $this->qty;
+        $card->bal -= $this->qty;
+
+        $card->save();
     }
 }

@@ -155,7 +155,7 @@ class IoTransList extends Component
                         'dmdprdte' => $stock->dmdprdte,
                     ]);
                     $stock->save();
-                    LogIoTransIssue::dispatch($warehouse_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty);
+                    LogIoTransIssue::dispatch($warehouse_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty, $stock->exp_date);
                 }
             }
             $this->selected_request->issued_qty = $issued_qty;
