@@ -370,13 +370,10 @@
         document.addEventListener('keydown', e => {
             if (e.ctrlKey && e.key == 'a') {
                 e.preventDefault();
-                $('.checkbox-blank').prop("checked", true);
-            }
-        });
-        document.addEventListener('keydown', e => {
-            if (e.ctrlKey && e.altKey && e.key == 'a') {
-                e.preventDefault();
-                $('.checkbox-blank').prop("checked", false);
+                var all_checkbox = $('.checkbox-blank');
+                for (a = 0; a <= all_checkbox.length; a++) {
+                    all_checkbox[a].click();
+                }
             }
         });
 
@@ -385,7 +382,10 @@
             $("#generic").trigger("change");
             $('input:checkbox').change(function() {
                 if ($(this).is(':checked')) {
-                    $('.' + this.className).prop("checked", true);
+                    var all_checkbox = $('.' + this.className);
+                    for (a = 0; a <= all_checkbox.length; a++) {
+                        all_checkbox[a].click();
+                    }
                 }
             });
 

@@ -125,7 +125,6 @@ class LogDrugStockIssue implements ShouldQueue
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
             'stock_date' => $date,
-            'reference' => $this->pcchrgcod,
         ]);
         $card->iss += $this->trans_qty;
         $card->bal -= $this->trans_qty;

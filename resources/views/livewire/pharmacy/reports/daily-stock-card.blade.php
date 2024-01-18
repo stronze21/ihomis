@@ -105,9 +105,9 @@
                 @forelse ($cards as $card)
                     @php
                         $ref = $card->reference;
-                        $receipt = $card->rec_revolving + $card->rec_regular + $card->rec_others;
-                        $issued = $card->iss_revolving + $card->iss_regular + $card->iss_others;
-                        $balance = $card->bal_revolving + $card->bal_regular + $card->bal_others;
+                        $receipt = $card->rec;
+                        $issued = $card->iss;
+                        $balance = $card->bal;
                         $total = $ref + $receipt - $issued;
                     @endphp
                     <tr classs="border border-black">

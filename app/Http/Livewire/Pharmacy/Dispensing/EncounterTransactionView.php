@@ -140,7 +140,6 @@ class EncounterTransactionView extends Component
 
         $pcchrgcod = 'P' . date('y') . '-' . sprintf('%07d', $charge_code->id);
         $cnt = 0;
-
         foreach ($this->selected_items as $docointkey) {
             $cnt = DB::update(
                 "UPDATE hospital.dbo.hrxo SET pcchrgcod = ?, estatus = 'P' WHERE docointkey = ? AND estatus = 'U'",
@@ -148,7 +147,7 @@ class EncounterTransactionView extends Component
             );
         }
 
-        if ($cnt > 0) {
+        if ($cnt != 0) {
             $this->dispatchBrowserEvent('charged', ['pcchrgcod' => $pcchrgcod]);
         } else {
             $this->alert('error', 'No item to charge.');

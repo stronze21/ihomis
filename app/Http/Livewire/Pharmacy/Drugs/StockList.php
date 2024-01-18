@@ -68,6 +68,7 @@ class StockList extends Component
                 'hdmhdrprice.compounding_fee',
                 'pharm_locations.description',
             )
+            ->orderBy('drug_concat', 'ASC')
             ->paginate(20);
 
         return view('livewire.pharmacy.drugs.stock-list', [
@@ -90,7 +91,8 @@ class StockList extends Component
             ->whereHas('sub', function ($query) {
                 // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'));
                 return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
-            })->get();
+            })->orderBy('drug_concat', 'ASC')
+            ->get();
 
 
         // $stocks = DrugStock::all();

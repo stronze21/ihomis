@@ -40,10 +40,11 @@ class IoTransListRequestor extends Component
             ->with('charge')
             ->where('loc_code', session('pharm_location_id'));
 
-        $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', DB::raw('SUM(stock_bal) as "avail"'))
+        $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', DB::raw('SUM(stock_bal) as "avail"'), 'drug_concat')
             ->whereRelation('location', 'description', 'LIKE', '%Warehouse%')
             ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
-            ->groupBy('dmdcomb', 'dmdctr');
+            ->orderBy('drug_concat', 'ASC')
+            ->groupBy('dmdcomb', 'dmdctr', 'drug_concat');
 
         return view('livewire.pharmacy.drugs.io-trans-list-requestor', [
             'trans' => $trans->latest()->paginate(20),
