@@ -155,7 +155,8 @@
                             <tr class="border">
                                 <td class="w-10 text-center">
                                     <input type="checkbox" class="checkbox{{ '-' . ($rxo->pcchrgcod ?? 'blank') }}"
-                                        wire:model.defer="selected_items" value="{{ $rxo->docointkey }}" />
+                                        wire:model.defer="selected_items" wire:key="item-{{ $rxo->docointkey }}"
+                                        value="{{ $rxo->docointkey }}" />
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">
                                     @if ($rxo->pcchrgcod)
@@ -349,6 +350,14 @@
 </div>
 @push('scripts')
     <script>
+        $('input:checkbox').change(function() {
+            if ($(this).is(':checked')) {
+                var all_checkbox = $('.' + this.className);
+                for (a = 1; a < all_checkbox.length; a++) {
+                    all_checkbox[a].click();
+                }
+            }
+        });
         document.addEventListener('keydown', e => {
             if (e.ctrlKey && e.key == 'c') {
                 e.preventDefault();
@@ -367,27 +376,10 @@
                 $('#issBtn').click();
             }
         });
-        document.addEventListener('keydown', e => {
-            if (e.ctrlKey && e.key == 'a') {
-                e.preventDefault();
-                var all_checkbox = $('.checkbox-blank');
-                for (a = 0; a <= all_checkbox.length; a++) {
-                    all_checkbox[a].click();
-                }
-            }
-        });
 
         var data;
         $(document).ready(function() {
             $("#generic").trigger("change");
-            $('input:checkbox').change(function() {
-                if ($(this).is(':checked')) {
-                    var all_checkbox = $('.' + this.className);
-                    for (a = 0; a <= all_checkbox.length; a++) {
-                        all_checkbox[a].click();
-                    }
-                }
-            });
 
             $("#generic").on("keyup", function() {
                 var value = $(this).val().toLowerCase();

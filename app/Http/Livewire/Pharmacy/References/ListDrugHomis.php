@@ -17,13 +17,13 @@ class ListDrugHomis extends Component
     public function render()
     {
         $drugs = Drug::where('dmdstat', 'A')
-                    ->with('generic')
-                    ->with('form')
-                    ->with('route')
-                    ->with('strength')
-                    ->whereRelation('sub', 'dmhdrsub', 'DRUME')
-                    ->whereRelation('generic', 'gendesc', 'LIKE', '%'.$this->search.'%');
-        return view('livewire.pharmacy.references.list-drug-homis',[
+            ->has('generic')
+            ->with('form')
+            ->with('route')
+            ->with('strength')
+            ->whereRelation('sub', 'dmhdrsub', 'DRUME')
+            ->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
+        return view('livewire.pharmacy.references.list-drug-homis', [
             'drugs' => $drugs->paginate(20),
         ]);
     }
@@ -32,5 +32,4 @@ class ListDrugHomis extends Component
     {
         $this->resetPage();
     }
-
 }

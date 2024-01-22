@@ -80,7 +80,7 @@ class EncounterTransactionView extends Component
                                 WHERE loc_code = ?
                                 AND drug_concat LIKE ?
                                 GROUP BY pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.loc_code
-                                ", [$this->location_id, $this->generic . '%']);
+                                ORDER BY drug_concat", [$this->location_id, $this->generic . '%']);
 
         $this->dispatchBrowserEvent('issued');
 

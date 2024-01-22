@@ -49,8 +49,8 @@
                         <td>{{ $tran->created_at() }}</td>
                         <td>{{ $tran->location->description }}</td>
                         <td>{{ $tran->drug->drug_concat() }}</td>
-                        <td>{{ $tran->requested_qty }}</td>
-                        <td>{{ $tran->issued_qty < 1 ? '0' : $tran->issued_qty }}</td>
+                        <td>{{ number_format($tran->requested_qty) }}</td>
+                        <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
                         <td>{!! $tran->updated_at() !!}</td>
                         <td></td>
                     </tr>

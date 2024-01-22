@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Pharmacy\Dispensing\DrugOrder;
 use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
 use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Models\Pharmacy\Drugs\DrugStockCard;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
 use App\Models\Record\Prescriptions\PrescriptionDataIssued;
@@ -165,6 +166,19 @@ class DispenseIssueProcess implements ShouldQueue
 
                     // $this->add_to_inventory($dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty);
 
+
+                    $card = DrugStockCard::firstOrNew([
+                        'chrgcode' => $stock->chrgcode,
+                        'loc_code' => $stock->warehouse_id,
+                        'dmdcomb' => $stock->dmdcomb,
+                        'dmdctr' => $stock->dmdctr,
+                        'exp_date' => $stock->exp_date,
+                        'stock_date' => $date,
+                    ]);
+                    $card->iss += $trans_qty;
+                    $card->bal -= $trans_qty;
+
+                    $card->save();
                 }
             }
             //END DEDUCT TO STOCKS

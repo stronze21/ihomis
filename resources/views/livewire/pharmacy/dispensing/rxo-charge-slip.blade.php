@@ -1,3 +1,6 @@
+@php
+    $total_issued = 0;
+@endphp
 <div class="container max-w-xl mx-auto mt-5">
     <div class="flex justify-between mb-3 align-middle">
         <div class="form-control">
@@ -73,6 +76,11 @@
                             if ($view_returns) {
                                 $returned_qty += $item->returns->sum('qty');
                             }
+                            if ($item->estatus == 'S') {
+                                $total_issued += $item->qtyissued;
+                            } else {
+                                $total_issued += $item->pchrgqty;
+                            }
                         @endphp
                     @endforeach
                 </tbody>
@@ -81,7 +89,8 @@
                         @if ($view_returns)
                             <td class="text-right ">{{ $returned_qty }} Item/s Returned</td>
                         @endif
-                        <td colspan="2">{{ number_format((float) $rxo->sum('qtyissued') ?? 0) }} ITEMS</td>
+                        <td colspan="2">{{ number_format($total_issued) }}
+                            ITEMS</td>
                         <td colspan="2">TOTAL {{ number_format((float) $rxo->sum('pcchrgamt'), 2) }}</td>
                     </tr>
                 </tfoot>

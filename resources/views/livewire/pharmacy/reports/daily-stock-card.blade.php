@@ -94,9 +94,9 @@
                     <td class="text-sm uppercase border border-black">Drug</td>
                     <td class="text-sm uppercase border border-black">Date</td>
                     <td class="text-sm border border-black">Reference</td>
+                    <td class="text-sm border border-black">Beginning Balance</td>
                     <td class="border border-black">Receipt</td>
                     <td class="border border-black">Issued</td>
-                    <td class="border border-black">Balance</td>
                     <td class="text-sm uppercase border border-black">Total</td>
                     <td class="text-sm border border-black">Expiry Date</td>
                 </tr>
@@ -118,11 +118,11 @@
                             </div>
                         </td>
                         <td class="text-sm text-right border">{{ $card->stock_date }}</td>
-                        <td class="text-sm text-right border">{{ $card->reference }}</td>
-                        <td class="text-sm border">{{ $card->rec }}</td>
-                        <td class="text-sm border">{{ $card->iss }}</td>
-                        <td class="text-sm border">{{ $card->bal }}</td>
-                        <td class="text-sm text-right border">{{ $total }}</td>
+                        <td class="text-sm text-right border"></td>
+                        <td class="text-sm text-right border">{{ number_format($card->reference) }}</td>
+                        <td class="text-sm border">{{ number_format($card->rec) }}</td>
+                        <td class="text-sm border">{{ number_format($card->iss) }}</td>
+                        <td class="text-sm text-right border">{{ number_format($total) }}</td>
                         <td class="text-sm border">{{ $card->exp_date }}</td>
                     </tr>
                 @empty

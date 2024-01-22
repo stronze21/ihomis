@@ -52,13 +52,13 @@
                 @forelse ($trans as $tran)
                     <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}"
                         @if ($tran->trans_stat == 'Requested') onclick="cancel_tx({{ $tran->id }})" @endif
-                        @if ($tran->trans_stat == 'Issued' and session('pharm_location_id') == $tran->loc_code) @can('receive-requested-drugs') onclick="receive_issued('{{ $tran->id }}', '{{ $tran->drug->drug_name() }}', '{{ $tran->issued_qty }}')" @endcan @endif>
+                        @if ($tran->trans_stat == 'Issued' and session('pharm_location_id') == $tran->loc_code) @can('receive-requested-drugs') onclick="receive_issued('{{ $tran->id }}', '{{ $tran->drug->drug_concat() }}', '{{ number_format($tran->issued_qty) }}')" @endcan @endif>
                         <th>{{ $tran->trans_no }}</th>
                         <td>{{ $tran->created_at() }}</td>
                         <td>{{ $tran->location->description }}</td>
                         <td>{{ $tran->drug->drug_concat() }}</td>
-                        <td>{{ $tran->requested_qty }}</td>
-                        <td>{{ $tran->issued_qty < 1 ? '0' : $tran->issued_qty }}</td>
+                        <td>{{ number_format($tran->requested_qty) }}</td>
+                        <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
                         <td>{!! $tran->updated_at() !!}</td>
                         <td></td>
                     </tr>
@@ -86,7 +86,7 @@
                         <select class="select select-bordered select2" id="stock_id">
                             <option disabled selected>Choose drug/medicine</option>
                             @foreach ($drugs as $drug)
-                                <option value="{{ $drug->id }}">{{ $drug->drug->drug_concat() }} - [avail QTY: {{ $drug->avail }}]</option>
+                                <option value="{{ $drug->id }}">{{ $drug->drug->drug_concat() }} - [avail QTY: {{ number_format($drug->avail) }}]</option>
                             @endforeach
                         </select>
                     </div>

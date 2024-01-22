@@ -90,7 +90,7 @@
                             <th>{{ $stk->dmduprice }}</th>
                         @endrole
                         <td>{{ $stk->dmselprice }}</td>
-                        <td>{{ $stk->stock_bal }}</td>
+                        <td>{{ number_format($stk->stock_bal) }}</td>
                         <td>{!! $stk->expiry() !!}</td>
                     </tr>
                 @empty

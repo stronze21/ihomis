@@ -102,10 +102,10 @@
                         $total_amount += $item->total_amount;
                     @endphp
                     <tr
-                        @if ($details->status == 'pending') class="cursor-pointer hover" onclick="edit_item('{{ $item->id }}', '{{ $item->lot_no }}', '{{ $item->qty }}', '{{ $item->unit_price }}', '{{ $item->retail_price }}', '{{ $item->total_amount }}', '{{ $item->expiry_date }}', '{{ $dm->drug_concat() }}')" @endif>
+                        @if ($details->status == 'pending') class="cursor-pointer hover" onclick="edit_item('{{ $item->id }}', '{{ $item->lot_no }}', '{{ number_format($item->qty) }}', '{{ $item->unit_price }}', '{{ $item->retail_price }}', '{{ $item->total_amount }}', '{{ $item->expiry_date }}', '{{ $dm->drug_concat() }}')" @endif>
                         <td>{{ $item->lot_no }}</td>
                         <td>{{ $dm->drug_concat() }} (exp: {{ $item->expiry_date }})</td>
-                        <td class="text-right">{{ $item->qty }}</td>
+                        <td class="text-right">{{ number_format($item->qty) }}</td>
                         <td class="text-right">{{ $item->unit_price }}</td>
                         <td class="text-right">
                             @if ($item->current_price->has_compounding)
@@ -171,7 +171,7 @@
                         <label class="label" for="unit_price">
                             <span class="label-text">Unit Cost</span>
                         </label>
-                        <input id="unit_price" type="number" step="0.01" class="w-full input input-bordered" />
+                        <input id="unit_price" type="number" class="w-full input input-bordered" />
                     </div>
                     <div class="w-full form-control">
                         <label class="label" for="lot_no">

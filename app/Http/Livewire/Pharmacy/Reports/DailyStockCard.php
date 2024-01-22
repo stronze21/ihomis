@@ -35,7 +35,7 @@ class DailyStockCard extends Component
     public function render()
     {
         $locations = PharmLocation::all();
-        $cards = DrugStockCard::select(DB::raw('MAX(reference), SUM(rec) as rec, SUM(iss) as iss, SUM(bal) as bal'), 'drug_concat', 'exp_date', 'stock_date', 'reference', 'chrgcode')
+        $cards = DrugStockCard::select(DB::raw('reference, SUM(rec) as rec, SUM(iss) as iss, SUM(bal) as bal'), 'drug_concat', 'exp_date', 'stock_date', 'reference', 'chrgcode')
             ->where('dmdcomb', $this->dmdcomb)
             ->where('dmdctr', $this->dmdctr)
             ->whereBetween('stock_date', [$this->date_from, $this->date_to])
@@ -46,6 +46,7 @@ class DailyStockCard extends Component
         }
 
         $cards = $cards->groupBy('dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode')
+            ->orderBy('stock_date', 'ASC')
             ->orderBy('drug_concat', 'ASC')
             ->orderBy('exp_date', 'ASC')
             ->with('charge')
@@ -66,7 +67,10 @@ class DailyStockCard extends Component
         $this->drugs = Drug::where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
                 return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
-            })->get();
+            })
+            ->whereNotNull('drug_concat')
+            ->has('generic')
+            ->orderBy('drug_concat', 'ASC')->get();
 
         $this->fund_sources = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')

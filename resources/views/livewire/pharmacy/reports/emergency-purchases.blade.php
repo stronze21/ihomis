@@ -66,8 +66,8 @@
                             {{ $purchase->drug->drug_concat() }} (exp: {{ $purchase->expiry_date }})
                         </td>
                         <td>{{ $purchase->unit_price }}</td>
-                        <td>{{ $purchase->qty }}</td>
-                        <td>{{ $purchase->total_amount }}</td>
+                        <td>{{ number_format($purchase->qty) }}</td>
+                        <td>{{ number_format($purchase->total_amount, 2) }}</td>
                         <td>{{ $purchase->charge->chrgdesc }}</td>
                         <td>{{ $purchase->user->name }}</td>
                         <td>
