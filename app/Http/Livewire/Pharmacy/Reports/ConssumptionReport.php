@@ -71,6 +71,7 @@ class ConssumptionReport extends Component
                                         pdsl.ems as ems,
                                         pdsl.maip as maip,
                                         pdsl.wholesale as wholesale,
+                                        pdsl.opdpay as opdpay,
                                         pdsl.pay as pay,
                                         pdsl.service as service,
                                         pdsl.konsulta as konsulta,

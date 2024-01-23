@@ -38,7 +38,7 @@ class EncounterTransactionView extends Component
 
     public $order_qty, $unit_price, $return_qty, $docointkey;
     public $item_id;
-    public $ems, $maip, $wholesale, $caf, $type = 'pay', $konsulta, $pcso, $phic, $pay, $service;
+    public $ems, $maip, $wholesale, $caf, $type, $konsulta, $pcso, $phic, $pay, $service, $bnb = false;
 
     public $is_ris = false;
     public $remarks;
@@ -65,7 +65,7 @@ class EncounterTransactionView extends Component
     {
         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
 
-        $rxos = DB::select("SELECT docointkey, pcchrgcod, dodate, pchrgqty, estatus, qtyissued, pchrgup, pcchrgamt, drug_concat, chrgdesc, remarks, mssikey
+        $rxos = DB::select("SELECT docointkey, pcchrgcod, dodate, pchrgqty, estatus, qtyissued, pchrgup, pcchrgamt, drug_concat, chrgdesc, remarks, mssikey, tx_type
                             FROM hospital.dbo.hrxo
                             INNER JOIN hdmhdr ON hdmhdr.dmdcomb = hrxo.dmdcomb AND hdmhdr.dmdctr = hrxo.dmdctr
                             INNER JOIN hcharge ON orderfrom = chrgcode
@@ -161,8 +161,73 @@ class EncounterTransactionView extends Component
 
         $rxos = DB::table('hospital.dbo.hrxo')->whereIn('docointkey', $this->selected_items)
             ->where('estatus', 'P')->get();
+        if ($this->encounter->toecode == 'ADM' or $this->encounter->toecode == 'OPDAD' or $this->encounter->toecode == 'ERADM') {
+            if ($this->mss) {
+                switch ($this->mss->mssikey) {
+                    case 'MSSA11111999':
+                    case 'MSSB11111999':
+                        $this->type = 'pay';
+                        break;
+
+                    case 'MSSC111111999':
+                        $this->type = 'pay';
+                        $class = 'PP1';
+                        break;
+
+                    case 'MSSC211111999':
+                        $class = 'PP2';
+                        break;
+
+                    case 'MSSC311111999':
+                        $class = 'PP3';
+                        break;
+
+                    case 'MSSD11111999':
+                        $this->type = 'service';
+                        break;
+
+                    default:
+                        $this->type = 'service';
+                }
+            } else {
+                if ($this->bnb) {
+                    $this->type = 'pay';
+                } else {
+                    $this->type = 'service';
+                }
+            }
+        } else {
+            if ($this->ems) {
+                $this->type = 'ems';
+            } else if ($this->maip) {
+                $this->type = 'maip';
+            } else if ($this->wholesale) {
+                $this->type = 'wholesale';
+            } else if ($this->service) {
+                $this->type = 'service';
+            } else if ($this->caf) {
+                $this->type = 'caf';
+            } else if ($this->is_ris) {
+                $this->type = 'ris';
+            } else if ($this->pcso) {
+                $this->type = 'pcso';
+            } else if ($this->phic) {
+                $this->type = 'phic';
+            } else if ($this->konsulta) {
+                $this->type = 'konsulta';
+            } else {
+                $this->type = 'opdpay';
+            }
+        }
+
 
         foreach ($rxos as $rxo) {
+
+            DB::update(
+                "UPDATE hospital.dbo.hrxo SET tx_type = ? WHERE docointkey = ?",
+                [$this->type, $rxo->docointkey]
+            );
+
             $stocks = DB::select(
                 "SELECT * FROM pharm_drug_stocks
                             WHERE dmdcomb = ? AND dmdctr = ? AND chrgcode = ? AND loc_code = ? AND exp_date > ? AND stock_bal > 0
@@ -179,7 +244,7 @@ class EncounterTransactionView extends Component
                 $unit_price = $rxo->pchrgup;
                 $pcchrgamt = $rxo->pcchrgamt;
                 $pcchrgcod = $rxo->pcchrgcod;
-                $tag = $rxo->tx_type;
+                $tag = $this->type;
 
                 foreach ($stocks as $stock) {
                     $trans_qty = 0;
@@ -201,8 +266,11 @@ class EncounterTransactionView extends Component
                         } else {
                             $total_deduct = 0;
                         }
+                        $drug_concat = '';
+                        $drug_concat = implode("", explode('_', $stock->drug_concat));
+
                         //TODO: Job for DrugStockIssue
-                        LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price);
+                        LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price, $drug_concat, date('Y-m-d'));
                         //TODO: Job for DrugStockLog
                     }
                 }
@@ -221,192 +289,6 @@ class EncounterTransactionView extends Component
                 LogDrugOrderIssue::dispatch($row2->docointkey, $row2->enccode, $row2->hpercode, $row2->dmdcomb, $row2->dmdctr, $row2->pchrgqty, session('employeeid'), $row2->orderfrom, $row2->pcchrgcod, $row2->pchrgup, $row2->ris, $row2->prescription_data_id);
             }
             $this->alert('success', 'Order issued successfully.');
-            // return redirect()->route('dispensing.view.enctr', ['enccode' => $this->enccode]);
-        } else {
-            $this->alert('error', 'No item to issue.');
-        }
-    }
-
-    public function issue_order_old_function()
-    {
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-        $cnt = 0;
-
-        $rxos = DrugOrder::whereIn('docointkey', $this->selected_items)
-            ->where('estatus', 'P')->get();
-
-        foreach ($rxos as $row) {
-            if ($row->items) {
-                if ($row->items->sum('stock_bal') >= $row->pchrgqty) {
-                    $cnt = 1;
-                } else {
-                    $cnt = 2;
-                    break;
-                }
-            }
-        }
-
-        if ($cnt == 1) {
-            foreach ($rxos as $rxo) {
-                // $this->update_prescription($row->dmdctr, $row->dmdcomb, $row->docointkey, $row->pchrgqty);
-                // $this->deduct_stocks($row->dmdctr, $row->dmdcomb, $row->orderfrom, $row->pchrgqty, $row->loc_code, $row->docointkey, $row->pcchrgcod, $row->tx_type, $row->pcchrgamt, $row->pchrgup, $enccode);
-
-                if ($rxo->prescription_data_id) {
-                    $rx_data = PrescriptionData::find($rxo->prescription_data_id);
-
-                    PrescriptionDataIssued::create([
-                        'presc_data_id' => $rx_data->id,
-                        'docointkey' => $rxo->docointkey,
-                        'qtyissued' => $rxo->pchrgqty,
-                    ]);
-
-                    $rx_data->stat = 'I';
-                    // $rx_data->order_by = $rx_data->rx->empid;
-                    // $rx_data->deptcode = $rx_data->rx->employee->deptcode;
-                    $rx_data->save();
-                }
-
-                //START DEDUCT STOCK
-                $total_deduct = $rxo->pchrgqty;
-                $dmdcomb = $rxo->dmdcomb;
-                $dmdctr = $rxo->dmdctr;
-                $docointkey = $rxo->docointkey;
-                $loc_code = $rxo->loc_code;
-                $chrgcode = $rxo->orderfrom;
-                $unit_price = $rxo->pchrgup;
-                $pcchrgamt = $rxo->pcchrgamt;
-                $pcchrgcod = $rxo->pcchrgcod;
-                $tag = $rxo->tx_type;
-
-                $stocks = DrugStock::where('dmdcomb', $dmdcomb)
-                    ->where('dmdctr', $dmdctr)
-                    ->where('chrgcode', $chrgcode)
-                    ->where('loc_code', $loc_code)
-                    ->where('exp_date', '>', date('Y-m-d'))
-                    ->where('stock_bal', '>', '0')
-                    ->oldest('exp_date')
-                    ->get();
-
-                foreach ($stocks as $stock) {
-                    $trans_qty = 0;
-                    if ($total_deduct) {
-                        if (!$this->is_ris) {
-                            if ($total_deduct > $stock->stock_bal) {
-                                $trans_qty = $stock->stock_bal;
-                                $total_deduct -= $stock->stock_bal;
-                                $stock->stock_bal = 0;
-                            } else {
-                                $trans_qty = $total_deduct;
-                                $stock->stock_bal -= $total_deduct;
-                                $total_deduct = 0;
-                            }
-                            $stock->save();
-                        } else {
-                            $total_deduct = 0;
-                        }
-
-                        $issued_drug = DrugStockIssue::create([
-                            'stock_id' => $stock->id,
-                            'docointkey' => $docointkey,
-                            'dmdcomb' => $dmdcomb,
-                            'dmdctr' => $dmdctr,
-                            'loc_code' => $loc_code,
-                            'chrgcode' => $chrgcode,
-                            'exp_date' => $stock->exp_date,
-                            'qty' => $trans_qty,
-                            'pchrgup' => $unit_price,
-                            'pcchrgamt' => $pcchrgamt,
-                            'status' => 'Issued',
-                            'user_id' => session('user_id'),
-                            'hpercode' => $this->hpercode,
-                            'enccode' => $enccode,
-                            'toecode' => $this->toecode,
-                            'pcchrgcod' => $pcchrgcod,
-
-                            'sc_pwd' => $tag == 'sc_pwd' ? $trans_qty : false,
-                            'ems' => $tag == 'ems' ? $trans_qty : false,
-                            'maip' => $tag == 'maip' ? $trans_qty : false,
-                            'wholesale' => $tag == 'wholesale' ? $trans_qty : false,
-                            'pay' => $tag == 'pay' ? $trans_qty : false,
-                            'medicare' => $tag == 'medicare' ? $trans_qty : false,
-                            'service' => $tag == 'service' ? $trans_qty : false,
-                            'govt_emp' => $tag == 'govt_emp' ? $trans_qty : false,
-                            'caf' => $tag == 'caf' ? $trans_qty : false,
-                            'ris' => $rxo->ris ? true : false,
-
-                            'dmdprdte' => $stock->dmdprdte,
-                        ]);
-
-                        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
-                        $log = DrugStockLog::firstOrNew([
-                            'loc_code' => $stock->loc_code,
-                            'dmdcomb' => $stock->dmdcomb,
-                            'dmdctr' => $stock->dmdctr,
-                            'chrgcode' => $stock->chrgcode,
-                            'date_logged' => $date,
-                            'dmdprdte' => $stock->dmdprdte,
-                            'unit_price' => $stock->retail_price,
-                        ]);
-                        $log->time_logged = now();
-                        $log->issue_qty += $trans_qty;
-
-                        $log->sc_pwd += $issued_drug->sc_pwd;
-                        $log->ems += $issued_drug->ems;
-                        $log->maip += $issued_drug->maip;
-                        $log->wholesale += $issued_drug->wholesale;
-                        $log->pay += $issued_drug->pay;
-                        $log->medicare += $issued_drug->medicare;
-                        $log->service += $issued_drug->service;
-                        $log->govt_emp += $issued_drug->govt_emp;
-                        $log->caf += $issued_drug->caf;
-                        $log->ris += $issued_drug->ris ? 1 : 0;
-
-                        $log->save();
-
-                        // $this->add_to_inventory($dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty);
-
-                    }
-                }
-                //END DEDUCT TO STOCKS
-
-                $rxo->estatus = 'S';
-                $rxo->qtyissued = $rxo->pchrgqty;
-                $rxo->save();
-
-                //START RECORD ISSUED DRUG
-                DrugOrderIssue::updateOrCreate([
-                    'docointkey' => $docointkey,
-                    'enccode' => $rxo->enccode,
-                    'hpercode' => $rxo->hpercode,
-                    'dmdcomb' => $rxo->dmdcomb,
-                    'dmdctr' => $rxo->dmdctr,
-                ], [
-                    'issuedte' => now(),
-                    'issuetme' => now(),
-                    'qty' => $rxo->pchrgqty,
-                    'issuedby' => session('employeeid'),
-                    'status' => 'A', //A
-                    'rxolock' => 'N', //N
-                    'updsw' => 'N', //N
-                    'confdl' => 'N', //N
-                    'entryby' => session('employeeid'),
-                    'locacode' => 'PHARM', //PHARM
-                    'dmdprdte' => now(),
-                    'issuedfrom' => $rxo->orderfrom,
-                    'pcchrgcod' => $rxo->pcchrgcod,
-                    'chrgcode' => $rxo->orderfrom,
-                    'pchrgup' => $rxo->pchrgup,
-                    'issuetype' => 'c', //c
-                    'ris' => $rxo->ris ? true : false,
-                ]);
-                //END RECORD ISSUED DRUG
-
-            }
-
-            $this->emit('refresh');
-            $this->alert('success', 'Order issued successfully.');
-        } elseif ($cnt == 2) {
-            $this->alert('error', 'Insufficient Stock Balance.');
         } else {
             $this->alert('error', 'No item to issue.');
         }
@@ -556,26 +438,62 @@ class EncounterTransactionView extends Component
 
         $total_deduct = $this->order_qty;
 
-        if ($this->ems) {
-            $this->type = 'ems';
-        } else if ($this->maip) {
-            $this->type = 'maip';
-        } else if ($this->wholesale) {
-            $this->type = 'wholesale';
-        } else if ($this->service) {
-            $this->type = 'service';
-        } else if ($this->caf) {
-            $this->type = 'caf';
-        } else if ($this->is_ris) {
-            $this->type = 'ris';
-        } else if ($this->pcso) {
-            $this->type = 'pcso';
-        } else if ($this->phic) {
-            $this->type = 'phic';
-        } else if ($this->konsulta) {
-            $this->type = 'konsulta';
+        if ($this->encounter->toecode == 'ADM' or $this->encounter->toecode == 'OPDAD' or $this->encounter->toecode == 'ERADM') {
+            if ($this->mss) {
+                switch ($this->mss->mssikey) {
+                    case 'MSSA11111999':
+                    case 'MSSB11111999':
+                        $this->type = 'pay';
+                        break;
+
+                    case 'MSSC111111999':
+                        $class = 'PP1';
+                        break;
+
+                    case 'MSSC211111999':
+                        $class = 'PP2';
+                        break;
+
+                    case 'MSSC311111999':
+                        $class = 'PP3';
+                        break;
+
+                    case 'MSSD11111999':
+                        $this->type = 'service';
+                        break;
+
+                    default:
+                        $this->type = 'service';
+                }
+            } else {
+                if ($this->bnb) {
+                    $this->type = 'pay';
+                } else {
+                    $this->type = 'service';
+                }
+            }
         } else {
-            $this->type = 'pay';
+            if ($this->ems) {
+                $this->type = 'ems';
+            } else if ($this->maip) {
+                $this->type = 'maip';
+            } else if ($this->wholesale) {
+                $this->type = 'wholesale';
+            } else if ($this->service) {
+                $this->type = 'service';
+            } else if ($this->caf) {
+                $this->type = 'caf';
+            } else if ($this->is_ris) {
+                $this->type = 'ris';
+            } else if ($this->pcso) {
+                $this->type = 'pcso';
+            } else if ($this->phic) {
+                $this->type = 'phic';
+            } else if ($this->konsulta) {
+                $this->type = 'konsulta';
+            } else {
+                $this->type = 'opdpay';
+            }
         }
 
         if ($this->is_ris or $available >= $total_deduct) {
@@ -633,7 +551,7 @@ class EncounterTransactionView extends Component
                     ->update(['stat' => 'I']);
             }
 
-            $this->resetExcept('generic', 'rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
+            $this->resetExcept('generic', 'rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname', 'mss');
             $this->emit('refresh');
             $this->alert('success', 'Item added.');
         } else {
@@ -835,96 +753,6 @@ class EncounterTransactionView extends Component
             $this->alert('error', 'Insufficient stock!');
         }
     }
-
-    // public function add_prescribed_item($dmdcomb, $dmdctr){
-
-
-    //     $total_deduct = $this->order_qty;
-
-    //     if ($this->ems) {
-    //         $this->type = 'ems';
-    //     } else if ($this->maip) {
-    //         $this->type = 'maip';
-    //     } else if ($this->wholesale) {
-    //         $this->type = 'wholesale';
-    //     } else if ($this->pay) {
-    //         $this->type = 'pay';
-    //     } else if ($this->service) {
-    //         $this->type = 'service';
-    //     } else if ($this->caf) {
-    //         $this->type = 'caf';
-    //     } else if ($this->is_ris) {
-    //         $this->type = 'ris';
-    //     } else if ($this->pcso) {
-    //         $this->type = 'pcso';
-    //     } else if ($this->phic) {
-    //         $this->type = 'phic';
-    //     } else if ($this->konsulta) {
-    //         $this->type = 'konsulta';
-    //     }
-
-    //     if ($this->is_ris or $available >= $total_deduct) {
-    //         $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
-    //         DB::insert(
-    //             'INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
-    //                 rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,
-    //                 has_tag, tx_type, ris, pchrgqty, pchrgup, pcchrgamt, dodate, dotime, dodtepost, dotmepost, dmdprdte, exp_date, loc_code, item_id, remarks, prescription_data_id, prescribed_by )
-    //             VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-    //                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-    //                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-    //                     ?, ?, ?, ?, ?, ? )',
-    //             [
-    //                 '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $chrgcode . $dmdcomb . $dmdctr,
-    //                 $enccode,
-    //                 $this->hpercode,
-    //                 '1',
-    //                 '1',
-    //                 $dmdcomb,
-    //                 '1',
-    //                 'A',
-    //                 'N',
-    //                 'N',
-    //                 'N',
-    //                 $dmdctr,
-    //                 'U',
-    //                 session('employeeid'),
-    //                 'NEWOR',
-    //                 'ACTIV',
-    //                 'PHARM',
-    //                 $chrgcode,
-    //                 'c',
-    //                 $this->type ? true : false,
-    //                 $this->type,
-    //                 $this->is_ris ? true : false,
-    //                 $this->order_qty,
-    //                 $this->unit_price,
-    //                 $this->order_qty * $this->unit_price,
-    //                 now(),
-    //                 now(),
-    //                 now(),
-    //                 now(),
-    //                 $dmdprdte,
-    //                 $exp_date,
-    //                 $loc_code,
-    //                 $id,
-    //                 $this->remarks ?? '',
-    //                 $with_rx ? $rx_id : null,
-    //                 $with_rx ? $empid : null,
-    //             ]
-    //         );
-    //         if ($with_rx) {
-    //             DB::connection('webapp')->table('webapp.dbo.prescription_data')
-    //                 ->where('id', $rx_id)
-    //                 ->update(['stat' => 'I']);
-    //         }
-
-    //         $this->resetExcept('generic', 'rx_dmdcomb', 'rx_dmdctr', 'rx_id', 'empid', 'stocks', 'enccode', 'location_id', 'encounter', 'charges', 'hpercode', 'toecode', 'selected_items', 'patient', 'active_prescription', 'adm', 'wardname', 'rmname');
-    //         $this->emit('refresh');
-    //         $this->alert('success', 'Item added.');
-    //     } else {
-    //         $this->alert('error', 'Insufficient stock!');
-    //     }
-    // }
 
     public function update_remarks()
     {

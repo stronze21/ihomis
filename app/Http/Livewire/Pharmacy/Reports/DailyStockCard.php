@@ -45,7 +45,7 @@ class DailyStockCard extends Component
             $cards = $cards->where('chrgcode', $this->chrgcode);
         }
 
-        $cards = $cards->groupBy('dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode')
+        $cards = $cards->groupBy('dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode', 'stock_date')
             ->orderBy('stock_date', 'ASC')
             ->orderBy('drug_concat', 'ASC')
             ->orderBy('exp_date', 'ASC')

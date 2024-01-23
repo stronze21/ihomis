@@ -97,7 +97,7 @@
                     <td class="text-sm border border-black">Beginning Balance</td>
                     <td class="border border-black">Receipt</td>
                     <td class="border border-black">Issued</td>
-                    <td class="text-sm uppercase border border-black">Total</td>
+                    <td class="text-sm uppercase border border-black">Balance</td>
                     <td class="text-sm border border-black">Expiry Date</td>
                 </tr>
             </thead>

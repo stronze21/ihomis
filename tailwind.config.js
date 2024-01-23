@@ -27,7 +27,9 @@ module.exports = {
         'textarea-bordered',
         'textarea-ghost',
         'input-bordered',
-        'toggle-success'
+        'toggle-success',
+        'py-auto',
+        'align-middle'
     ],
     important: true,
 

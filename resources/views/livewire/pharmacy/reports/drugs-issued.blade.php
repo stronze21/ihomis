@@ -19,7 +19,7 @@
 @endpush
 
 <div class="max-w-screen">
-    <div class="flex flex-col px-2 py-5 overflow-auto">
+    <div class="flex flex-col px-5 py-5 overflow-auto">
         <div class="flex justify-between my-2">
             <div class="flex justify-between">
             </div>
@@ -160,5 +160,40 @@
                 }) :
                 XLSX.writeFile(wb, fn || ('Ward Consumption Report.' + (type || 'xlsx')));
         }
+
+        $('#table').dataTable({
+            "bPaginate": false,
+            "searching": false,
+            "pageLength": 1000000,
+            "bInfo": false,
+            "columns": [{
+                    "width": "5%"
+                },
+                {
+                    "width": "20%"
+                },
+                {
+                    "width": "5%"
+                },
+                {
+                    "width": "10%"
+                },
+                {
+                    "width": "10%"
+                },
+                {
+                    "width": "10%"
+                },
+                {
+                    "width": "20%"
+                },
+                {
+                    "width": "10%"
+                },
+                {
+                    "width": "10%"
+                }
+            ]
+        });
     </script>
 @endpush

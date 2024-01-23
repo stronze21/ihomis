@@ -19,7 +19,15 @@ class DrugsIssued extends Component
     use WithPagination;
 
     public $filter_charge = 'DRUMB,*Drugs and Meds (Revolving) Satellite';
-    public $date_from, $date_to, $location_id;
+    public $date_from, $date_to, $location_id, $dmdcomb, $dmdctr;
+
+    public function updatedSelectedDrug()
+    {
+        $drug = $this->selected_drug;
+        $selected_drug = explode(',', $drug);
+        $this->dmdcomb = $selected_drug[0];
+        $this->dmdctr = $selected_drug[1];
+    }
 
     public function updatingFilterCharge()
     {

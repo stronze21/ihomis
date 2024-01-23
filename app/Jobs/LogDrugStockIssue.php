@@ -3,28 +3,29 @@
 namespace App\Jobs;
 
 use App\Models\Pharmacy\Drugs\DrugStockCard;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Models\Pharmacy\Drugs\DrugStockIssue;
-use Carbon\Carbon;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class LogDrugStockIssue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price;
+    public $stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price)
+    public function __construct($stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date)
     {
         $this->onQueue('rx_issue_logger');
         $this->stock_id = $stock_id;
@@ -46,6 +47,8 @@ class LogDrugStockIssue implements ShouldQueue
         $this->ris = $ris;
         $this->dmdprdte = $dmdprdte;
         $this->retail_price = $retail_price;
+        $this->concat = $concat;
+        $this->stock_date = $stock_date;
     }
 
     /**
@@ -77,6 +80,7 @@ class LogDrugStockIssue implements ShouldQueue
             'maip' => $this->tag == 'maip' ? $this->trans_qty : false,
             'wholesale' => $this->tag == 'wholesale' ? $this->trans_qty : false,
             'pay' => $this->tag == 'pay' ? $this->trans_qty : false,
+            'opdpay' => $this->tag == 'opdpay' ? $this->trans_qty : false,
             'service' => $this->tag == 'service' ? $this->trans_qty : false,
             'caf' => $this->tag == 'caf' ? $this->trans_qty : false,
             'ris' =>  $this->ris ? true : false,
@@ -124,11 +128,13 @@ class LogDrugStockIssue implements ShouldQueue
             'dmdcomb' => $this->dmdcomb,
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
-            'stock_date' => $date,
+            'stock_date' => $this->stock_date,
+            'drug_concat' => $this->concat,
         ]);
         $card->iss += $this->trans_qty;
         $card->bal -= $this->trans_qty;
 
         $card->save();
+        Log::info($card);
     }
 }

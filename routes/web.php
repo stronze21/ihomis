@@ -33,6 +33,7 @@ use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedDepartments;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 use App\Http\Livewire\Pharmacy\Drugs\StockPullOutList;
 use App\Http\Livewire\Pharmacy\Reports\DailyStockCard;
+use App\Http\Livewire\Pharmacy\Reports\TotalDrugsIssued;
 use App\Http\Livewire\Records\PatientRegister;
 
 /*
@@ -103,6 +104,7 @@ Route::middleware([
         Route::get('/stock-card', DailyStockCard::class)->name('stkcrd');
         Route::get('/issuance/log', DrugsTransactionLog::class)->name('issuance.log');
         Route::get('/issuance/all', DrugsIssued::class)->name('issuance.all');
+        Route::get('/issuance/total', TotalDrugsIssued::class)->name('issuance.total');
         Route::get('/issuance/returns', DrugsReturned::class)->name('issuance.returns');
         Route::get('/issuance/chargeslips', DrugsChargeSlips::class)->name('issuance.charges');
         Route::get('/consumption', ConssumptionReport::class)->name('consumption');

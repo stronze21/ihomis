@@ -57,36 +57,41 @@
                     <td class="text-xs border border-black" colspan="2">Total Purchases</td>
                     <td class="text-xs border border-black" colspan="3">Total Avail. For Sale</td>
                     <td class="text-xs border border-black" colspan="1"></td>
-                    <td class="text-xs border border-black" colspan="14">Issuances</td>
+                    <td class="text-xs border border-black" colspan="15">Issuances</td>
                     <td class="text-xs border border-black" colspan="2">Ending Bal.</td>
                 </tr>
                 <tr class="text-center">
-                    <td class="text-xs uppercase border border-black cursor-pointer" onclick="sortTable(0)">
+                    <td class="text-xs uppercase border border-black cursor-pointer" onclick="sortTable(0)"
+                        rowspan="2">
                         {{ $current_charge }} <span class="ml-1"><i class="las la-sort"></i></span></td>
-                    <td class="text-xs border border-black">QTY.</td>
-                    <td class="text-xs border border-black">Amount</td>
-                    <td class="text-xs border border-black">QTY.</td>
-                    <td class="text-xs border border-black">AMT.</td>
-                    <td class="text-xs border border-black">QTY.</td>
-                    <td class="text-xs border border-black">Unit <br> Cost</td>
-                    <td class="text-xs border border-black">Total <br> Cost</td>
-                    <td class="text-xs border border-black">Returns</td>
-                    <td class="text-xs border border-black">EMS</td>
-                    <td class="text-xs border border-black">MAIP</td>
-                    <td class="text-xs border border-black">W.S.</td>
-                    <td class="text-xs border border-black">Pay</td>
-                    <td class="text-xs border border-black">Service</td>
-                    <td class="text-xs border border-black">CAF</td>
-                    <td class="text-xs border border-black">PCSO</td>
-                    <td class="text-xs border border-black">PHIC</td>
-                    <td class="text-xs border border-black">Kon. <br> Pkg.</td>
-                    <td class="text-xs border border-black">Issued <br> Total</td>
-                    <td class="text-xs border border-black">Selling <br> Price</td>
-                    <td class="text-xs border border-black">Total <br> Sales</td>
-                    <td class="text-xs border border-black">COGS</td>
-                    <td class="text-xs border border-black">Profit</td>
-                    <td class="text-xs border border-black">QTY.</td>
-                    <td class="text-xs border border-black">Amount</td>
+                    <td class="text-xs border border-black" rowspan="2">QTY.</td>
+                    <td class="text-xs border border-black" rowspan="2">Amount</td>
+                    <td class="text-xs border border-black" rowspan="2">QTY.</td>
+                    <td class="text-xs border border-black" rowspan="2">AMT.</td>
+                    <td class="text-xs border border-black" rowspan="2">QTY.</td>
+                    <td class="text-xs border border-black" rowspan="2">Unit <br> Cost</td>
+                    <td class="text-xs border border-black" rowspan="2">Total <br> Cost</td>
+                    <td class="text-xs border border-black" rowspan="2">Returns</td>
+                    <td class="text-xs border border-black" rowspan="2">EMS</td>
+                    <td class="text-xs border border-black" rowspan="2">MAIP</td>
+                    <td class="text-xs border border-black" rowspan="2">W.S.</td>
+                    <td class="text-xs border border-black" rowspan="2">Pay</td>
+                    <td class="text-xs border border-black" rowspan="1" colspan="2">Inpatient</td>
+                    <td class="text-xs border border-black" rowspan="2">CAF</td>
+                    <td class="text-xs border border-black" rowspan="2">PCSO</td>
+                    <td class="text-xs border border-black" rowspan="2">PHIC</td>
+                    <td class="text-xs border border-black" rowspan="2">Kon. <br> Pkg.</td>
+                    <td class="text-xs border border-black" rowspan="2">Issued <br> Total</td>
+                    <td class="text-xs border border-black" rowspan="2">Selling <br> Price</td>
+                    <td class="text-xs border border-black" rowspan="2">Total <br> Sales</td>
+                    <td class="text-xs border border-black" rowspan="2">COGS</td>
+                    <td class="text-xs border border-black" rowspan="2">Profit</td>
+                    <td class="text-xs border border-black" rowspan="2">QTY.</td>
+                    <td class="text-xs border border-black" rowspan="2">Amount</td>
+                </tr>
+                <tr class="text-center uppercase">
+                    <td class="text-xs border border-black">Basic</td>
+                    <td class="text-xs border border-black">Non-Basic</td>
                 </tr>
             </thead>
             <tbody>
@@ -151,6 +156,7 @@
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->ems) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->maip) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->wholesale) }}</td>
+                        <td class="text-xs text-right border border-black">{{ number_format($rxi->opdpay) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->pay) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->service) }}</td>
                         <td class="text-xs text-right border border-black">{{ number_format($rxi->caf) }}</td>

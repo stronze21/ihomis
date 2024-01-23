@@ -159,11 +159,14 @@
                                         value="{{ $rxo->docointkey }}" />
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">
-                                    @if ($rxo->pcchrgcod)
-                                        <a rel="noopener noreferrer" class="font-semibold text-blue-600"
-                                            href="{{ route('dispensing.rxo.chargeslip', $rxo->pcchrgcod) }}"
-                                            target="_blank">{{ $rxo->pcchrgcod }}</a>
-                                    @endif
+                                    <div class="flex flex-col align-center">
+                                        @if ($rxo->pcchrgcod)
+                                            <a rel="noopener noreferrer" class="font-semibold text-blue-600"
+                                                href="{{ route('dispensing.rxo.chargeslip', $rxo->pcchrgcod) }}"
+                                                target="_blank">{{ $rxo->pcchrgcod }}</a>
+                                        @endif
+                                        <span>{{ $rxo->tx_type }}</span>
+                                    </div>
                                 </td>
                                 <td class="align-center whitespace-nowrap w-min">
                                     <div class="flex flex-col">
@@ -495,53 +498,33 @@
             })
         }
 
-        function issue_order() {
-            Swal.fire({
-                title: 'Are you sure?',
-                showCancelButton: true,
-                confirmButtonText: 'Continue',
-                html: `
-                        <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
-                        <div class="mt-2 text-slate-500" id="inf">Issue all charged items. Continue?</div>
-                    `,
-            }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                    Livewire.emit('issue_order')
-                }
-            })
-        }
+        // function issue_order() {
+        //     Swal.fire({
+        //         title: 'Are you sure?',
+        //         showCancelButton: true,
+        //         confirmButtonText: 'Continue',
+        //         html: `
+    //                 <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
+    //                 <div class="mt-2 text-slate-500" id="inf">Issue all charged items. Continue?</div>
+    //             `,
+        //     }).then((result) => {
+        //         /* Read more about isConfirmed, isDenied below */
+        //         if (result.isConfirmed) {
+        //             Livewire.emit('issue_order')
+        //         }
+        //     })
+        // }
 
 
         @if ($encounter->toecode == 'OPD')
-            function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available, exp_date) {
+            function issue_order() {
                 Swal.fire({
+                    title: 'Are you sure?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Continue',
                     html: `
-                        <div class="text-xl font-bold">` + drug + `</div>
-                        <div class="flex w-full space-x-3">
-                            <div class="w-full mb-3 form-control">
-                                <label class="label">
-                                    <span class="label-text">Quantity</span>
-                                </label>
-                                <input id="order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
-                            </div>
-                            <div class="w-full">
-                                <div class="w-full form-control">
-                                    <label class="label">
-                                        <span class="label-text">Unit Price</span>
-                                    </label>
-                                    <input id="unit_price" type="number" step="0.01" class="w-full input input-bordered" />
-                                </div>
-
-                                <div class="w-full mb-3 form-control">
-                                    <label class="label">
-                                        <span class="label-text">TOTAL</span>
-                                    </label>
-                                    <input id="total" type="number" step="0.01" class="w-full input input-bordered" readonly tabindex="-1" />
-                                </div>
-                            </div>
-                        </div>
-
+                        <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
+                        <div class="mt-2 text-slate-500" id="inf">Issue all charged items. Continue?</div>
                         <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
                             <div class="col-span-4 font-bold">TAG</div>
                             <div class="col-span-2">
@@ -599,6 +582,65 @@
                                 </label>
                             </div>
                         </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                    didOpen: () => {
+
+                        const ems = Swal.getHtmlContainer().querySelector('#ems')
+                        const maip = Swal.getHtmlContainer().querySelector('#maip')
+                        const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
+                        const caf = Swal.getHtmlContainer().querySelector('#caf')
+                        const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
+                        const remarks = Swal.getHtmlContainer().querySelector('#remarks')
+                        const konsulta = Swal.getHtmlContainer().querySelector('#konsulta')
+                        const pcso = Swal.getHtmlContainer().querySelector('#pcso')
+                        const phic = Swal.getHtmlContainer().querySelector('#phic')
+                    }
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        @this.set('ems', ems.checked);
+                        @this.set('maip', maip.checked);
+                        @this.set('wholesale', wholesale.checked);
+                        @this.set('konsulta', konsulta.checked);
+                        @this.set('pcso', pcso.checked);
+                        @this.set('phic', phic.checked);
+                        @this.set('caf', caf.checked);
+                        @this.set('is_ris', is_ris.checked);
+                        Livewire.emit('issue_order')
+                    }
+                })
+            }
+
+            function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available,
+                exp_date) {
+                Swal.fire({
+                    html: `
+                        <div class="text-xl font-bold">` + drug + `</div>
+                        <div class="flex w-full space-x-3">
+                            <div class="w-full mb-3 form-control">
+                                <label class="label">
+                                    <span class="label-text">Quantity</span>
+                                </label>
+                                <input id="order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full form-control">
+                                    <label class="label">
+                                        <span class="label-text">Unit Price</span>
+                                    </label>
+                                    <input id="unit_price" type="number" step="0.01" class="w-full input input-bordered" />
+                                </div>
+
+                                <div class="w-full mb-3 form-control">
+                                    <label class="label">
+                                        <span class="label-text">TOTAL</span>
+                                    </label>
+                                    <input id="total" type="number" step="0.01" class="w-full input input-bordered" readonly tabindex="-1" />
+                                </div>
+                            </div>
+                        </div>
                         <div class="px-2 mt-2">
                             <textarea id="remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
                         </div>
@@ -609,15 +651,6 @@
                         const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
                         const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
                         const total = Swal.getHtmlContainer().querySelector('#total')
-                        const ems = Swal.getHtmlContainer().querySelector('#ems')
-                        const maip = Swal.getHtmlContainer().querySelector('#maip')
-                        const wholesale = Swal.getHtmlContainer().querySelector('#wholesale')
-                        const caf = Swal.getHtmlContainer().querySelector('#caf')
-                        const is_ris = Swal.getHtmlContainer().querySelector('#is_ris')
-                        const remarks = Swal.getHtmlContainer().querySelector('#remarks')
-                        const konsulta = Swal.getHtmlContainer().querySelector('#konsulta')
-                        const pcso = Swal.getHtmlContainer().querySelector('#pcso')
-                        const phic = Swal.getHtmlContainer().querySelector('#phic')
 
                         order_qty.focus();
                         unit_price.value = up;
@@ -645,14 +678,6 @@
                         @this.set('unit_price', unit_price.value)
                         @this.set('order_qty', order_qty.value)
 
-                        @this.set('ems', ems.checked);
-                        @this.set('maip', maip.checked);
-                        @this.set('wholesale', wholesale.checked);
-                        @this.set('konsulta', konsulta.checked);
-                        @this.set('pcso', pcso.checked);
-                        @this.set('phic', phic.checked);
-                        @this.set('caf', caf.checked);
-                        @this.set('is_ris', is_ris.checked);
                         @this.set('remarks', remarks.value);
 
                         Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
@@ -801,7 +826,43 @@
                 });
             }
         @else
-            function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available, exp_date) {
+            function issue_order() {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Continue',
+                    html: `
+                        <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
+                        <div class="mt-2 text-slate-500" id="inf">Issue all charged items. Continue?</div>
+                        <div class="grid grid-cols-4 gap-2 px-2 mt-3 gap-y-2">
+                            <div class="col-span-4 font-bold">TAG</div>
+                            <div class="col-span-4 text-center align-middle py-auto">
+                                <label class="cursor-pointer py-auto" for="na">
+                                    <span class="label-text">Basic</span>
+                                </label>
+                                <input class="toggle toggle-success" type="checkbox" id="na" name="radio">
+                                <label class="cursor-pointer py-auto" for="na">
+                                    <span class="label-text">NON-Basic</span>
+                                </label>
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: `Confirm`,
+                    didOpen: () => {
+                        const na = Swal.getHtmlContainer().querySelector('#na')
+                    }
+                }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                        @this.set('bnb', na.checked);
+                        Livewire.emit('issue_order')
+                    }
+                })
+            }
+
+            function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available,
+                exp_date) {
                 Swal.fire({
                     html: `
                     <div class="text-xl font-bold">` + drug + `</div>
@@ -838,6 +899,7 @@
                         const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
                         const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
                         const total = Swal.getHtmlContainer().querySelector('#total')
+                        const na = Swal.getHtmlContainer().querySelector('#na')
 
                         order_qty.focus();
                         unit_price.value = up;
@@ -859,6 +921,7 @@
                         @this.set('unit_price', unit_price.value)
                         @this.set('order_qty', order_qty.value)
                         @this.set('remarks', remarks.value);
+                        @this.set('bnb', na.checked);
 
                         Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
                             available, exp_date)
