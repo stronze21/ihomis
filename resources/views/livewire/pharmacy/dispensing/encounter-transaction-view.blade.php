@@ -899,7 +899,6 @@
                         const order_qty = Swal.getHtmlContainer().querySelector('#order_qty')
                         const unit_price = Swal.getHtmlContainer().querySelector('#unit_price')
                         const total = Swal.getHtmlContainer().querySelector('#total')
-                        const na = Swal.getHtmlContainer().querySelector('#na')
 
                         order_qty.focus();
                         unit_price.value = up;
@@ -921,7 +920,6 @@
                         @this.set('unit_price', unit_price.value)
                         @this.set('order_qty', order_qty.value)
                         @this.set('remarks', remarks.value);
-                        @this.set('bnb', na.checked);
 
                         Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
                             available, exp_date)
