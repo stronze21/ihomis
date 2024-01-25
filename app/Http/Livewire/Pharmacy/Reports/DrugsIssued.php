@@ -40,11 +40,8 @@ class DrugsIssued extends Component
 
     public function render()
     {
-
-        // $this->date_from = Carbon::parse($this->month.'-01')->startOfMonth()->format('Y-m-d');
-        // $this->date_to = Carbon::parse($this->month.'-01')->endOfMonth()->format('Y-m-d');
-        $this->date_from = Carbon::parse($this->date_from)->startOfWeek()->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
+        $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
@@ -56,7 +53,7 @@ class DrugsIssued extends Component
         $drugs_issued = DrugOrderIssue::with('dm')->with('patient')->with('issuer')->with('adm_pat_room')->with('encounter')
             ->where('issuedfrom', $filter_charge[0])
             ->whereRelation('main_order', 'loc_code', $this->location_id)
-            ->whereBetween('issuedte', [$this->date_from, $this->date_to])
+            ->whereBetween('issuedte', [$date_from, $date_to])
             ->latest('issuedte')
             ->paginate(15);
 

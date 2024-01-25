@@ -8,7 +8,7 @@
                 <i class="mr-1 las la-file-excel la-lg"></i> Report
             </li>
             <li>
-                <i class="mr-1 las la-clone la-lg"></i> Total Drug Issuance
+                <i class="mr-1 las la-clone la-lg"></i> Drug Issuance Summary
             </li>
         </ul>
     </div>
@@ -54,20 +54,6 @@
                             min="{{ $date_from }}" wire:model.lazy="date_to" />
                     </label>
                 </div>
-            </div>
-        </div>
-        <div class="flex justify-end space-x-3">
-            <div class="ml-2 form-control">
-                <label class="input-group">
-                    <span>Drug</span>
-                    <select class="text-sm select select-bordered select-sm" wire:model="selected_drug">
-                        <option value="">N/A</option>
-                        @foreach ($drugs as $stock_item)
-                            <option value="{{ $stock_item->dmdcomb }},{{ $stock_item->dmdctr }}">
-                                {{ $stock_item->drug_concat() }}</option>
-                        @endforeach
-                    </select>
-                </label>
             </div>
             <div class="ml-2">
                 <div class="form-control">

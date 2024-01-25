@@ -90,8 +90,8 @@
                     <td class="text-xs border border-black" rowspan="2">Amount</td>
                 </tr>
                 <tr class="text-center uppercase">
-                    <td class="text-xs border border-black">Basic</td>
                     <td class="text-xs border border-black">Non-Basic</td>
+                    <td class="text-xs border border-black">Basic</td>
                 </tr>
             </thead>
             <tbody>

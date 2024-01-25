@@ -100,13 +100,9 @@
                                 <div class="text-sm font-bold">{{ $concat }}</div>
                             </div>
                         </td>
-                        <td class="text-sm text-right border">{{ $rxi->qty }}</td>
+                        <td class="text-sm text-right border">{{ number_format($rxi->qty) }}</td>
                     </tr>
                 @empty
-                    <tr>
-                        <td colspan="22" class="font-bold text-center uppercase bg-red-400 border border-black">No
-                            record found!</td>
-                    </tr>
                 @endforelse
             </tbody>
         </table>
