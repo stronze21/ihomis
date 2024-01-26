@@ -2,16 +2,15 @@
 
 namespace App\Http\Livewire\Pharmacy\Reports;
 
+use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
+use App\Models\Pharmacy\PharmLocation;
+use App\Models\References\ChargeCode;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\Auth;
-use App\Models\References\ChargeCode;
-use App\Models\Pharmacy\PharmLocation;
-use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
-use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
 
-class DrugsReturned extends Component
+class DrugsReturnedSummary extends Component
 {
     use WithPagination;
 
@@ -29,8 +28,8 @@ class DrugsReturned extends Component
 
     public function render()
     {
-        $this->date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
+        $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
@@ -39,16 +38,16 @@ class DrugsReturned extends Component
 
         $filter_charge = explode(',', $this->filter_charge);
 
-        $drugs_returned = DrugOrderReturn::with('dm')->with('patient')->with('receiver')->with('adm_pat_room')->with('encounter')
-            ->where('returnfrom', $filter_charge[0])
-            ->whereRelation('main_order', 'loc_code', $this->location_id)
-            ->whereBetween('returndate', [$this->date_from, $this->date_to])
-            ->latest('returndate')
-            ->paginate(15);
+        $drugs_returned = DB::select('SELECT SUM(ret.qty) as qty, drug_concat
+                                        FROM hrxoreturn as ret
+                                        INNER JOIN pharm_drug_stocks as stock ON ret.dmdcomb = stock.dmdcomb AND ret.dmdctr = stock.dmdctr
+                                        WHERE ret.returnfrom = ? AND ret.returndate BETWEEN ? AND ?
+                                        GROUP BY ret.dmdcomb, ret.dmdctr, stock.drug_concat
+                                        ORDER BY stock.drug_concat
+        ', [$filter_charge[0], $date_from, $date_to]);
 
         $locations = PharmLocation::all();
-
-        return view('livewire.pharmacy.reports.drugs-returned', [
+        return view('livewire.pharmacy.reports.drugs-returned-summary', [
             'charge_codes' => $charge_codes,
             'current_charge' => $filter_charge[1],
             'drugs_returned' => $drugs_returned,

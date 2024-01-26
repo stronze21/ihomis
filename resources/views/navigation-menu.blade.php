@@ -98,6 +98,10 @@
                                     {{ __('Returned Log') }}
                                 </x-jet-dropdown-link>
                                 <div class="border-t border-gray-100"></div>
+                                <x-jet-dropdown-link href="{{ route('reports.issuance.returns.summary') }}">
+                                    {{ __('Returned Log Summary') }}
+                                </x-jet-dropdown-link>
+                                <div class="border-t border-gray-100"></div>
                                 <x-jet-dropdown-link href="{{ route('reports.issuance.charges') }}">
                                     {{ __('Summary of Charge Slip') }}
                                 </x-jet-dropdown-link>
