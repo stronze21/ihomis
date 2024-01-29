@@ -930,67 +930,68 @@
             function select_rx_item(rx_id, drug, rx_qty, empid, rx_dmdcomb, rx_dmdctr) {
 
                 var search = drug.split(",");
-                $("#generic").val(search[0]);
-                $("#generic").trigger('keyup');
                 @this.rx_id = rx_id;
+                @this.generic = search[0];
                 @this.rx_dmdcomb = rx_dmdcomb;
                 @this.rx_dmdctr = rx_dmdctr;
                 @this.empid = empid;
+                $("#generic").val(search[0]);
+                $("#generic").trigger('keyup');
 
-                Swal.fire({
-                    html: `
-                        <div class="text-xl font-bold">` + drug + `</div>
-                        <div class="flex w-full space-x-3">
-                            <div class="w-full mb-3 form-control">
-                                <label class="label">
-                                    <span class="label-text">Quantity</span>
-                                </label>
-                                <input id="rx_order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
-                            <div class="col-span-4 font-bold">Fund Source</div>
-                            <div class="col-span-4">
-                                <select id="rx_charge_code" class="w-full select select-bordered select-sm">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="px-2 mt-2">
-                            <textarea id="rx_remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: `Confirm`,
-                    didOpen: () => {
-                        const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
-                        const rx_charge_code = Swal.getHtmlContainer().querySelector('#rx_charge_code')
-                        const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
+                // Swal.fire({
+                //     html: `
+            //         <div class="text-xl font-bold">` + drug + `</div>
+            //         <div class="flex w-full space-x-3">
+            //             <div class="w-full mb-3 form-control">
+            //                 <label class="label">
+            //                     <span class="label-text">Quantity</span>
+            //                 </label>
+            //                 <input id="rx_order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+            //             </div>
+            //         </div>
+            //         <div class="grid grid-cols-4 gap-2 px-2 text-left gap-y-2">
+            //             <div class="col-span-4 font-bold">Fund Source</div>
+            //             <div class="col-span-4">
+            //                 <select id="rx_charge_code" class="w-full select select-bordered select-sm">
+            //                 </select>
+            //             </div>
+            //         </div>
+            //         <div class="px-2 mt-2">
+            //             <textarea id="rx_remarks" class="w-full textarea textarea-bordered" placeholder="Remarks"></textarea>
+            //         </div>
+            //     `,
+                //     showCancelButton: true,
+                //     confirmButtonText: `Confirm`,
+                //     didOpen: () => {
+                //         const rx_order_qty = Swal.getHtmlContainer().querySelector('#rx_order_qty')
+                //         const rx_charge_code = Swal.getHtmlContainer().querySelector('#rx_charge_code')
+                //         const rx_remarks = Swal.getHtmlContainer().querySelector('#rx_remarks')
 
-                        $.each(data, function(index, value) {
-                            if (index == 0) {
-                                rx_charge_code.options[rx_charge_code.options.length] = new Option(
-                                    value[
-                                        'text'], value['id'], true, true);
-                            } else {
-                                rx_charge_code.options[rx_charge_code.options.length] = new Option(
-                                    value[
-                                        'text'], value['id']);
-                            }
-                        });
-                        rx_order_qty.focus();
-                        rx_order_qty.value = rx_qty;
+                //         $.each(data, function(index, value) {
+                //             if (index == 0) {
+                //                 rx_charge_code.options[rx_charge_code.options.length] = new Option(
+                //                     value[
+                //                         'text'], value['id'], true, true);
+                //             } else {
+                //                 rx_charge_code.options[rx_charge_code.options.length] = new Option(
+                //                     value[
+                //                         'text'], value['id']);
+                //             }
+                //         });
+                //         rx_order_qty.focus();
+                //         rx_order_qty.value = rx_qty;
 
-                    }
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        @this.set('order_qty', rx_order_qty.value)
-                        @this.set('rx_charge_code', rx_charge_code.value);
-                        @this.set('remarks', rx_remarks.value);
+                //     }
+                // }).then((result) => {
+                //     /* Read more about isConfirmed, isDenied below */
+                //     if (result.isConfirmed) {
+                //         @this.set('order_qty', rx_order_qty.value)
+                //         @this.set('rx_charge_code', rx_charge_code.value);
+                //         @this.set('remarks', rx_remarks.value);
 
-                        Livewire.emit('add_prescribed_item', rx_dmdcomb, rx_dmdctr);
-                    }
-                });
+                //         Livewire.emit('add_prescribed_item', rx_dmdcomb, rx_dmdctr);
+                //     }
+                // });
             }
         @endif
 

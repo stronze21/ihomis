@@ -174,6 +174,7 @@ class DispenseIssueProcess implements ShouldQueue
                         'dmdctr' => $stock->dmdctr,
                         'exp_date' => $stock->exp_date,
                         'stock_date' => $date,
+                        'drug_concat' => $stock->drug_concat(),
                     ]);
                     $card->iss += $trans_qty;
                     $card->bal -= $trans_qty;

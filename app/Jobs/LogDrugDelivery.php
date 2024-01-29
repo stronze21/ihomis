@@ -14,13 +14,13 @@ use Illuminate\Queue\SerializesModels;
 class LogDrugDelivery implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    public $pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty;
+    public $pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty, $drug_concat;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty)
+    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty, $drug_concat)
     {
         $this->onQueue('rx_delivery');
         $this->pharm_location_id = $pharm_location_id;
@@ -29,6 +29,7 @@ class LogDrugDelivery implements ShouldQueue
         $this->exp_date = $exp_date;
         $this->chrgcode = $chrgcode;
         $this->qty = $qty;
+        $this->drug_concat = $drug_concat;
     }
 
     /**
@@ -47,6 +48,7 @@ class LogDrugDelivery implements ShouldQueue
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
             'stock_date' => $date,
+            'drug_concat' => $this->drug_concat,
         ]);
 
         $card->rec += $this->qty;

@@ -16,14 +16,14 @@ class LogDrugTransaction implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date;
+    protected $pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date, $drug_concat;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date)
+    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date, $drug_concat)
     {
         $this->onQueue('stocklogger');
         $this->pharm_location_id = $pharm_location_id;
@@ -37,6 +37,7 @@ class LogDrugTransaction implements ShouldQueue
         $this->qty = $qty;
         $this->stock_id = $stock_id;
         $this->exp_date = $exp_date;
+        $this->drug_concat = $drug_concat;
     }
 
     /**
@@ -70,6 +71,7 @@ class LogDrugTransaction implements ShouldQueue
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
             'stock_date' => $date,
+            'drug_concat' => $this->drug_concat,
         ]);
         $card->rec += $this->qty;
         $card->bal += $this->qty;

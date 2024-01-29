@@ -16,13 +16,13 @@ class LogIoTransIssue implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 
-    protected $warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date;
+    protected $warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date, $drug_concat;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date)
+    public function __construct($warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date, $drug_concat)
     {
         $this->onQueue('iotx');
         $this->warehouse_id = $warehouse_id;
@@ -35,6 +35,7 @@ class LogIoTransIssue implements ShouldQueue
         $this->trans_time = $trans_time;
         $this->qty = $qty;
         $this->exp_date = $exp_date;
+        $this->drug_concat = $drug_concat;
     }
 
     /**
@@ -64,6 +65,7 @@ class LogIoTransIssue implements ShouldQueue
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
             'stock_date' => $this->trans_date,
+            'drug_concat' => $this->drug_concat,
         ]);
         $card->iss += $this->qty;
         $card->bal -= $this->qty;

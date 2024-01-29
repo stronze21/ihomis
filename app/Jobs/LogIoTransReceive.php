@@ -15,14 +15,14 @@ class LogIoTransReceive implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $to, $dmdcomb, $dmdctr, $chrgcode, $date_logged, $dmdprdte, $retail_price, $time_logged, $qty, $stock_id, $exp_date;
+    public $to, $dmdcomb, $dmdctr, $chrgcode, $date_logged, $dmdprdte, $retail_price, $time_logged, $qty, $stock_id, $exp_date, $drug_concat;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($to, $dmdcomb, $dmdctr, $chrgcode, $date_logged, $dmdprdte, $retail_price, $time_logged, $qty, $stock_id, $exp_date)
+    public function __construct($to, $dmdcomb, $dmdctr, $chrgcode, $date_logged, $dmdprdte, $retail_price, $time_logged, $qty, $stock_id, $exp_date, $drug_concat)
     {
         $this->onQueue('iotx');
         $this->to = $to;
@@ -36,6 +36,7 @@ class LogIoTransReceive implements ShouldQueue
         $this->qty = $qty;
         $this->stock_id = $stock_id;
         $this->exp_date = $exp_date;
+        $this->drug_concat = $drug_concat;
     }
 
     /**
@@ -65,6 +66,7 @@ class LogIoTransReceive implements ShouldQueue
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
             'stock_date' => $this->date_logged,
+            'drug_concat' => $this->drug_concat,
         ]);
         $card->rec += $this->qty;
         $card->bal += $this->qty;

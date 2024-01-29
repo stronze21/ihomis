@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Pharmacy\Drugs\DrugStock;
-use App\Models\Pharmacy\Drugs\DrugStockCard;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
 use Carbon\Carbon;
 use Illuminate\Console\Command;

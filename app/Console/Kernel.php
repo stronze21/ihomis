@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->everyMinute();
         $schedule->command('init:stock-card')->daily();
-        $schedule->command('init:consumption')->monthly();
+        // $schedule->command('init:consumption')->monthly();
     }
 
     /**
