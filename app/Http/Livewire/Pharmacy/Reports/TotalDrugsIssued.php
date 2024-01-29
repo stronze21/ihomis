@@ -45,11 +45,10 @@ class TotalDrugsIssued extends Component
                                     INNER JOIN hospital.dbo.hrxo rx ON rxo.docointkey = rx.docointkey
                                     WHERE rxo.issuedte BETWEEN ? AND ?
                                     AND rxo.chrgcode LIKE ?
-                                    AND rxo.dmdcomb LIKE ?
-                                    AND rxo.dmdctr LIKE ?
+                                    AND rx.loc_code = ?
                                     GROUP BY drug.drug_concat, charge.chrgdesc, rx.exp_date
                                     ORDER BY drug.drug_concat ASC
-                                    ", [$this->date_from, $this->date_to, $filter_charge[0] ?? '%%', $this->dmdcomb, $this->dmdctr]);
+                                    ", [$this->date_from, $this->date_to, $filter_charge[0] ?? '%%', $this->location_id]);
 
         // $drugs_issued = DrugOrder::select(DB::raw('SUM(qty) as qty, dmdctr, dmdcomb, orderfrom, docointkey'))
         //     ->with('dm')
@@ -72,6 +71,7 @@ class TotalDrugsIssued extends Component
 
     public function mount()
     {
+        $this->location_id = session('pharm_location_id');
         $this->drugs = Drug::where('dmdstat', 'A')
             ->whereHas('sub', function ($query) {
                 return $query->where('dmhdrsub', 'LIKE', '%DRUM%');

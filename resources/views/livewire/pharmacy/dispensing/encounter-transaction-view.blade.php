@@ -154,7 +154,8 @@
                             @endphp
                             <tr class="border">
                                 <td class="w-10 text-center">
-                                    <input type="checkbox" class="checkbox{{ '-' . ($rxo->pcchrgcod ?? 'blank') }}"
+                                    <input type="checkbox"
+                                        class="checkbox{{ '-' . ($rxo->pcchrgcod ?? 'blank') }}{{ date('mdY', strtotime($rxo->dodate)) }}"
                                         wire:model.defer="selected_items" wire:key="item-{{ $rxo->docointkey }}"
                                         value="{{ $rxo->docointkey }}" />
                                 </td>
@@ -356,6 +357,7 @@
         $('input:checkbox').change(function() {
             if ($(this).is(':checked')) {
                 var all_checkbox = $('.' + this.className);
+
                 for (a = 1; a < all_checkbox.length; a++) {
                     all_checkbox[a].click();
                 }
