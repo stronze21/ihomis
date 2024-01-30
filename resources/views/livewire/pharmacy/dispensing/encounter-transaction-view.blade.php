@@ -325,20 +325,46 @@
                     <tbody class="bg-white">
                         @forelse($active_prescription as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
-                                <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}}
-                                    {{-- ondblclick="select_rx_item_inactive({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')" --}}
+                                <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}} {{-- ondblclick="select_rx_item_inactive({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')" --}}
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->updated_at)) }}
                                         {{ date('h:i A', strtotime($presc_data->updated_at)) }}
                                     </td>
                                     <td class="text-xs cursor-pointer"
-                                    onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"
-                                    >{{ $presc_data->dm->drug_concat() }}</td>
+                                        onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')">
+                                        {{ $presc_data->dm->drug_concat() }}</td>
                                     <td class="text-xs">{{ $presc_data->qty }}</td>
                                     <td class="text-xs">{{ $presc_data->remark }}</td>
                                     <td class="text-xs">{{ $presc->employee->fullname() }}</td>
-                                    <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error" onclick="select_rx_item_inactive({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"><i class="las la-sliders-h"></i></button></td>
+                                    <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
+                                            onclick="select_rx_item_inactive({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"><i
+                                                class="las la-sliders-h"></i></button></td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5"><i class="las la-lg la-ban"></i> No record found!</td>
+                                </tr>
+                            @endforelse
+                        @empty
+                        @endforelse
+                        @forelse($extra_prescriptions as $extra)
+                            @forelse($extra->data_active->all() as $extra_data)
+                                <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $extra_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $extra_data->dm->generic->gendesc }})" --}} {{-- ondblclick="select_rx_item_inactive({{ $extra_data->id }}, '{{ $extra_data->dm->drug_concat() }}', '{{ $extra_data->qty }}', '{{ $extra->empid }}', '{{ $extra_data->dmdcomb }}', '{{ $extra_data->dmdctr }}')" --}}
+                                    wire:key="select-rx-item-{{ $loop->iteration }}">
+                                    <td class="text-xs">
+                                        {{ date('Y-m-d', strtotime($extra_data->updated_at)) }}
+                                        {{ date('h:i A', strtotime($extra_data->updated_at)) }}
+                                    </td>
+                                    <td class="text-xs cursor-pointer"
+                                        onclick="select_rx_item({{ $extra_data->id }}, '{{ $extra_data->dm->drug_concat() }}', '{{ $extra_data->qty }}', '{{ $extra->empid }}', '{{ $extra_data->dmdcomb }}', '{{ $extra_data->dmdctr }}')">
+                                        {{ $extra_data->dm->drug_concat() }}</td>
+                                    <td class="text-xs">{{ $extra_data->qty }}</td>
+                                    <td class="text-xs">{{ $extra_data->remark }}</td>
+                                    <td class="text-xs">{{ $extra->employee->fullname() }}</td>
+                                    <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
+                                            onclick="select_rx_item_inactive({{ $extra_data->id }}, '{{ $extra_data->dm->drug_concat() }}', '{{ $extra_data->qty }}', '{{ $extra->empid }}', '{{ $extra_data->dmdcomb }}', '{{ $extra_data->dmdctr }}')"><i
+                                                class="las la-sliders-h"></i></button></td>
                                 </tr>
                             @empty
                                 <tr>
@@ -361,7 +387,7 @@
         $('input:checkbox').change(function() {
             if ($(this).is(':checked')) {
                 var all_checkbox = $('.' + this.className);
-                if(all_checkbox.length > 1){
+                if (all_checkbox.length > 1) {
                     for (a = 1; a < all_checkbox.length; a++) {
                         all_checkbox[a].click();
                     }
@@ -1005,29 +1031,29 @@
 
         function select_rx_item_inactive(rx_id, drug, rx_qty, empid, rx_dmdcomb, rx_dmdctr) {
 
-        var search = drug.split(",");
-        @this.rx_id = rx_id;
-        @this.generic = search[0];
-        @this.rx_dmdcomb = rx_dmdcomb;
-        @this.rx_dmdctr = rx_dmdctr;
-        @this.empid = empid;
-        $("#generic").val(search[0]);
-        $("#generic").trigger('keyup');
+            var search = drug.split(",");
+            @this.rx_id = rx_id;
+            @this.generic = search[0];
+            @this.rx_dmdcomb = rx_dmdcomb;
+            @this.rx_dmdctr = rx_dmdctr;
+            @this.empid = empid;
+            $("#generic").val(search[0]);
+            $("#generic").trigger('keyup');
 
-        Swal.fire({
-            html: `
+            Swal.fire({
+                html: `
                 <div class="text-xl font-bold"> Deactivate ` + drug + `</div>
                 <div class="flex w-full space-x-3">
                 </div>
             `,
-            showCancelButton: true,
-            confirmButtonText: `Confirm`,
-        }).then((result) => {
-            /* Read more about isConfirmed, isDenied below */
-            if (result.isConfirmed) {
-                Livewire.emit('deactivate_rx', rx_id);
-            }
-        });
+                showCancelButton: true,
+                confirmButtonText: `Confirm`,
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('deactivate_rx', rx_id);
+                }
+            });
         }
 
         function return_issued(docointkey, drug, up, or_qty) {
