@@ -117,7 +117,7 @@ class PatientsList extends Component
     public function view_enctr()
     {
 
-        $enccode = Crypt::encrypt(str_replace(' ', '-', $this->enccode));
+        $enccode = Crypt::encrypt(str_replace(' ', '--', $this->enccode));
         return redirect()->route('dispensing.view.enctr', ['enccode' => $enccode]);
     }
 
@@ -130,7 +130,7 @@ class PatientsList extends Component
             ->first();
 
         if ($check_walkn) {
-            $enccode = Crypt::encrypt(str_replace(' ', '-', $check_walkn->enccode));
+            $enccode = Crypt::encrypt(str_replace(' ', '--', $check_walkn->enccode));
         } else {
             $new_enccode = '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now()));
             $new_encounter = EncounterLog::create([
@@ -145,7 +145,7 @@ class PatientsList extends Component
                 'confdl' => 'N',
             ]);
 
-            $enccode = Crypt::encrypt(str_replace(' ', '-', $new_encounter->enccode));
+            $enccode = Crypt::encrypt(str_replace(' ', '--', $new_encounter->enccode));
         }
 
         return redirect()->route('dispensing.view.enctr', ['enccode' => $enccode]);

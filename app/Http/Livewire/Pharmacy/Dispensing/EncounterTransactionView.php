@@ -63,7 +63,7 @@ class EncounterTransactionView extends Component
 
     public function render()
     {
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+        $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
 
         $rxos = DB::select("SELECT docointkey, pcchrgcod, dodate, pchrgqty, estatus, qtyissued, pchrgup, pcchrgamt, drug_concat, chrgdesc, remarks, mssikey, tx_type
                             FROM hospital.dbo.hrxo
@@ -96,7 +96,7 @@ class EncounterTransactionView extends Component
 
         $this->location_id = session('pharm_location_id');
 
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+        $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
 
         // $this->encounter = EncounterLog::where('enccode', $enccode)
         //     ->with('patient')->with('rxo')->with('active_prescription')->with('adm')->first();
@@ -168,7 +168,7 @@ class EncounterTransactionView extends Component
 
     public function issue_order()
     {
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+        $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
         $cnt = 0;
 
         $rxos = DB::table('hospital.dbo.hrxo')->whereIn('docointkey', $this->selected_items)
@@ -308,7 +308,7 @@ class EncounterTransactionView extends Component
 
     public function update_prescription($dmdctr, $dmdcomb, $docointkey, $qtyissued)
     {
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+        $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
 
         $rx_header = Prescription::where('enccode', $enccode)
             ->with('data_active')
@@ -426,7 +426,7 @@ class EncounterTransactionView extends Component
 
     public function reset_order()
     {
-        $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+        $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
         $items = DrugOrder::where('enccode', $enccode)
             ->whereRaw('item_id IS NOT NULL')
             ->get();
@@ -508,7 +508,7 @@ class EncounterTransactionView extends Component
         }
 
         if ($this->is_ris or $available >= $total_deduct) {
-            $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+            $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
             DB::insert(
                 'INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
                     rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,
@@ -713,7 +713,7 @@ class EncounterTransactionView extends Component
             ->first();
 
         if ($dm) {
-            $enccode = str_replace('-', ' ', Crypt::decrypt($this->enccode));
+            $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
 
             DrugOrder::create([
                 'docointkey' => '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $dm->chrgcode . $dm->dmdcomb . $dm->dmdctr,

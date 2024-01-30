@@ -83,7 +83,7 @@
                     @forelse ($prescriptions as $rx)
                         <tr wire:key="view-enctr-{{ $rx->enccode }}-{{ $loop->iteration }}"
                             class="cursor-pointer hover clickable-row content {{ Illuminate\Support\Str::slug($rx->wardname, '-') }}@if ($rx->basic) has-basic @elseif ($rx->g24) has-g24 @elseif ($rx->or) has-or @else has-none @endif"
-                            data-href="{{ route('dispensing.view.enctr', ['enccode' => Crypt::encrypt(str_replace(' ', '-', $rx->enccode))]) }}">
+                            data-href="{{ route('dispensing.view.enctr', ['enccode' => Crypt::encrypt(str_replace(' ', '--', $rx->enccode))]) }}">
                             <td>
                                 <div class="flex-col">
                                     <div>{{ Carbon\Carbon::parse($rx->admdate)->format('Y/m/d') }}</div>

@@ -39,7 +39,7 @@ class PrescriptionEr extends Component
 
     public function view_enctr($enccode)
     {
-        $enccode = Crypt::encrypt(str_replace(' ', '-', $enccode));
+        $enccode = Crypt::encrypt(str_replace(' ', '--', $enccode));
         return redirect()->route('dispensing.view.enctr', ['enccode' => $enccode]);
     }
 }
