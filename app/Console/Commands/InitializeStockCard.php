@@ -44,7 +44,7 @@ class InitializeStockCard extends Command
         $stocks = DrugStock::select('id', 'stock_bal', 'dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode', 'loc_code')->where('stock_bal', '>', 0)->get();
 
         foreach ($stocks as $stock) {
-            $card = DrugStockCard::firstOrCreate([
+            DrugStockCard::firstOrCreate([
                 'chrgcode' => $stock->chrgcode,
                 'loc_code' => $stock->loc_code,
                 'dmdcomb' => $stock->dmdcomb,
@@ -55,6 +55,23 @@ class InitializeStockCard extends Command
                 'reference' => $stock->stock_bal,
                 'bal' => $stock->stock_bal,
             ]);
+
+
+            $card = DrugStockCard::whereNull('reference')
+            ->whereNull('rec')
+            ->where('chrgcode', $stock->chrgcode)
+            ->where('loc_code', $stock->loc_code)
+            ->where('dmdcomb', $stock->dmdcomb)
+            ->where('dmdctr', $stock->dmdctr)
+            ->where('drug_concat', $stock->drug_concat)
+            ->where('exp_date', $stock->exp_date)
+            ->first();
+
+            if($card){
+                $card->reference = $stock->stock_bal + $card->iss + $card->rec;
+                $card->bal = $stock->stock_bal;
+                $card->save();
+            }
         }
 
         return 'Stock card reference value captured';

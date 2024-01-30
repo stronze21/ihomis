@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Pharmacy\Drug;
-use App\Jobs\LogDrugTransaction;
 use App\Models\Pharmacy\DrugPrice;
 use Illuminate\Support\Facades\DB;
 use App\Events\IoTransRequestIssued;

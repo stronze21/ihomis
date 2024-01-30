@@ -31,7 +31,7 @@ class EncounterTransactionView extends Component
 {
     use LivewireAlert;
 
-    protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'add_prescribed_item', 'delete_item'];
+    protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'add_prescribed_item', 'delete_item', 'deactivate_rx'];
 
     public $generic, $charge_code = [];
     public $enccode, $location_id, $hpercode, $toecode;
@@ -105,7 +105,7 @@ class EncounterTransactionView extends Component
         $this->mss = PatientMss::where('enccode', $enccode)->first();
         $this->patient = Patient::find($this->encounter->hpercode);
         $this->active_prescription = Prescription::where('enccode', $enccode)->with('employee')->with('data_active')->has('data_active')->get();
-        $patient_room = PatientRoom::where('enccode', $enccode)->first();
+        $patient_room = PatientRoom::where('enccode', $enccode)->latest('hprdate')->first();
         if ($patient_room) {
             $this->wardname = Ward::select('wardname')->where('wardcode', $patient_room->wardcode)->first();
             $this->rmname = Room::select('rmname')->where('rmintkey', $patient_room->rmintkey)->first();
@@ -763,5 +763,13 @@ class EncounterTransactionView extends Component
         $this->emit('refresh');
         $this->alert('success', 'Remarks updated');
         $this->reset('selected_remarks', 'new_remarks');
+    }
+
+    public function deactivate_rx($rx_id)
+    {
+        $data = PrescriptionData::find($rx_id);
+        $data->stat = 'I';
+        $data->save();
+        $this->alert('success', 'Prescription updated!');
     }
 }

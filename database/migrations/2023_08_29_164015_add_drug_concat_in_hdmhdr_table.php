@@ -17,12 +17,6 @@ class AddDrugConcatInHdmhdrTable extends Migration
         Schema::table('hdmhdr', function (Blueprint $table) {
             $table->string('drug_concat')->nullable();
         });
-
-        $drugs = Drug::all();
-        foreach ($drugs as $drug) {
-            $drug->drug_concat = $drug->drug_name();
-            $drug->save();
-        }
     }
 
     /**

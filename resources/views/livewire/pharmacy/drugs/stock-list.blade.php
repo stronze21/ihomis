@@ -100,7 +100,7 @@
                 @endforelse
             </tbody>
         </table>
-        {{ $stocks->links() }}
+        {{-- {{ $stocks->links() }} --}}
     </div>
 </div>
 

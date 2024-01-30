@@ -69,7 +69,7 @@ class StockList extends Component
                 'pharm_locations.description',
             )
             ->orderBy('drug_concat', 'ASC')
-            ->paginate(20);
+            ->get();
 
         return view('livewire.pharmacy.drugs.stock-list', [
             'stocks' => $stocks,
@@ -88,35 +88,13 @@ class StockList extends Component
             ->get();
 
         $this->drugs = Drug::where('dmdstat', 'A')
-            ->whereHas('sub', function ($query) {
-                // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'));
-                return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
-            })
+            // ->whereHas('sub', function ($query) {
+            //     // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'));
+            //     return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
+            // })
             ->whereNotNull('drug_concat')
             ->has('generic')->orderBy('drug_concat', 'ASC')
             ->get();
-
-
-        // $stocks = DrugStock::all();
-        // foreach ($stocks as $stock) {
-        //     $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
-
-        //     $log = DrugStockLog::firstOrNew([
-        //         'loc_code' =>  $stock->loc_code,
-        //         'dmdcomb' => $stock->dmdcomb,
-        //         'dmdctr' => $stock->dmdctr,
-        //         'chrgcode' => $stock->chrgcode,
-        //         'date_logged' => $date,
-        //         'dmdprdte' => $stock->dmdprdte,
-        //         'unit_cost' => $stock->current_price->dmduprice,
-        //         'unit_price' => $stock->retail_price,
-        //     ]);
-        //     $log->time_logged = now();
-        //     $log->beg_bal += $stock->stock_bal;
-        //     $stock->beg_bal = $stock->stock_bal;
-
-        //     $log->save();
-        // }
     }
 
     public function add_item_new()
@@ -224,7 +202,6 @@ class StockList extends Component
             'expiry_date' => 'required',
             'chrgcode' => 'required',
         ]);
-
         $old_chrgcode = $stock->chrgcode;
         $old_stock_bal = $stock->stock_bal;
 
@@ -314,7 +291,7 @@ class StockList extends Component
         ]);
         $log->time_logged = now();
         $log->beg_bal += $this->qty;
-
+        $stock->dmdprdte =  $new_price->dmdprdte;
         $new_price->save();
         $log->save();
         $stock->save();

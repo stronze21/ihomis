@@ -32,6 +32,7 @@ use App\Http\Livewire\Pharmacy\Reports\IoTransReceivedReport;
 use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedDepartments;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 use App\Http\Livewire\Pharmacy\Drugs\StockPullOutList;
+use App\Http\Livewire\Pharmacy\References\PndfGenerics;
 use App\Http\Livewire\Pharmacy\Reports\DailyStockCard;
 use App\Http\Livewire\Pharmacy\Reports\DrugsReturnedSummary;
 use App\Http\Livewire\Pharmacy\Reports\TotalDrugsIssued;
@@ -95,6 +96,7 @@ Route::middleware([
     Route::name('ref.')->prefix('/reference')->group(function () {
         Route::get('/location', ListLocation::class)->name('location');
         Route::get('/drugsandmedicine', ListDrugHomis::class)->name('dmd');
+        Route::get('/PNDF-Generics', PndfGenerics::class)->name('pndf');
         Route::get('/permissions', ListPermissions::class)->name('permissions');
         Route::get('/users', UserManagement::class)->name('users');
         Route::get('/manual', Manual::class)->name('manual');

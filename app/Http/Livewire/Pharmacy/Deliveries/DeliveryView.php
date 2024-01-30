@@ -24,18 +24,11 @@ class DeliveryView extends Component
 
     public function render()
     {
-        // $drugs = Drug::with('generic')->with('route')->with('form')->with('strength')
-        //     ->has('generic')
-        //     ->where('dmdstat', 'A')
-        //     ->whereHas('sub', function ($query) {
-        //         // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'));
-        //         return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
-        //     });
         $drugs = Drug::where('dmdstat', 'A')
-            ->whereHas('sub', function ($query) {
-                // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'));
-                return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
-            })
+            // ->whereHas('sub', function ($query) {
+            //     // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'));
+            //     return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
+            // })
             ->whereNotNull('drug_concat')
             ->has('generic')
             ->orderBy('drug_concat', 'ASC')

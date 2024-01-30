@@ -34,25 +34,23 @@
         <table class="table w-full table-compact table-zebra table-bordered">
             <thead>
                 <tr>
-                    <th>Combination</th>
-                    <th>Counter</th>
-                    <th>Generic</th>
-                    <th>Strength</th>
-                    <th>Form</th>
-                    <th>Route</th>
-                    <th>Remarks</th>
+                    <th>Major Category</th>
+                    <th>SUB 1 Group Description</th>
+                    <th>SUB 2 Group Description</th>
+                    <th>SUB 3 Group Description</th>
+                    <th>SUB 4 Group Description</th>
+                    <th>Generic Name</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($drugs as $drug)
+                @forelse ($groups as $group)
                     <tr>
-                        <th>{{ $drug->dmdcomb }}</th>
-                        <th>{{ $drug->dmdctr }}</th>
-                        <td>{{ $drug->generic->gendesc }}</td>
-                        <td>{{ $drug->dmdnost . ' ' . $drug->strecode }}</td>
-                        <td>{{ $drug->formcode }}</td>
-                        <td>{{ $drug->rtecode }}</td>
-                        <td>{{ $drug->dmdrem }}</td>
+                        <th>{{ $group->submajor->dmdesc }}</th>
+                        <th>{{ $group->dms1key ? $group->sub1->dms1desc : ''}}</th>
+                        <th>{{ $group->dms2key ? $group->sub2->dms2desc : ''}}</th>
+                        <th>{{ $group->dms3key ? $group->sub3->dms3desc : ''}}</th>
+                        <th>{{ $group->dms4key ? $group->sub4->dms4desc : ''}}</th>
+                        <td>{{ $group->generic ? $group->generic->gendesc : '' }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -61,7 +59,7 @@
                 @endforelse
             </tbody>
         </table>
-        {{ $drugs->links() }}
+        {{ $groups->links() }}
     </div>
 
     <!-- Put this part before </body> tag -->
@@ -107,6 +105,64 @@
                     </div>
                     <input type="text" class="input input-bordered w-full" wire:model.defer="interactions" />
                 </label>
+                <label class="form-control w-full">
+                    <div class="label">
+                    <span class="label-text">Major Category</span>
+                    </div>
+                    <select class="select select-bordered w-full" wire:model="selected_major">
+                      <option></option>
+                      @foreach ($majors as $major)
+                        <option value="{{ $major->dmcode }}">{{ $major->dmdesc }}</option>
+                      @endforeach
+                    </select>
+                    @error('major_category')
+                        <span class="text-sm text-red-600">{{ $message }}</span>
+                    @enderror
+                </label>
+                <label class="form-control w-full">
+                    <div class="label">
+                    <span class="label-text">Sub 1 Group</span>
+                    </div>
+                    <select class="select select-bordered w-full" wire:model="selected_sub1">
+                      <option></option>
+                      @foreach ($sub1 as $s1)
+                        <option value="{{ $s1->dms1key }}">{{ $s1->dms1desc }}</option>
+                      @endforeach
+                    </select>
+                </label>
+                <label class="form-control w-full">
+                    <div class="label">
+                    <span class="label-text">Sub 2 Group</span>
+                    </div>
+                    <select class="select select-bordered w-full" wire:model="selected_sub2">
+                      <option></option>
+                      @foreach ($sub2 as $s2)
+                        <option value="{{ $s2->dms2key }}">{{ $s2->dms2desc }}</option>
+                      @endforeach
+                    </select>
+                </label>
+                <label class="form-control w-full">
+                    <div class="label">
+                    <span class="label-text">Sub 3 Group</span>
+                    </div>
+                    <select class="select select-bordered w-full" wire:model="selected_sub3">
+                      <option></option>
+                      @foreach ($sub3 as $s3)
+                        <option value="{{ $s3->dms3key }}">{{ $s3->dms3desc }}</option>
+                      @endforeach
+                    </select>
+                </label>
+                <label class="form-control w-full">
+                    <div class="label">
+                    <span class="label-text">Sub 4 Group</span>
+                    </div>
+                    <select class="select select-bordered w-full" wire:model="selected_sub4">
+                      <option></option>
+                      @foreach ($sub4 as $s4)
+                        <option value="{{ $s4->dms4key }}">{{ $s4->dms4desc }}</option>
+                      @endforeach
+                    </select>
+                </label>
 
                 <button class="btn btn-sm btn-primary ml-auto mt-3" wire:click="new_generic">Save</button>
             </p>
@@ -114,7 +170,7 @@
     </div>
 
 
-    <input type="checkbox" id="new_drug" class="modal-toggle" />
+    {{-- <input type="checkbox" id="new_drug" class="modal-toggle" />
     <div class="modal">
         <div class="modal-box relative">
             <label for="new_drug" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
@@ -204,5 +260,5 @@
                 <button class="btn btn-sm btn-primary ml-auto mt-3" wire:click="new_generic">Save</button>
             </p>
         </div>
-    </div>
+    </div> --}}
 </div>

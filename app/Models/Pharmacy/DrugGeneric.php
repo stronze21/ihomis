@@ -10,7 +10,21 @@ class DrugGeneric extends Model
     use HasFactory;
 
     protected $connection = 'hospital';
-    protected $table = 'hospital.dbo.hgen';
+    protected $table = 'hospital.dbo.hgen', $primaryKey = 'gencode', $keyType = 'string';
+    public $timestamps = false, $incrementing = false;
+
+    protected $fillable = [
+        'gencode',
+        'gendesc',
+        'genstat',
+        'genlock',
+        'updsw',
+        'datemod',
+        'entryby',
+        'rationale',
+        'monitor',
+        'interactions',
+    ];
 
     public function group()
     {

@@ -319,22 +319,26 @@
                             <td class="text-xs">QTY</td>
                             <td class="text-xs">Remarks</td>
                             <td class="text-xs">Prescribed by</td>
+                            <td class="text-xs">Deactivate</td>
                         </tr>
                     </thead>
                     <tbody class="bg-white">
                         @forelse($active_prescription as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
-                                <tr class="cursor-pointer hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}}
-                                    onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"
+                                <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}}
+                                    {{-- ondblclick="select_rx_item_inactive({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')" --}}
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->updated_at)) }}
                                         {{ date('h:i A', strtotime($presc_data->updated_at)) }}
                                     </td>
-                                    <td class="text-xs">{{ $presc_data->dm->drug_concat() }}</td>
+                                    <td class="text-xs cursor-pointer"
+                                    onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"
+                                    >{{ $presc_data->dm->drug_concat() }}</td>
                                     <td class="text-xs">{{ $presc_data->qty }}</td>
                                     <td class="text-xs">{{ $presc_data->remark }}</td>
                                     <td class="text-xs">{{ $presc->employee->fullname() }}</td>
+                                    <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error" onclick="select_rx_item_inactive({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"><i class="las la-sliders-h"></i></button></td>
                                 </tr>
                             @empty
                                 <tr>
@@ -357,10 +361,12 @@
         $('input:checkbox').change(function() {
             if ($(this).is(':checked')) {
                 var all_checkbox = $('.' + this.className);
-                all_checkbox.click();
-                // for (a = 1; a < all_checkbox.length; a++) {
-                //     all_checkbox[a].click();
-                // }
+                if(all_checkbox.length > 1){
+                    for (a = 1; a < all_checkbox.length; a++) {
+                        all_checkbox[a].click();
+                    }
+                }
+
             }
         });
         document.addEventListener('keydown', e => {
@@ -996,6 +1002,33 @@
                 // });
             }
         @endif
+
+        function select_rx_item_inactive(rx_id, drug, rx_qty, empid, rx_dmdcomb, rx_dmdctr) {
+
+        var search = drug.split(",");
+        @this.rx_id = rx_id;
+        @this.generic = search[0];
+        @this.rx_dmdcomb = rx_dmdcomb;
+        @this.rx_dmdctr = rx_dmdctr;
+        @this.empid = empid;
+        $("#generic").val(search[0]);
+        $("#generic").trigger('keyup');
+
+        Swal.fire({
+            html: `
+                <div class="text-xl font-bold"> Deactivate ` + drug + `</div>
+                <div class="flex w-full space-x-3">
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: `Confirm`,
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                Livewire.emit('deactivate_rx', rx_id);
+            }
+        });
+        }
 
         function return_issued(docointkey, drug, up, or_qty) {
             Swal.fire({

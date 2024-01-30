@@ -157,6 +157,10 @@
                                     {{ __('Drugs and Meds (Homis)') }}
                                 </x-jet-dropdown-link>
 
+                                <x-jet-dropdown-link href="{{ route('ref.pndf') }}">
+                                    {{ __('PNDF Generics (Homis)') }}
+                                </x-jet-dropdown-link>
+
                                 <div class="border-t border-gray-100"></div>
 
                                 <x-jet-dropdown-link href="{{ route('ref.permissions') }}">

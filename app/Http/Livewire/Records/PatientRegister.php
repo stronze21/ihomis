@@ -11,6 +11,8 @@ use App\Models\References\Province;
 use App\Models\References\Religion;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Record\Patients\Patient;
+use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Models\Pharmacy\Drugs\DrugStockCard;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Record\Patients\Models\PatientAddress;
 
@@ -35,6 +37,29 @@ class PatientRegister extends Component
 
         return view('livewire.records.patient-register', compact('cities', 'barangays', 'provinces', 'religions'));
     }
+
+    // public function mount(){
+
+    //     $stocks = DrugStock::select('id', 'stock_bal', 'dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode', 'loc_code')->where('stock_bal', '>', 0)->get();
+
+    //     foreach ($stocks as $stock) {
+    //         $card = DrugStockCard::
+    //         where('reference', '<', 0)
+    //         ->where('rec', 0)
+    //         ->where('chrgcode', $stock->chrgcode)
+    //         ->where('loc_code', $stock->loc_code)
+    //         ->where('dmdcomb', $stock->dmdcomb)
+    //         ->where('dmdctr', $stock->dmdctr)
+    //         ->where('exp_date', $stock->exp_date)
+    //         ->first();
+
+    //         if($card){
+    //             $card->reference = $stock->stock_bal;
+    //             $card->rec = null;
+    //             $card->save();
+    //         }
+    //     }
+    // }
 
     public function updatedPatbdate()
     {

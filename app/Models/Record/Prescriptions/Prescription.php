@@ -110,7 +110,8 @@ class Prescription extends Model
     {
         return $this->hasOneThrough(PatientRoom::class, AdmissionLog::class, 'enccode', 'enccode', 'enccode')
             ->with('ward')
-            ->with('room');
+            ->with('room')
+            ->latest('hprdate');
     }
 
     public function opd_patient()

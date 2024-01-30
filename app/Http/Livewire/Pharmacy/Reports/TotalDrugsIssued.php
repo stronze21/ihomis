@@ -73,9 +73,9 @@ class TotalDrugsIssued extends Component
     {
         $this->location_id = session('pharm_location_id');
         $this->drugs = Drug::where('dmdstat', 'A')
-            ->whereHas('sub', function ($query) {
-                return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
-            })
+            // ->whereHas('sub', function ($query) {
+            //     return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
+            // })
             ->whereNotNull('drug_concat')
             ->has('generic')
             ->orderBy('drug_concat', 'ASC')->get();

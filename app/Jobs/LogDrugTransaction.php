@@ -73,7 +73,7 @@ class LogDrugTransaction implements ShouldQueue
             'stock_date' => $date,
             'drug_concat' => $this->drug_concat,
         ]);
-        $card->rec += $this->qty;
+        $card->reference += $this->qty;
         $card->bal += $this->qty;
 
         $card->save();
