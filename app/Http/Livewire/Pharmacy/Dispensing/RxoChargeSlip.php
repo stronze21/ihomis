@@ -37,7 +37,8 @@ class RxoChargeSlip extends Component
 
         $this->toecode = $rxo[0]->toecode;
 
-        $patient_room = PatientRoom::where('enccode', $rxo[0]->enccode)->where('patrmstat', 'A')->first();
+        $patient_room = PatientRoom::where('enccode', $rxo[0]->enccode)->latest('hprdate')->first();
+        // $patient_room = PatientRoom::where('enccode', $rxo[0]->enccode)->where('patrmstat', 'A')->first();
         if ($patient_room) {
             $this->wardname = Ward::select('wardname')->where('wardcode', $patient_room->wardcode)->first();
         }

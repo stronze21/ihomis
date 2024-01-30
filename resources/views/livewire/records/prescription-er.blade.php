@@ -136,7 +136,7 @@
                 </tbody>
             </table>
             <div class="mt-2">
-                {{ $prescriptions->links() }}
+                {{-- {{ $prescriptions->links() }} --}}
             </div>
         </div>
     </div>

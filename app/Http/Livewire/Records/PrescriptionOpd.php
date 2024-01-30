@@ -65,7 +65,7 @@ class PrescriptionOpd extends Component
             ->orderByDesc('rx.created_at');
 
         return view('livewire.records.prescription-opd', [
-            'prescriptions' => $prescriptions->paginate(10),
+            'prescriptions' => $prescriptions->get(),
         ]);
     }
 

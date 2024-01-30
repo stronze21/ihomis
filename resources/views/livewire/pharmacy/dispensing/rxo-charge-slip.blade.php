@@ -30,11 +30,9 @@
                     <div>Patient's Name: <span class="font-semibold">{{ $rxo_header->patient->fullname() }}</span></div>
                     <div>Hosp Number: <span class="font-semibold">{{ $rxo_header->patient->hpercode }}</span></div>
                     <div>Ward:
-                        @if ($toecode == 'ADM' or $toecode == 'OPDAD' or $toecode == 'ERADM')
-                            <span class="font-semibold">{{ $wardname->wardname }}</span>
-                        @endif
+                        <span class="font-semibold">{{ $wardname ? $wardname->wardname : '' }}</span>
                         <span
-                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? $prescription->adm_pat_room->ward->wardname : 'N/A' }}
+                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? $prescription->adm_pat_room->ward->wardname : '' }}
                             / {{ $toecode }}</span>
                     </div>
 

@@ -51,7 +51,7 @@ class EncounterTransactionView extends Component
     public $selected_remarks, $new_remarks;
 
     public $patient;
-    public $active_prescription, $extra_prescriptions;
+    public $active_prescription, $extra_prescriptions = [];
     public $adm;
     public $rx_charge_code;
 

@@ -348,7 +348,7 @@
                             @endforelse
                         @empty
                         @endforelse
-                        @forelse($extra_prescriptions as $extra)
+                        @foreach ($extra_prescriptions as $extra)
                             @forelse($extra->data_active->all() as $extra_data)
                                 <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $extra_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $extra_data->dm->generic->gendesc }})" --}} {{-- ondblclick="select_rx_item_inactive({{ $extra_data->id }}, '{{ $extra_data->dm->drug_concat() }}', '{{ $extra_data->qty }}', '{{ $extra->empid }}', '{{ $extra_data->dmdcomb }}', '{{ $extra_data->dmdctr }}')" --}}
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
@@ -367,15 +367,8 @@
                                                 class="las la-sliders-h"></i></button></td>
                                 </tr>
                             @empty
-                                <tr>
-                                    <td colspan="5"><i class="las la-lg la-ban"></i> No record found!</td>
-                                </tr>
                             @endforelse
-                        @empty
-                            <tr>
-                                <td colspan="5"><i class="las la-lg la-ban"></i> No record found!</td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>

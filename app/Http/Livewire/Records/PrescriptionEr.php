@@ -22,13 +22,13 @@ class PrescriptionEr extends Component
         $to = Carbon::parse($this->filter_date)->endOfDay();
 
         $prescriptions = Prescription::has('active_er')->has('data_active')
-                                    ->with('active_er')->with('data_active')
-                                    ->with('active_g24')->with('active_or')->with('active_basic')
-                                    ->where('stat', 'A')
-                                    ->whereBetween('created_at', [$from, $to]);
+            ->with('active_er')->with('data_active')
+            ->with('active_g24')->with('active_or')->with('active_basic')
+            ->where('stat', 'A')
+            ->whereBetween('created_at', [$from, $to]);
 
         return view('livewire.records.prescription-er', [
-            'prescriptions' => $prescriptions->paginate(10),
+            'prescriptions' => $prescriptions->get(),
         ]);
     }
 
@@ -43,4 +43,3 @@ class PrescriptionEr extends Component
         return redirect()->route('dispensing.view.enctr', ['enccode' => $enccode]);
     }
 }
-
