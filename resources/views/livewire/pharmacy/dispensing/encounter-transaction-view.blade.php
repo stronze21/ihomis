@@ -328,8 +328,8 @@
                                     onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"
                                     wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
-                                        {{ date('Y-m-d', strtotime($presc_data->created_at)) }}
-                                        {{ date('h:i A', strtotime($presc_data->created_at)) }}
+                                        {{ date('Y-m-d', strtotime($presc_data->updated_at)) }}
+                                        {{ date('h:i A', strtotime($presc_data->updated_at)) }}
                                     </td>
                                     <td class="text-xs">{{ $presc_data->dm->drug_concat() }}</td>
                                     <td class="text-xs">{{ $presc_data->qty }}</td>
