@@ -16,27 +16,32 @@ class PrescriptionList extends Component
     public $wardcode, $wards;
     public $department = 'opd';
 
-    public function updatingDepartment(){ $this->resetPage(); }
-    public function updatingWardcode(){ $this->resetPage(); }
+    public function updatingDepartment()
+    {
+        $this->resetPage();
+    }
+    public function updatingWardcode()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
 
-        switch($this->department)
-        {
+        switch ($this->department) {
             case 'ward':
                 $prescriptions = Prescription::has('adm')->has('data');
-            break;
+                break;
 
             case 'opd':
                 $prescriptions = Prescription::has('opd')->has('data');
-            break;
+                break;
 
             default: //er
                 $prescriptions = Prescription::has('er')->has('data');
         }
 
-        $prescriptions = $prescriptions->where('stat', 'A')->where('created_at', '>', '2020-01-01');
+        $prescriptions = $prescriptions->where('stat', 'A')->where('updated_at', '>', '2020-01-01');
 
         return view('livewire.records.prescription-list', [
             'prescriptions' => $prescriptions->paginate(10),
@@ -46,7 +51,7 @@ class PrescriptionList extends Component
     public function mount()
     {
         $this->wards = Ward::where('wardcode', '<>', $this->wardcode)
-                    ->where('wardstat', 'A')
-                    ->get();
+            ->where('wardstat', 'A')
+            ->get();
     }
 }
