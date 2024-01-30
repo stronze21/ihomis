@@ -57,7 +57,7 @@ class DrugsIssuedDepartments extends Component
         // $this->date_to = Carbon::parse(now())->endOfWeek()->format('Y-m-d H:i:s');
         $this->charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
-            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'))
+            ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'))
             ->get();
     }
 }

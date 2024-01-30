@@ -119,7 +119,7 @@ class EncounterTransactionView extends Component
         if (!$this->charges) {
             $this->charges = ChargeCode::where('bentypcod', 'DRUME')
                 ->where('chrgstat', 'A')
-                ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS'))
+                ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'))
                 ->get();
         }
 
