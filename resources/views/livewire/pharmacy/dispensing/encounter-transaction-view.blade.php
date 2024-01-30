@@ -69,8 +69,8 @@
                                     <div class="flex space-x-2">
                                         <span>Room/Encounter Type: </span>
                                         @if ($encounter->toecode == 'ADM' or $encounter->toecode == 'OPDAD' or $encounter->toecode == 'ERADM')
-                                            <div> {{ $wardname->wardname }}</div>
-                                            <div class="text-sm">{{ $rmname->rmname }} /
+                                            <div> {{ $wardname ? $wardname->wardname : '' }}</div>
+                                            <div class="text-sm">{{ $rmname ? $rmname->rmname : '' }} /
                                             </div>
                                         @endif
                                         {{ $encounter->toecode }}

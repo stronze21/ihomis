@@ -106,6 +106,11 @@ class Prescription extends Model
             ->with('patient')->with('patient_room');
     }
 
+    public function encounter()
+    {
+        return $this->belongsTo(AdmissionLog::class, 'enccode', 'enccode');
+    }
+
     public function adm_pat_room()
     {
         return $this->hasOneThrough(PatientRoom::class, AdmissionLog::class, 'enccode', 'enccode', 'enccode')
