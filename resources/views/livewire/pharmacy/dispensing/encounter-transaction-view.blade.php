@@ -357,10 +357,10 @@
         $('input:checkbox').change(function() {
             if ($(this).is(':checked')) {
                 var all_checkbox = $('.' + this.className);
-
-                for (a = 1; a < all_checkbox.length; a++) {
-                    all_checkbox[a].click();
-                }
+                all_checkbox.click();
+                // for (a = 1; a < all_checkbox.length; a++) {
+                //     all_checkbox[a].click();
+                // }
             }
         });
         document.addEventListener('keydown', e => {

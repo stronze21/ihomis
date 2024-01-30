@@ -2,15 +2,19 @@
 
 namespace App\Jobs;
 
+use App\Models\Pharmacy\Dispensing\DrugOrder;
+use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
+use App\Models\Record\Prescriptions\Prescription;
+use App\Models\Record\Prescriptions\PrescriptionDataIssued;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
-use App\Models\Record\Prescriptions\PrescriptionDataIssued;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LogDrugOrderIssue implements ShouldQueue
 {
@@ -54,7 +58,36 @@ class LogDrugOrderIssue implements ShouldQueue
                 'docointkey' => $this->docointkey,
                 'qtyissued' => $this->pchrgqty,
             ]);
+        } else {
+            $rx_header = Prescription::where('enccode', $this->enccode)
+                ->with('data_active')
+                ->get();
+            if ($rx_header) {
+                foreach ($rx_header as $rxh) {
+                    $rx_data = $rxh->data_active()
+                        ->where('dmdcomb', $this->dmdcomb)
+                        ->where('dmdctr', $this->dmdctr)
+                        ->get();
+                    if ($rx_data) {
+                        PrescriptionDataIssued::create([
+                            'presc_data_id' => $rx_data->id,
+                            'docointkey' => $this->docointkey,
+                            'qtyissued' => $this->pchrgqty,
+                        ]);
+
+                        DB::update(
+                            "UPDATE hospital.dbo.hrxo SET prescription_data_id = ?, prescribed_by = ? WHERE docointkey = ?",
+                            [$rx_data->id, $rx_header->empid, $this->docointkey]
+                        );
+
+                        $rx_data->stat = 'I';
+                        $rx_data->save();
+                    }
+                }
+            }
         }
+
+
         DrugOrderIssue::updateOrCreate([
             'docointkey' => $this->docointkey,
             'enccode' => $this->enccode,
