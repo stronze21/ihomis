@@ -69,7 +69,7 @@ class IoTransListRequestor extends Component
             'remarks' => ['nullable', 'string'],
         ]);
 
-        $reference_no = $this->reference_no ?? Carbon::now()->format('y-m-') . (sprintf("%04d", InOutTransaction::groupBy('reference_no')->count() + 1));
+        $reference_no = $this->reference_no ?? Carbon::now()->format('y-m-') . (sprintf("%04d", InOutTransaction::groupBy('trans_no')->count() + 1));
 
         $io_tx = InOutTransaction::create([
             'trans_no' => $reference_no,
