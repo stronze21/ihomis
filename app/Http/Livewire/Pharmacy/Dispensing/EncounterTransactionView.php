@@ -51,8 +51,8 @@ class EncounterTransactionView extends Component
     public $selected_remarks, $new_remarks;
 
     public $patient;
-    public $active_prescription, $extra_prescriptions = [];
-    public $active_prescription_all, $extra_prescriptions_all = [];
+    public $active_prescription = [], $extra_prescriptions = [];
+    public $active_prescription_all = [], $extra_prescriptions_all = [];
     public $adm;
     public $rx_charge_code;
 
@@ -137,14 +137,6 @@ class EncounterTransactionView extends Component
                 ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'))
                 ->get();
         }
-
-        // $this->stocks = DB::select("SELECT pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, pharm_drug_stocks.loc_code, MAX(pharm_drug_stocks.dmdprdte) as dmdprdte, SUM(stock_bal) as stock_bal, MAX(id) as id, MIN(exp_date) as exp_date
-        //                         FROM hospital.dbo.pharm_drug_stocks
-        //                         INNER JOIN hcharge on hcharge.chrgcode = pharm_drug_stocks.chrgcode
-        //                         INNER JOIN hdmhdrprice on hdmhdrprice.dmdprdte = pharm_drug_stocks.dmdprdte
-        //                         WHERE loc_code = ?
-        //                         GROUP BY pharm_drug_stocks.dmdcomb, pharm_drug_stocks.dmdctr, pharm_drug_stocks.chrgcode, hdmhdrprice.retail_price, dmselprice, drug_concat, hcharge.chrgdesc, pharm_drug_stocks.loc_code
-        //                         ", [$this->location_id]);
     }
 
     public function charge_items()
@@ -289,12 +281,9 @@ class EncounterTransactionView extends Component
                         $drug_concat = '';
                         $drug_concat = implode("", explode('_', $stock->drug_concat));
 
-                        //TODO: Job for DrugStockIssue
                         LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price, $drug_concat, date('Y-m-d'));
-                        //TODO: Job for DrugStockLog
                     }
                 }
-                //TODO: Job for DrugOrderIssue
             } else {
                 return $this->alert('error', 'Insufficient Stock Balance.');
             }
@@ -311,124 +300,6 @@ class EncounterTransactionView extends Component
             $this->alert('success', 'Order issued successfully.');
         } else {
             $this->alert('error', 'No item to issue.');
-        }
-    }
-
-    public function update_prescription($dmdctr, $dmdcomb, $docointkey, $qtyissued)
-    {
-        $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
-
-        $rx_header = Prescription::where('enccode', $enccode)
-            ->with('data_active')
-            ->get();
-        if ($rx_header) {
-            foreach ($rx_header as $rxh) {
-                $rx_data = $rxh->data_active()
-                    ->where('dmdcomb', $dmdcomb)
-                    ->where('dmdctr', $dmdctr)
-                    ->get();
-                if ($rx_data) {
-                    PrescriptionDataIssued::create([
-                        'presc_data_id' => $rx_data->id,
-                        'docointkey' => $docointkey,
-                        'qtyissued' => $qtyissued,
-                    ]);
-
-                    if ($rx_data->issued()->sum('qtyissued') >= $rx_data->qty) {
-                        $rx_data->stat = 'I';
-                        $rx_data->save();
-                    }
-                }
-            }
-        }
-    }
-
-    public function deduct_stocks($dmdctr, $dmdcomb, $chrgcode, $total_deduct, $loc_code, $docointkey, $pcchrgcod, $tag, $pcchrgamt, $unit_price, $enccode)
-    {
-        $stocks = DrugStock::where('dmdcomb', $dmdcomb)
-            ->where('dmdctr', $dmdctr)
-            ->where('chrgcode', $chrgcode)
-            ->where('loc_code', $loc_code)
-            ->where('exp_date', '>', date('Y-m-d'))
-            ->where('stock_bal', '>', '0')
-            ->oldest('exp_date')
-            ->get();
-
-        foreach ($stocks as $stock) {
-            $trans_qty = 0;
-            if ($total_deduct) {
-                if ($total_deduct > $stock->stock_bal) {
-                    $trans_qty = $stock->stock_bal;
-                    $total_deduct -= $stock->stock_bal;
-                    $stock->stock_bal = 0;
-                } else {
-                    $trans_qty = $total_deduct;
-                    $stock->stock_bal -= $total_deduct;
-                    $total_deduct = 0;
-                }
-                $stock->save();
-
-                $issued_drug = DrugStockIssue::create([
-                    'stock_id' => $stock->id,
-                    'docointkey' => $docointkey,
-                    'dmdcomb' => $dmdcomb,
-                    'dmdctr' => $dmdctr,
-                    'loc_code' => $loc_code,
-                    'chrgcode' => $chrgcode,
-                    'exp_date' => $stock->exp_date,
-                    'qty' => $trans_qty,
-                    'pchrgup' => $unit_price,
-                    'pcchrgamt' => $pcchrgamt,
-                    'status' => 'Issued',
-                    'user_id' => session('user_id'),
-                    'hpercode' => $this->hpercode,
-                    'enccode' => $enccode,
-                    'toecode' => $this->toecode,
-                    'pcchrgcod' => $pcchrgcod,
-
-                    'sc_pwd' => $tag == 'sc_pwd' ? $trans_qty : false,
-                    'ems' => $tag == 'ems' ? $trans_qty : false,
-                    'maip' => $tag == 'maip' ? $trans_qty : false,
-                    'wholesale' => $tag == 'wholesale' ? $trans_qty : false,
-                    'pay' => $tag == 'pay' ? $trans_qty : false,
-                    'medicare' => $tag == 'medicare' ? $trans_qty : false,
-                    'service' => $tag == 'service' ? $trans_qty : false,
-                    'govt_emp' => $tag == 'govt_emp' ? $trans_qty : false,
-                    'caf' => $tag == 'caf' ? $trans_qty : false,
-
-                    'dmdprdte' => $stock->dmdprdte,
-                ]);
-
-                $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
-                $log = DrugStockLog::firstOrNew([
-                    'loc_code' => $stock->loc_code,
-                    'dmdcomb' => $stock->dmdcomb,
-                    'dmdctr' => $stock->dmdctr,
-                    'chrgcode' => $stock->chrgcode,
-                    'date_logged' => $date,
-                    'dmdprdte' => $stock->dmdprdte,
-                    'unit_price' => $stock->retail_price,
-                ]);
-                $log->time_logged = now();
-                $log->issue_qty += $trans_qty;
-
-                $log->sc_pwd += $issued_drug->sc_pwd;
-                $log->ems += $issued_drug->ems;
-                $log->maip += $issued_drug->maip;
-                $log->wholesale += $issued_drug->wholesale;
-                $log->pay += $issued_drug->pay;
-                $log->medicare += $issued_drug->medicare;
-                $log->service += $issued_drug->service;
-                $log->govt_emp += $issued_drug->govt_emp;
-                $log->caf += $issued_drug->caf;
-
-                $log->save();
-
-                // $this->add_to_inventory($dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty);
-
-            } else {
-                break;
-            }
         }
     }
 
