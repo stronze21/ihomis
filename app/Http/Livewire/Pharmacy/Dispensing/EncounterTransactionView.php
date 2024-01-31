@@ -232,13 +232,20 @@ class EncounterTransactionView extends Component
             }
         }
 
+        $temp_type = $this->type;
 
         foreach ($rxos as $rxo) {
+
+            if ($rxo->orderfrom == 'DRUMK') {
+                $this->type = 'service';
+            }
 
             DB::update(
                 "UPDATE hospital.dbo.hrxo SET tx_type = ? WHERE docointkey = ?",
                 [$this->type, $rxo->docointkey]
             );
+
+            $this->type = $temp_type;
 
             $stocks = DB::select(
                 "SELECT * FROM pharm_drug_stocks
