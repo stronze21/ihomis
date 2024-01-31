@@ -153,8 +153,9 @@ class EncounterTransactionView extends Component
         $pcchrgcod = 'P' . date('y') . '-' . sprintf('%07d', $charge_code->id);
         $cnt = 0;
         foreach ($this->selected_items as $docointkey) {
+
             $cnt = DB::update(
-                "UPDATE hospital.dbo.hrxo SET pcchrgcod = ?, estatus = 'P' WHERE docointkey = ? AND estatus = 'U'",
+                "UPDATE hospital.dbo.hrxo SET pcchrgcod = ?, estatus = 'P' WHERE docointkey = ? AND (estatus = 'U' OR pchrgup = 0)",
                 [$pcchrgcod, $docointkey]
             );
         }
@@ -172,7 +173,11 @@ class EncounterTransactionView extends Component
         $cnt = 0;
 
         $rxos = DB::table('hospital.dbo.hrxo')->whereIn('docointkey', $this->selected_items)
-            ->where('estatus', 'P')->get();
+            ->where(function ($query) {
+                $query->where('estatus', 'P')
+                    ->orWhere('pchrgup', 0);
+            })
+            ->get();
         if ($this->encounter->toecode == 'ADM' or $this->encounter->toecode == 'OPDAD' or $this->encounter->toecode == 'ERADM') {
             if ($this->mss) {
                 switch ($this->mss->mssikey) {
@@ -295,7 +300,7 @@ class EncounterTransactionView extends Component
         if ($cnt == 1) {
             foreach ($rxos as $row2) {
                 $cnt = DB::update(
-                    "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND estatus = 'P'",
+                    "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND (estatus = 'P' OR pchrgup = 0)",
                     [$row2->pchrgqty, $row2->docointkey]
                 );
                 LogDrugOrderIssue::dispatch($row2->docointkey, $row2->enccode, $row2->hpercode, $row2->dmdcomb, $row2->dmdctr, $row2->pchrgqty, session('employeeid'), $row2->orderfrom, $row2->pcchrgcod, $row2->pchrgup, $row2->ris, $row2->prescription_data_id);

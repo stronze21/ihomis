@@ -223,11 +223,11 @@
                                     </div>
                                 </td>
                                 @php
-                                    if ($rxo->estatus == 'U') {
+                                    if ($rxo->estatus == 'U' || !$rxo->pcchrgcod) {
                                         $badge = '<span class="badge badge-sm badge-warning">Pending</span>';
-                                    } elseif ($rxo->estatus == 'P') {
+                                    } elseif ($rxo->estatus == 'P' && $rxo->pcchrgcod) {
                                         $badge = '<span class="badge badge-sm badge-secondary">Charged</span>';
-                                    } elseif ($rxo->estatus == 'S') {
+                                    } elseif ($rxo->estatus == 'S' && $rxo->pcchrgcod) {
                                         $badge = '<span class="badge badge-sm badge-success">Issued</span>';
                                     }
                                 @endphp
