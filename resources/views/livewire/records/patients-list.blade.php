@@ -57,7 +57,7 @@
                         @enderror
                     </div>
                     <div class="ml-3 form-control">
-                        <button id="refreshBtn" class="btn btn-sm btn-info" wire:click="$refresh"
+                        <button id="refreshBtn" class="btn btn-sm btn-info" wire:click="searchBtn"
                             wire:loading.attr="disabled">Search</button>
                     </div>
                     <div class="ml-3 form-control">
@@ -103,7 +103,12 @@
             </div>
         </div>
         <div class="w-1/5 mt-10 overflow-x-hidden overflow-y-auto max-h-96">
-            <span>Encounters</span>
+            <div class="flex justify-between my-2">
+                <span>Encounters</span>
+                @if ($hpercode)
+                    <button class="btn btn-xs btn-error" wire:click="walk_in()">Continue as WALK IN</button>
+                @endif
+            </div>
             <table class="table w-full table-fixed table-sm table-hover table-bordered table-compact">
                 <thead class="sticky top-0 border-b ">
                     <tr>
@@ -130,14 +135,6 @@
                             <td colspan="3">No encounter found</td>
                         </tr>
                     @endforelse
-                    @if ($hpercode)
-                        <tr class="bg-error">
-                            <td colspan="3" class="font-bold cursor-pointer bg-error" wire:click="walk_in()">
-                                <span>Continue as
-                                    WALK IN</span>
-                            </td>
-                        </tr>
-                    @endif
                 </tbody>
             </table>
         </div>

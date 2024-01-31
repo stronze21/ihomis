@@ -22,6 +22,11 @@ class PatientsList extends Component
     public $hpercode;
     public $enc_list = [];
 
+    public function searchBtn()
+    {
+        $this->reset('enc_list');
+    }
+
     public function updatingSearch()
     {
         $this->resetPage();
