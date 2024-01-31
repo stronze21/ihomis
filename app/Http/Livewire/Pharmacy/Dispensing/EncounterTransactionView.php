@@ -52,6 +52,7 @@ class EncounterTransactionView extends Component
 
     public $patient;
     public $active_prescription, $extra_prescriptions = [];
+    public $active_prescription_all, $extra_prescriptions_all = [];
     public $adm;
     public $rx_charge_code;
 
@@ -105,6 +106,7 @@ class EncounterTransactionView extends Component
         $this->mss = PatientMss::where('enccode', $enccode)->first();
         $this->patient = Patient::find($this->encounter->hpercode);
         $this->active_prescription = Prescription::where('enccode', $enccode)->with('employee')->with('data_active')->has('data_active')->get();
+        $this->active_prescription_all = Prescription::where('enccode', $enccode)->get();
         if ($this->encounter->toecode == 'ADM') {
             $past_log = EncounterLog::where('hpercode', $this->encounter->hpercode)
                 ->where(function ($query) {
@@ -115,6 +117,7 @@ class EncounterTransactionView extends Component
                 ->first();
             if ($past_log) {
                 $this->extra_prescriptions = Prescription::where('enccode', $past_log->enccode)->with('employee')->with('data_active')->has('data_active')->get();
+                $this->extra_prescriptions_all = Prescription::where('enccode', $past_log->enccode)->get();
             }
         }
         $patient_room = PatientRoom::where('enccode', $enccode)->latest('hprdate')->first();

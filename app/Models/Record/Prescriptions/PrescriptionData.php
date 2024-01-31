@@ -2,11 +2,14 @@
 
 namespace App\Models\Record\Prescriptions;
 
+use App\Models\Hospital\Employee;
 use App\Models\Pharmacy\Drug;
-use Awobaz\Compoships\Compoships;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Models\Record\Prescriptions\Prescription;
+use App\Models\Record\Prescriptions\PrescriptionDataIssued;
+use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class PrescriptionData extends Model
 {
@@ -39,5 +42,10 @@ class PrescriptionData extends Model
     public function rx()
     {
         return $this->belongsTo(Prescription::class, 'presc_id', 'id');
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'entry_by', 'employeeid')->with('dept')->with('provider');
     }
 }

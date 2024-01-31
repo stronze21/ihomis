@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
+use App\Models\Record\Prescriptions\PrescriptionData;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class DrugOrder extends Model
@@ -51,6 +52,11 @@ class DrugOrder extends Model
     public function prescriptions()
     {
         return $this->hasMany(Prescription::class, 'enccode', 'enccode');
+    }
+
+    public function prescription_data()
+    {
+        return $this->belongsTo(PrescriptionData::class, 'prescription_data_id', 'id');
     }
 
     public function prescription_header()

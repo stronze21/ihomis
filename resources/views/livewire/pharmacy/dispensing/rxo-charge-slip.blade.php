@@ -22,8 +22,9 @@
                     <div class="font-bold">{{ $pcchrgcod }}</div>
                 </div>
                 <div class="flex flex-col text-left whitespace-nowrap">
-                    <div>Dep't./Section: <span
-                            class="font-semibold">{{ $prescription->employee->dept->deptname ?? '' }}</span></div>
+                    <div>Dep't./Section: <span class="font-semibold">
+                            {{ $rxo[0]->prescription_data ? $rxo[0]->prescription_data->employee->dept->deptname : '' }}</span>
+                    </div>
                     <div>Date/Time: <span
                             class="font-semibold">{{ date('F j, Y h:i A', strtotime($rxo_header->dodate)) }}</span>
                     </div>
@@ -37,7 +38,7 @@
                     </div>
 
                     <div>Ordering Physician: <span
-                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . $prescription->employee->fullname() : 'N/A' }}</span>
+                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . ($rxo[0]->prescription_data ? $rxo[0]->prescription_data->employee->fullname() : '') . ' ' . ($rxo[0]->employee->provider ? $rxo[0]->employee->provider->clscode : '') : 'N/A' }}</span>
                     </div>
                 </div>
             </div>
@@ -96,7 +97,7 @@
             <div class="flex flex-col py-0 my-0 text-left text-xs/4 whitespace-nowrap">
                 <div>Issued by: {{ $rxo_header->employee ? $rxo_header->employee->fullname() : $rxo_header->entry_by }}
                 </div>
-                <div><span>Time: {{ \Carbon\Carbon::create($rxo_header->dodate)->format('h:m A') }}</span></div>
+                <div><span>Time: {{ \Carbon\Carbon::create($rxo_header->dodate)->format('h:i A') }}</span></div>
                 <div><span>Verified by Nurse/N.A.: _________________________</span></div>
                 <div><span>Received by Patient/Watcher: ____________________</span></div>
                 <div class="mt-10 text-right justify-content-end"><span class="border-t border-black">Signature Over

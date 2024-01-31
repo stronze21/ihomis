@@ -18,12 +18,15 @@
     <div class="grid grid-cols-12 gap-4">
         <div class="col-span-12 xl:col-span-8">
             <div class="flex flex-col max-h-screen p-1 overflow-scroll">
+                @if ($errors->first())
+                    <div class="shadow-lg max-w-fit alert alert-error">
+                        <i class="mr-2 las la-lg la-exclamation-triangle"></i> {{ $errors->first() }}
+                    </div>
+                @endif
                 <div class="flex justify-between mb-3">
-                    @if ($errors->first())
-                        <div class="shadow-lg max-w-fit alert alert-error">
-                            <i class="mr-2 las la-lg la-exclamation-triangle"></i> {{ $errors->first() }}
-                        </div>
-                    @endif
+                    <div class="flex space-x-3">
+                        <label for="prescription_lists" class="btn btn-sm">Prescription</label>
+                    </div>
                     <div class="flex ml-auto">
                         <div class="flex flex-col text-center">
                             <button id="delBtn" class="ml-2 btn btn-sm btn-error" onclick="delete_item()"
@@ -336,7 +339,7 @@
                                         {{ $presc_data->dm->drug_concat() }}</td>
                                     <td class="text-xs">{{ $presc_data->qty }}</td>
                                     <td class="text-xs">{{ $presc_data->remark }}</td>
-                                    <td class="text-xs">{{ $presc->employee->fullname() }}</td>
+                                    <td class="text-xs">{{ $presc_data->employee->fullname() }}</td>
                                     <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
                                             onclick="select_rx_item_inactive({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')"><i
                                                 class="las la-sliders-h"></i></button></td>
@@ -371,6 +374,75 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+    <input type="checkbox" id="prescription_lists" class="modal-toggle" />
+    <div class="modal">
+        <div class="w-11/12 max-w-5xl modal-box">
+            <h3 class="text-lg font-bold">Prescriptions</h3>
+            <table class="w-full rounded-lg shadow-md table-compact">
+                <thead class="sticky top-0 bg-gray-200 border-b">
+                    <tr>
+                        <td class="text-xs">Order at</td>
+                        <td class="text-xs">Description</td>
+                        <td class="text-xs">QTY</td>
+                        <td class="text-xs">Remarks</td>
+                        <td class="text-xs">Prescribed by</td>
+                        <td class="text-xs">Deactivate</td>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    @forelse($active_prescription_all as $presc_all)
+                        @forelse($presc_all->data->all() as $presc_all_data)
+                            <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_all_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_all_data->dm->generic->gendesc }})" --}} {{-- ondblclick="select_rx_item_inactive({{ $presc_all_data->id }}, '{{ $presc_all_data->dm->drug_concat() }}', '{{ $presc_all_data->qty }}', '{{ $presc_all->empid }}', '{{ $presc_all_data->dmdcomb }}', '{{ $presc_all_data->dmdctr }}')" --}}
+                                wire:key="select-rx-item-{{ $loop->iteration }}">
+                                <td class="text-xs">
+                                    {{ date('Y-m-d', strtotime($presc_all_data->updated_at)) }}
+                                    {{ date('h:i A', strtotime($presc_all_data->updated_at)) }}
+                                </td>
+                                <td class="text-xs cursor-pointer"
+                                    onclick="select_rx_item({{ $presc_all_data->id }}, '{{ $presc_all_data->dm->drug_concat() }}', '{{ $presc_all_data->qty }}', '{{ $presc_all->empid }}', '{{ $presc_all_data->dmdcomb }}', '{{ $presc_all_data->dmdctr }}')">
+                                    {{ $presc_all_data->dm->drug_concat() }}</td>
+                                <td class="text-xs">{{ $presc_all_data->qty }}</td>
+                                <td class="text-xs">{{ $presc_all_data->remark }}</td>
+                                <td class="text-xs">{{ $presc_all_data->employee->fullname() }}</td>
+                                <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
+                                        onclick="select_rx_item_inactive({{ $presc_all_data->id }}, '{{ $presc_all_data->dm->drug_concat() }}', '{{ $presc_all_data->qty }}', '{{ $presc_all->empid }}', '{{ $presc_all_data->dmdcomb }}', '{{ $presc_all_data->dmdctr }}')"><i
+                                            class="las la-sliders-h"></i></button></td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5"><i class="las la-lg la-ban"></i> No record found!</td>
+                            </tr>
+                        @endforelse
+                    @empty
+                    @endforelse
+                    @foreach ($extra_prescriptions_all as $extra_all)
+                        @forelse($extra_all->data->all() as $extra_all_data)
+                            <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $extra_all_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $extra_all_data->dm->generic->gendesc }})" --}} {{-- ondblclick="select_rx_item_inactive({{ $extra_all_data->id }}, '{{ $extra_all_data->dm->drug_concat() }}', '{{ $extra_all_data->qty }}', '{{ $extra_all->empid }}', '{{ $extra_all_data->dmdcomb }}', '{{ $extra_all_data->dmdctr }}')" --}}
+                                wire:key="select-rx-item-{{ $loop->iteration }}">
+                                <td class="text-xs">
+                                    {{ date('Y-m-d', strtotime($extra_all_data->updated_at)) }}
+                                    {{ date('h:i A', strtotime($extra_all_data->updated_at)) }}
+                                </td>
+                                <td class="text-xs cursor-pointer"
+                                    onclick="select_rx_item({{ $extra_all_data->id }}, '{{ $extra_all_data->dm->drug_concat() }}', '{{ $extra_all_data->qty }}', '{{ $extra_all->empid }}', '{{ $extra_all_data->dmdcomb }}', '{{ $extra_all_data->dmdctr }}')">
+                                    {{ $extra_all_data->dm->drug_concat() }}</td>
+                                <td class="text-xs">{{ $extra_all_data->qty }}</td>
+                                <td class="text-xs">{{ $extra_all_data->remark }}</td>
+                                <td class="text-xs">{{ $extra_all->employee->fullname() }}</td>
+                                <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
+                                        onclick="select_rx_item_inactive({{ $extra_all_data->id }}, '{{ $extra_all_data->dm->drug_concat() }}', '{{ $extra_all_data->qty }}', '{{ $extra_all->empid }}', '{{ $extra_all_data->dmdcomb }}', '{{ $extra_all_data->dmdctr }}')"><i
+                                            class="las la-sliders-h"></i></button></td>
+                            </tr>
+                        @empty
+                        @endforelse
+                    @endforeach
+                </tbody>
+            </table>
+            <div class="justify-end modal-action">
+                <label for="prescription_lists" class="btn btn-sm">Close</label>
             </div>
         </div>
     </div>
