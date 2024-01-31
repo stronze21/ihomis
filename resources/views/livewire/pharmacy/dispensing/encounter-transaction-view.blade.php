@@ -380,10 +380,8 @@
     <input type="checkbox" id="prescription_lists" class="modal-toggle" />
     <div class="modal">
         <div class="w-11/12 max-w-5xl modal-box">
+            <label for="prescription_lists" class="absolute btn btn-sm btn-circle right-2 top-2">✕</label>
             <h3 class="text-lg font-bold">Prescriptions</h3>
-            <div class="top-0 justify-end ml-auto">
-                <label for="prescription_lists" class="ml-auto btn btn-sm">Close</label>
-            </div>
             <table class="w-full rounded-lg shadow-md table-compact">
                 <thead class="sticky top-0 bg-gray-200 border-b">
                     <tr>
