@@ -32,8 +32,7 @@
                     <div>Hosp Number: <span class="font-semibold">{{ $rxo_header->patient->hpercode }}</span></div>
                     <div>Ward:
                         <span class="font-semibold">{{ $wardname ? $wardname->wardname : '' }}</span>
-                        <span
-                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? $prescription->adm_pat_room->ward->wardname : '' }}
+                        <span class="font-semibold">{{ $room_name->rmname }}
                             / {{ $toecode }}</span>
                     </div>
 

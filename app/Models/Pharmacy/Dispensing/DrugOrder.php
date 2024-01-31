@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
+use App\Models\Record\Encounters\EncounterLog;
 use App\Models\Record\Prescriptions\PrescriptionData;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -38,6 +39,11 @@ class DrugOrder extends Model
         'prescribed_by',
         'remarks',
     ];
+
+    public function enctr()
+    {
+        return $this->belongsTo(EncounterLog::class, 'enccode', 'enccode');
+    }
 
     public function patient()
     {
