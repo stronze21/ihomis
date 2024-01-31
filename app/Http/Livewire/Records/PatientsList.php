@@ -20,6 +20,7 @@ class PatientsList extends Component
     public $enccode;
     public $search = '', $searchpatfirst = '', $searchpatmiddle = '', $searchpatlast = '', $searchhpercode = '', $searchpatdob = '';
     public $hpercode;
+    public $enc_list = [];
 
     public function updatingSearch()
     {
@@ -76,47 +77,56 @@ class PatientsList extends Component
     public function select_patient($hpercode)
     {
 
-        $encounter = EncounterLog::where('hpercode', $hpercode)
-            ->where('encstat', 'A')
+        // $encounter = EncounterLog::where('hpercode', $hpercode)
+        //     ->where('encstat', 'A')
+        //     ->where('toecode', '<>', 'WALKN')
+        //     ->where('toecode', '<>', '32')
+        //     ->where('enclock', 'N')
+        //     ->latest('encdate')
+        //     ->first();
+
+        $this->enc_list = EncounterLog::where('hpercode', $hpercode)
             ->where('toecode', '<>', 'WALKN')
             ->where('toecode', '<>', '32')
             ->where('enclock', 'N')
             ->latest('encdate')
-            ->first();
+            ->get();
 
         $this->hpercode = $hpercode;
-        if ($encounter) {
-            $this->enccode = $encounter->enccode;
-            $this->alert('info', 'Active ' . $encounter->enctr_type() . ' encounter dated ' . date('F j, Y G:i A', strtotime($encounter->encdate)) . ' found!', [
-                'toast' => false,
-                'position' => 'center',
-                'showConfirmButton' => true,
-                'confirmButtonText' => $encounter->enctr_type(),
-                'onConfirmed' => 'view_enctr',
-                'showDenyButton' => true,
-                'denyButtonText' => 'Walk-in',
-                'onDenied' => 'walk_in',
-                'showCancelButton' => true,
-                'reverseButtons' => true,
-                'timer' => false,
-            ]);
-        } else {
-            $this->alert('error', 'No active encounter found! Continue as walk in?', [
-                'toast' => false,
-                'position' => 'center',
-                'showConfirmButton' => true,
-                'confirmButtonText' => 'Continue',
-                'onConfirmed' => 'walk_in',
-                'showCancelButton' => true,
-                'reverseButtons' => true,
-                'timer' => false,
-            ]);
-        }
+        // if ($encounter) {
+        //     $this->enccode = $encounter->enccode;
+        //     $this->alert('info', 'Active ' . $encounter->enctr_type() . ' encounter dated ' . date('F j, Y G:i A', strtotime($encounter->encdate)) . ' found!', [
+        //         'toast' => false,
+        //         'position' => 'center',
+        //         'showConfirmButton' => true,
+        //         'confirmButtonText' => $encounter->enctr_type(),
+        //         'onConfirmed' => 'view_enctr',
+        //         'showDenyButton' => true,
+        //         'denyButtonText' => 'Walk-in',
+        //         'onDenied' => 'walk_in',
+        //         'showCancelButton' => true,
+        //         'reverseButtons' => true,
+        //         'timer' => false,
+        //     ]);
+        // } else {
+        //     $this->alert('error', 'No active encounter found! Continue as walk in?', [
+        //         'toast' => false,
+        //         'position' => 'center',
+        //         'showConfirmButton' => true,
+        //         'confirmButtonText' => 'Continue',
+        //         'onConfirmed' => 'walk_in',
+        //         'showCancelButton' => true,
+        //         'reverseButtons' => true,
+        //         'timer' => false,
+        //     ]);
+        // }
     }
 
-    public function view_enctr()
+    public function view_enctr($code = null)
     {
-
+        if ($code) {
+            $this->enccode = $code;
+        }
         $enccode = Crypt::encrypt(str_replace(' ', '--', $this->enccode));
         return redirect()->route('dispensing.view.enctr', ['enccode' => $enccode]);
     }

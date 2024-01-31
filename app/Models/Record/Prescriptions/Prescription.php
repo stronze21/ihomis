@@ -21,7 +21,7 @@ class Prescription extends Model
 
     public function data()
     {
-        return $this->hasMany(PrescriptionData::class, 'presc_id', 'id');
+        return $this->hasMany(PrescriptionData::class, 'presc_id', 'id')->latest('updated_at');
     }
 
     public function data_active()

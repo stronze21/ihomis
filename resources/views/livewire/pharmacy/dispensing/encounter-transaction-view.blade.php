@@ -381,6 +381,9 @@
     <div class="modal">
         <div class="w-11/12 max-w-5xl modal-box">
             <h3 class="text-lg font-bold">Prescriptions</h3>
+            <div class="top-0 justify-end ml-auto">
+                <label for="prescription_lists" class="ml-auto btn btn-sm">Close</label>
+            </div>
             <table class="w-full rounded-lg shadow-md table-compact">
                 <thead class="sticky top-0 bg-gray-200 border-b">
                     <tr>
@@ -389,6 +392,7 @@
                         <td class="text-xs">QTY</td>
                         <td class="text-xs">Remarks</td>
                         <td class="text-xs">Prescribed by</td>
+                        <td class="text-xs">Status</td>
                         <td class="text-xs">Deactivate</td>
                     </tr>
                 </thead>
@@ -407,6 +411,13 @@
                                 <td class="text-xs">{{ $presc_all_data->qty }}</td>
                                 <td class="text-xs">{{ $presc_all_data->remark }}</td>
                                 <td class="text-xs">{{ $presc_all_data->employee->fullname() }}</td>
+                                <td class="text-xs">
+                                    @if ($presc_all_data->stat == 'A')
+                                        <div class="badge badge-primary">{{ $presc_all_data->stat }}</div>
+                                    @else
+                                        <div class="badge badge-error">{{ $presc_all_data->stat }}</div>
+                                    @endif
+                                </td>
                                 <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
                                         onclick="select_rx_item_inactive({{ $presc_all_data->id }}, '{{ $presc_all_data->dm->drug_concat() }}', '{{ $presc_all_data->qty }}', '{{ $presc_all->empid }}', '{{ $presc_all_data->dmdcomb }}', '{{ $presc_all_data->dmdctr }}')"><i
                                             class="las la-sliders-h"></i></button></td>
@@ -441,9 +452,6 @@
                     @endforeach
                 </tbody>
             </table>
-            <div class="justify-end modal-action">
-                <label for="prescription_lists" class="btn btn-sm">Close</label>
-            </div>
         </div>
     </div>
 </div>
