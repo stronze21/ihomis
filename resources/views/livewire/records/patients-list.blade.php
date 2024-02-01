@@ -82,7 +82,7 @@
                 <tbody>
                     @forelse ($patients as $patient)
                         <tr wire:key="select-patient-{{ $patient->hpercode }}-{{ $loop->iteration }}"
-                            wire:click.prefetch="select_patient('{{ $patient->hpercode }}')" style="cursor: pointer">
+                            wire:click="select_patient('{{ $patient->hpercode }}')" style="cursor: pointer">
                             <td>{{ $patient->hpercode }}</td>
                             <td>{{ $patient->fullname() }}</td>
                             <td>{{ $patient->patsex }}</td>
