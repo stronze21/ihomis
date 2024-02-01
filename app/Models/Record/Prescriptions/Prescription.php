@@ -21,12 +21,12 @@ class Prescription extends Model
 
     public function data()
     {
-        return $this->hasMany(PrescriptionData::class, 'presc_id', 'id')->latest('updated_at');
+        return $this->hasMany(PrescriptionData::class, 'presc_id', 'id')->with('dm')->with('employee')->latest('updated_at');
     }
 
     public function data_active()
     {
-        return $this->hasMany(PrescriptionData::class, 'presc_id', 'id')->with('dm')->where('stat', 'A');
+        return $this->hasMany(PrescriptionData::class, 'presc_id', 'id')->with('dm')->with('employee')->where('stat', 'A');
     }
 
     public function active_g24()

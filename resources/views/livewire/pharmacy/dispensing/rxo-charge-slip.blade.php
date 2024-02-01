@@ -37,7 +37,7 @@
                     </div>
 
                     <div>Ordering Physician: <span
-                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . ($rxo[0]->prescription_data ? $rxo[0]->prescription_data->employee->fullname() : '') . ' ' . ($rxo[0]->employee->provider ? $rxo[0]->employee->provider->clscode : '') : 'N/A' }}</span>
+                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . ($rxo[0]->prescription_data ? $rxo[0]->prescription_data->employee->fullname() : '') : 'N/A' }}</span>
                     </div>
                 </div>
             </div>
