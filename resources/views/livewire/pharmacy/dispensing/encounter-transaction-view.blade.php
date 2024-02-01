@@ -275,7 +275,7 @@
                                 $drug = implode('', $concat);
                             @endphp
                             <tr class="cursor-pointer hover content {{ $stock->chrgcode }}"
-                                onclick="select_item('{{ $stock->id }}', '{{ $drug }}', '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}')">
+                                onclick="select_item('{{ $stock->id }}', `{{ $drug }}`, '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}')">
                                 <td class="break-words">
                                     <div>
                                         <span class="text-xs text-slate-600">{{ $stock->chrgdesc }}</span>
@@ -335,7 +335,7 @@
                                         {{ date('h:i A', strtotime($presc_data->updated_at)) }}
                                     </td>
                                     <td class="text-xs cursor-pointer"
-                                        onclick="select_rx_item({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')">
+                                        onclick="select_rx_item({{ $presc_data->id }}, `{{ $presc_data->dm->drug_concat() }}`, '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')">
                                         {{ $presc_data->dm->drug_concat() }}</td>
                                     <td class="text-xs">{{ $presc_data->qty }}</td>
                                     <td class="text-xs">{{ $presc_data->remark }}</td>
@@ -360,7 +360,7 @@
                                         {{ date('h:i A', strtotime($extra_data->updated_at)) }}
                                     </td>
                                     <td class="text-xs cursor-pointer"
-                                        onclick="select_rx_item({{ $extra_data->id }}, '{{ $extra_data->dm->drug_concat() }}', '{{ $extra_data->qty }}', '{{ $extra->empid }}', '{{ $extra_data->dmdcomb }}', '{{ $extra_data->dmdctr }}')">
+                                        onclick="select_rx_item({{ $extra_data->id }}, `{{ $extra_data->dm->drug_concat() }}`, '{{ $extra_data->qty }}', '{{ $extra->empid }}', '{{ $extra_data->dmdcomb }}', '{{ $extra_data->dmdctr }}')">
                                         {{ $extra_data->dm->drug_concat() }}</td>
                                     <td class="text-xs">{{ $extra_data->qty }}</td>
                                     <td class="text-xs">{{ $extra_data->remark }}</td>
@@ -417,7 +417,7 @@
                                     @endif
                                 </td>
                                 <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
-                                        onclick="select_rx_item_inactive({{ $presc_all_data->id }}, '{{ $presc_all_data->dm->drug_concat() }}', '{{ $presc_all_data->qty }}', '{{ $presc_all->empid }}', '{{ $presc_all_data->dmdcomb }}', '{{ $presc_all_data->dmdctr }}')"><i
+                                        onclick="select_rx_item_inactive({{ $presc_all_data->id }}, `{{ $presc_all_data->dm->drug_concat() }}`, '{{ $presc_all_data->qty }}', '{{ $presc_all->empid }}', '{{ $presc_all_data->dmdcomb }}', '{{ $presc_all_data->dmdctr }}')"><i
                                             class="las la-sliders-h"></i></button></td>
                             </tr>
                         @empty
@@ -436,13 +436,13 @@
                                     {{ date('h:i A', strtotime($extra_all_data->updated_at)) }}
                                 </td>
                                 <td class="text-xs cursor-pointer"
-                                    onclick="select_rx_item({{ $extra_all_data->id }}, '{{ $extra_all_data->dm->drug_concat() }}', '{{ $extra_all_data->qty }}', '{{ $extra_all->empid }}', '{{ $extra_all_data->dmdcomb }}', '{{ $extra_all_data->dmdctr }}')">
+                                    onclick="select_rx_item({{ $extra_all_data->id }}, `{{ $extra_all_data->dm->drug_concat() }}`, '{{ $extra_all_data->qty }}', '{{ $extra_all->empid }}', '{{ $extra_all_data->dmdcomb }}', '{{ $extra_all_data->dmdctr }}')">
                                     {{ $extra_all_data->dm->drug_concat() }}</td>
                                 <td class="text-xs">{{ $extra_all_data->qty }}</td>
                                 <td class="text-xs">{{ $extra_all_data->remark }}</td>
                                 <td class="text-xs">{{ $extra_all->employee->fullname() }}</td>
                                 <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
-                                        onclick="select_rx_item_inactive({{ $extra_all_data->id }}, '{{ $extra_all_data->dm->drug_concat() }}', '{{ $extra_all_data->qty }}', '{{ $extra_all->empid }}', '{{ $extra_all_data->dmdcomb }}', '{{ $extra_all_data->dmdctr }}')"><i
+                                        onclick="select_rx_item_inactive({{ $extra_all_data->id }}, `{{ $extra_all_data->dm->drug_concat() }}`, '{{ $extra_all_data->qty }}', '{{ $extra_all->empid }}', '{{ $extra_all_data->dmdcomb }}', '{{ $extra_all_data->dmdctr }}')"><i
                                             class="las la-sliders-h"></i></button></td>
                             </tr>
                         @empty
