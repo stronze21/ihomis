@@ -94,4 +94,9 @@ class InOutTransaction extends Model
 
         return '<div class="flex justify-between">' . $status . " " . Carbon::parse($this->updated_at)->diffForHumans() . '</div>';
     }
+
+    public function items()
+    {
+        return $this->hasMany(InOutTransactionItem::class, 'iotrans_id', 'id');
+    }
 }

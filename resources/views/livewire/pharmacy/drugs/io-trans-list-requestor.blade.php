@@ -45,6 +45,7 @@
                     <th class="w-6/12">Item Requested</th>
                     <th class="w-1/12">Requested QTY</th>
                     <th class="w-1/12">Issued QTY</th>
+                    <th class="w-1/12">Fund Source</th>
                     <th class="w-1/12">Updated At</th>
                     <th>Actions</th>
                 </tr>
@@ -60,6 +61,11 @@
                         <td>{{ $tran->drug->drug_concat() }}</td>
                         <td>{{ number_format($tran->requested_qty) }}</td>
                         <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
+                        <td>@php
+                            if($tran->trans_stat == 'Issued' OR $tran->trans_stat == 'Received'){
+                                echo $tran->items->first()->charge->chrgdesc;
+                            }
+                        @endphp</td>
                         <td>{!! $tran->updated_at() !!}</td>
                         <td></td>
                     </tr>

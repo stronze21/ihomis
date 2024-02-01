@@ -67,7 +67,7 @@ class LogDrugOrderIssue implements ShouldQueue
                     $rx_data = $rxh->data_active()
                         ->where('dmdcomb', $this->dmdcomb)
                         ->where('dmdctr', $this->dmdctr)
-                        ->get();
+                        ->first();
                     if ($rx_data) {
                         PrescriptionDataIssued::create([
                             'presc_data_id' => $rx_data->id,
@@ -77,7 +77,7 @@ class LogDrugOrderIssue implements ShouldQueue
 
                         DB::update(
                             "UPDATE hospital.dbo.hrxo SET prescription_data_id = ?, prescribed_by = ? WHERE docointkey = ?",
-                            [$rx_data->id, $rx_header->empid, $this->docointkey]
+                            [$rx_data->id, $rx_data->entry_by, $this->docointkey]
                         );
 
                         $rx_data->stat = 'I';
