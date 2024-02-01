@@ -26,7 +26,7 @@ class IoTransListRequestor extends Component
     use WithPagination;
     use LivewireAlert;
 
-    protected $listeners = ['add_request', 'cancel_tx', 'receive_issued', 'refreshComponent' => '$refresh'];
+    protected $listeners = ['add_request', 'cancel_tx', 'receive_issued', 'refreshComponent' => '$refresh', 'add_more_request'];
 
     public $stock_id, $requested_qty, $remarks;
     public $selected_request, $chrgcode, $issue_qty = 0;
@@ -69,7 +69,7 @@ class IoTransListRequestor extends Component
             'remarks' => ['nullable', 'string'],
         ]);
 
-        $reference_no = $this->reference_no ?? Carbon::now()->format('y-m-') . (sprintf("%04d", InOutTransaction::groupBy('trans_no')->count() + 1));
+        $reference_no = Carbon::now()->format('y-m-') . (sprintf("%04d", InOutTransaction::groupBy('trans_no')->count() + 1));
 
         $io_tx = InOutTransaction::create([
             'trans_no' => $reference_no,
@@ -84,6 +84,43 @@ class IoTransListRequestor extends Component
         IoTransNewRequest::dispatch($warehouse, $io_tx);
         $warehouse->notify(new IoTranNotification($io_tx, session('user_id')));
 
+        $this->reset();
+        $this->alert('success', 'Request added!');
+    }
+
+    public function add_more_request()
+    {
+        $this->validate(['stock_id' => ['required', 'numeric']]);
+        $stock = DrugStock::find($this->stock_id);
+        $dmdcomb = $stock->dmdcomb;
+        $dmdctr = $stock->dmdctr;
+
+        $current_qty = DrugStock::whereRelation('location', 'description', 'LIKE', '%Warehouse%')
+            ->where('dmdcomb', $dmdcomb)->where('dmdctr', $dmdctr)
+            ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
+            ->groupBy('dmdcomb', 'dmdctr')->sum('stock_bal');
+
+        $this->validate([
+            'requested_qty' => ['required', 'numeric', 'min:1', 'max:' . $current_qty],
+            'remarks' => ['nullable', 'string'],
+        ]);
+
+        $reference_no = Carbon::now()->format('y-m-') . (sprintf("%04d", InOutTransaction::latest()->first()->trans_no));
+
+        $io_tx = InOutTransaction::create([
+            'trans_no' => $reference_no,
+            'dmdcomb' => $dmdcomb,
+            'dmdctr' => $dmdctr,
+            'requested_qty' => $this->requested_qty,
+            'requested_by' => session('user_id'),
+            'loc_code' => session('pharm_location_id'),
+        ]);
+
+        $warehouse = PharmLocation::find('1');
+        IoTransNewRequest::dispatch($warehouse, $io_tx);
+        $warehouse->notify(new IoTranNotification($io_tx, session('user_id')));
+
+        $this->reset();
         $this->alert('success', 'Request added!');
     }
 

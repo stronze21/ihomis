@@ -14,8 +14,9 @@
 <div class="flex flex-col p-5 mx-auto">
     <div class="flex justify-between">
         @can('request-drugs')
-            <div>
+            <div class="flex space-x-2">
                 <button class="btn btn-sm btn-primary" onclick="add_request()">Add Request</button>
+                <button class="btn btn-sm btn-secondary" onclick="add_more_request()">Add To Last Request</button>
             </div>
         @endcan
         {{-- <div>
@@ -124,6 +125,59 @@
                     @this.set('remarks', remarks.value);
 
                     Livewire.emit('add_request');
+                }
+            });
+        }
+
+        function add_more_request() {
+            Swal.fire({
+                html: `
+                    <span class="text-xl font-bold"> Request Drugs/Medicine </span>
+                    <div class="w-full form-control">
+                        <label class="label" for="more_stock_id">
+                            <span class="label-text">Drug/Medicine</span>
+                        </label>
+                        <select class="select select-bordered select2" id="more_stock_id">
+                            <option disabled selected>Choose drug/medicine</option>
+                            @foreach ($drugs as $drug)
+                                <option value="{{ $drug->id }}">{{ $drug->drug->drug_concat() }} - [avail QTY: {{ number_format($drug->avail) }}]</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="w-full form-control">
+                        <label class="label" for="more_requested_qty">
+                            <span class="label-text">Request QTY</span>
+                        </label>
+                        <input id="more_requested_qty" type="text" class="w-full input input-bordered" />
+                    </div>
+                    <div class="w-full form-control">
+                        <label class="label" for="more_remarks">
+                            <span class="label-text">Remarks</span>
+                        </label>
+                        <input id="more_remarks" type="text" class="w-full input input-bordered" />
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: `Save`,
+                didOpen: () => {
+                    const more_stock_id = Swal.getHtmlContainer().querySelector('#more_stock_id');
+                    const more_requested_qty = Swal.getHtmlContainer().querySelector('#more_requested_qty');
+                    const more_remarks = Swal.getHtmlContainer().querySelector('#more_remarks');
+
+                    $('.select2').select2({
+                        dropdownParent: $('.swal2-container'),
+                        width: 'resolve',
+                        dropdownCssClass: "text-sm",
+                    });
+
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    @this.set('stock_id', more_stock_id.value);
+                    @this.set('requested_qty', more_requested_qty.value);
+                    @this.set('remarks', more_remarks.value);
+
+                    Livewire.emit('add_more_request');
                 }
             });
         }
