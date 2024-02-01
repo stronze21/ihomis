@@ -404,7 +404,7 @@
                                     {{ date('h:i A', strtotime($presc_all_data->updated_at)) }}
                                 </td>
                                 <td class="text-xs cursor-pointer"
-                                    onclick="select_rx_item({{ $presc_all_data->id }}, '{{ $presc_all_data->dm->drug_concat() }}', '{{ $presc_all_data->qty }}', '{{ $presc_all->empid }}', '{{ $presc_all_data->dmdcomb }}', '{{ $presc_all_data->dmdctr }}')">
+                                    onclick="select_rx_item({{ $presc_all_data->id }}, `{{ $presc_all_data->dm->drug_concat() }}`, '{{ $presc_all_data->qty }}', '{{ $presc_all->empid }}', '{{ $presc_all_data->dmdcomb }}', '{{ $presc_all_data->dmdctr }}')">
                                     {{ $presc_all_data->dm->drug_concat() }}</td>
                                 <td class="text-xs">{{ $presc_all_data->qty }}</td>
                                 <td class="text-xs">{{ $presc_all_data->remark }}</td>
