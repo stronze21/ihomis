@@ -34,7 +34,7 @@ class EncounterTransactionView extends Component
     protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'add_prescribed_item', 'delete_item', 'deactivate_rx'];
 
     public $generic, $charge_code = [];
-    public $enccode, $location_id, $hpercode, $toecode;
+    public $enccode, $location_id, $hpercode, $toecode, $mssikey;
 
     public $order_qty, $unit_price, $return_qty, $docointkey;
     public $item_id;
@@ -44,7 +44,7 @@ class EncounterTransactionView extends Component
     public $remarks;
 
     public $charges;
-    protected $encounter;
+    protected $encounter = [];
 
     public $selected_items = [];
     public $marked_items = false;
@@ -84,7 +84,6 @@ class EncounterTransactionView extends Component
                                 ORDER BY drug_concat", [$this->location_id, $this->generic . '%']);
 
         $this->dispatchBrowserEvent('issued');
-
         $encounter = $this->encounter;
 
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', compact(
@@ -93,6 +92,7 @@ class EncounterTransactionView extends Component
             'encounter',
         ));
     }
+
 
     public function mount($enccode)
     {
@@ -106,7 +106,7 @@ class EncounterTransactionView extends Component
         //     ->with('patient')->with('rxo')->with('active_prescription')->with('adm')->first();
 
         // $this->encounter = EncounterLog::where('enccode', $enccode)->first();
-        $this->encounter = collect(DB::select('SELECT TOP 1 enctr.hpercode, enctr.toecode, enctr.enccode, enctr.encdate, diag.diagtext, pat.patlast, pat.patfirst, pat.patmiddle,
+        $encounter = collect(DB::select('SELECT TOP 1 enctr.hpercode, enctr.toecode, enctr.enccode, enctr.encdate, diag.diagtext, pat.patlast, pat.patfirst, pat.patmiddle,
                                                 mss.mssikey, ward.wardname, room.rmname
                                 FROM henctr as enctr
                                 LEFT JOIN hencdiag as diag ON enctr.enccode = diag.enccode
@@ -118,7 +118,7 @@ class EncounterTransactionView extends Component
                                 WHERE enctr.enccode = ?
                                 ORDER BY patroom.hprdate DESC
                                 ', [$enccode]))->first();
-        // dd($this->encounter);
+// dd($this->encounter);
         // $this->mss = PatientMss::where('enccode', $enccode)->first();
         // $this->patient = Patient::find($this->encounter->hpercode);
         // $this->active_prescription = collect(DB::select('SELECT data.id, data.qty, data.remarks, data.empid, data.dmdcomb, data.dmdctr, drug.drug_concat, data.updated_at
@@ -130,8 +130,8 @@ class EncounterTransactionView extends Component
         // dd($this->active_prescription);
         $this->active_prescription = Prescription::where('enccode', $enccode)->with('data_active')->has('data_active')->get();
         $this->active_prescription_all = Prescription::where('enccode', $enccode)->with('data')->get();
-        if ($this->encounter->toecode == 'ADM') {
-            $past_log = EncounterLog::where('hpercode', $this->encounter->hpercode)
+        if ($encounter->toecode == 'ADM') {
+            $past_log = EncounterLog::where('hpercode', $encounter->hpercode)
                 ->where(function ($query) {
                     $query->where('toecode', 'ERADM')
                         ->orWhere('toecode', 'OPDAD');
@@ -150,9 +150,11 @@ class EncounterTransactionView extends Component
         // }
 
         if (!$this->hpercode) {
-            $this->hpercode = $this->encounter->hpercode;
-            $this->toecode = $this->encounter->toecode;
+            $this->hpercode = $encounter->hpercode;
+            $this->toecode = $encounter->toecode;
         }
+        $this->mssikey = $encounter->mssikey;
+        $this->encounter = $encounter;
 
         if (!$this->charges) {
             $this->charges = ChargeCode::where('bentypcod', 'DRUME')
@@ -196,9 +198,8 @@ class EncounterTransactionView extends Component
                     ->orWhere('pchrgup', 0);
             })
             ->get();
-        if ($this->encounter->toecode == 'ADM' or $this->encounter->toecode == 'OPDAD' or $this->encounter->toecode == 'ERADM') {
-            if ($this->encounter) {
-                switch ($this->encounter->mssikey) {
+        if ($this->toecode == 'ADM' or $this->toecode == 'OPDAD' or $this->toecode == 'ERADM') {
+                switch ($this->mssikey) {
                     case 'MSSA11111999':
                     case 'MSSB11111999':
                         $this->type = 'pay';
@@ -224,13 +225,11 @@ class EncounterTransactionView extends Component
                     default:
                         $this->type = 'service';
                 }
-            } else {
                 if ($this->bnb) {
                     $this->type = 'pay';
                 } else {
                     $this->type = 'service';
                 }
-            }
         } else {
             if ($this->ems) {
                 $this->type = 'ems';
@@ -349,6 +348,7 @@ class EncounterTransactionView extends Component
 
     public function add_item($dmdcomb, $dmdctr, $chrgcode, $loc_code, $dmdprdte, $id, $available, $exp_date)
     {
+// dd($this->encounter);
         $with_rx = false;
         if ($dmdcomb == $this->rx_dmdcomb and $dmdctr == $this->rx_dmdctr) {
             $with_rx = true;
@@ -358,39 +358,36 @@ class EncounterTransactionView extends Component
 
         $total_deduct = $this->order_qty;
 
-        if ($this->encounter->toecode == 'ADM' or $this->encounter->toecode == 'OPDAD' or $this->encounter->toecode == 'ERADM') {
-            if ($this->encounter) {
-                switch ($this->encounter->mssikey) {
-                    case 'MSSA11111999':
-                    case 'MSSB11111999':
-                        $this->type = 'pay';
-                        break;
-
-                    case 'MSSC111111999':
-                        $class = 'PP1';
-                        break;
-
-                    case 'MSSC211111999':
-                        $class = 'PP2';
-                        break;
-
-                    case 'MSSC311111999':
-                        $class = 'PP3';
-                        break;
-
-                    case 'MSSD11111999':
-                        $this->type = 'service';
-                        break;
-
-                    default:
-                        $this->type = 'service';
-                }
-            } else {
-                if ($this->bnb) {
+        if ($this->toecode == 'ADM' or $this->toecode == 'OPDAD' or $this->toecode == 'ERADM') {
+            switch ($this->mssikey) {
+                case 'MSSA11111999':
+                case 'MSSB11111999':
                     $this->type = 'pay';
-                } else {
+                    break;
+
+                case 'MSSC111111999':
+                    $class = 'PP1';
+                    break;
+
+                case 'MSSC211111999':
+                    $class = 'PP2';
+                    break;
+
+                case 'MSSC311111999':
+                    $class = 'PP3';
+                    break;
+
+                case 'MSSD11111999':
                     $this->type = 'service';
-                }
+                    break;
+
+                default:
+                    $this->type = 'service';
+            }
+            if ($this->bnb) {
+                $this->type = 'pay';
+            } else {
+                $this->type = 'service';
             }
         } else {
             if ($this->ems) {
