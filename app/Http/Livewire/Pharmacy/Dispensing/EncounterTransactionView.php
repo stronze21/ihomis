@@ -57,6 +57,12 @@ class EncounterTransactionView extends Component
     public $rx_charge_code;
 
     public $patient_room, $wardname, $rmname;
+    public $code ;
+    public $encdate;
+    public $diagtext;
+    public $patlast;
+    public $patfirst;
+    public $patmiddle;
 
     public $rx_id, $rx_dmdcomb, $rx_dmdctr, $empid, $mss;
 
@@ -118,6 +124,7 @@ class EncounterTransactionView extends Component
                                 WHERE enctr.enccode = ?
                                 ORDER BY patroom.hprdate DESC
                                 ', [$enccode]))->first();
+
 // dd($this->encounter);
         // $this->mss = PatientMss::where('enccode', $enccode)->first();
         // $this->patient = Patient::find($this->encounter->hpercode);
@@ -155,7 +162,14 @@ class EncounterTransactionView extends Component
         }
         $this->mssikey = $encounter->mssikey;
         $this->encounter = $encounter;
-
+        $this->code  = $encounter->enccode;
+        $this->encdate = $encounter->encdate;
+        $this->diagtext = $encounter->diagtext;
+        $this->patlast = $encounter->patlast;
+        $this->patfirst = $encounter->patfirst;
+        $this->patmiddle = $encounter->patmiddle;
+        $this->wardname = $encounter->wardname;
+        $this->rmname = $encounter->rmname;
         if (!$this->charges) {
             $this->charges = ChargeCode::where('bentypcod', 'DRUME')
                 ->where('chrgstat', 'A')

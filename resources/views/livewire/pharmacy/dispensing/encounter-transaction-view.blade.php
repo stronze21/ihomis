@@ -8,7 +8,7 @@
                 <i class="mr-1 las la-truck la-lg"></i> Drugs and Medicine Dispensing
             </li>
             <li>
-                <i class="mr-1 las la-file-prescription la-lg"></i> {{ $encounter->enccode }}
+                <i class="mr-1 las la-file-prescription la-lg"></i> {{ $code }}
             </li>
         </ul>
     </div>
@@ -50,39 +50,39 @@
                     <thead class="sticky font-bold bg-gray-200" wire:ignore>
                         <tr>
                             <td colspan="4" class="w-1/3 border border-black"><span>Hospital #: </span> <span
-                                    class="fw-bold">{{ $encounter->hpercode }}</span></td>
+                                    class="fw-bold">{{ $hpercode }}</span></td>
                             <td colspan="7" class="w-2/3 border border-black">
                                 <span>Diagnosis: </span>
                                 <div class="text-xs font-light">
                                     {{-- <p class="break-words">{{ $encounter->diag->diagtext ?? 'N/A' }}</p> --}}
-                                    <p class="break-words">{{ $encounter->diagtext ?? 'N/A' }}</p>
+                                    <p class="break-words">{{ $diagtext ?? 'N/A' }}</p>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td colspan="3" class="w-1/3 border border-black"><span>Last Name: </span> <span
-                                    class="fw-bold">{{ $encounter->patlast }}</span></td>
+                                    class="fw-bold">{{ $patlast }}</span></td>
                             <td colspan="5" class="w-1/3 border border-black"><span>First Name: </span> <span
-                                    class="fw-bold">{{ $encounter->patfirst }}</span></td>
+                                    class="fw-bold">{{ $patfirst }}</span></td>
                             <td colspan="3" class="w-1/3 border border-black"><span>Middle Name: </span> <span
-                                    class="fw-bold">{{ $encounter->patmiddle }}</span></td>
+                                    class="fw-bold">{{ $patmiddle }}</span></td>
                         </tr>
                         <tr>
                             <td colspan="5" class="w-1/3 border border-black">
                                 <span class="fw-bold">
                                     <div class="flex space-x-2">
                                         <span>Room/Encounter Type: </span>
-                                        @if ($encounter->toecode == 'ADM' or $encounter->toecode == 'OPDAD' or $encounter->toecode == 'ERADM')
-                                            <div> {{ $encounter->wardname }}</div>
-                                            <div class="text-sm">{{ $encounter->rmname }} /
+                                        @if ($toecode == 'ADM' or $toecode == 'OPDAD' or $toecode == 'ERADM')
+                                            <div> {{ $wardname }}</div>
+                                            <div class="text-sm">{{ $rmname }} /
                                             </div>
                                         @endif
-                                        {{ $encounter->toecode }}
+                                        {{ $toecode }}
                                     </div>
                                 </span>
                             </td>
                             <td colspan="6" class="border border-black"><span>Encounter Date/Time: </span> <span
-                                    class="fw-bold">{{ \Carbon\Carbon::create($encounter->encdate)->format('F j, Y / g:i A') }}</span>
+                                    class="fw-bold">{{ \Carbon\Carbon::create($encdate)->format('F j, Y / g:i A') }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -90,7 +90,7 @@
                                 @php
                                     $class = '---';
                                     // if ($mss) {
-                                    switch ($encounter->mssikey) {
+                                    switch ($mssikey) {
                                         case 'MSSA11111999':
                                         case 'MSSB11111999':
                                             $class = 'Pay';
@@ -639,7 +639,7 @@
         // }
 
 
-        @if ($encounter->toecode == 'OPD')
+        @if ($toecode == 'OPD')
             function issue_order() {
                 Swal.fire({
                     title: 'Are you sure?',

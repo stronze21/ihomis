@@ -23,7 +23,7 @@
                 </div>
                 <div class="flex flex-col text-left whitespace-nowrap">
                     <div>Dep't./Section: <span class="font-semibold">
-                            {{ $rxo[0]->prescription_data ? $rxo[0]->prescription_data->employee->dept->deptname : '' }}</span>
+                            {{ $rxo[0]->prescription_data ? ($rxo[0]->prescription_data->employee->dept ? $rxo[0]->prescription_data->employee->dept->deptname : '') : '' }}</span>
                     </div>
                     <div>Date/Time: <span
                             class="font-semibold">{{ date('F j, Y h:i A', strtotime($rxo_header->dodate)) }}</span>
@@ -94,7 +94,7 @@
                 </tfoot>
             </table>
             <div class="flex flex-col py-0 my-0 text-left text-xs/4 whitespace-nowrap">
-                <div>Issued by: {{ $rxo_header->employee ? $rxo_header->employee->fullname() : $rxo_header->entry_by }}
+                <div>Issued by: {{ $rxo_header->employee ? $rxo_header->employee->fullname() : $rxo_header->entry_by }}{{ $rxo_header->entry_by }}
                 </div>
                 <div><span>Time: {{ \Carbon\Carbon::create($rxo_header->dodate)->format('h:i A') }}</span></div>
                 <div><span>Verified by Nurse/N.A.: _________________________</span></div>
