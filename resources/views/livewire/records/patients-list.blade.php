@@ -93,13 +93,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6">No record found</td>
+                            <td colspan="7">No record found</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
             <div class="mt-2">
-                {{ $patients->links() }}
+                {{-- {{ $patients->links() }} --}}
             </div>
         </div>
         <div class="w-1/5 mt-10 overflow-x-hidden overflow-y-auto max-h-96">

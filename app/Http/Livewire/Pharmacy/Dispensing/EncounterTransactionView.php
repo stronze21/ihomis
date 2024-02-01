@@ -105,8 +105,8 @@ class EncounterTransactionView extends Component
         $this->encounter = EncounterLog::where('enccode', $enccode)->first();
         $this->mss = PatientMss::where('enccode', $enccode)->first();
         $this->patient = Patient::find($this->encounter->hpercode);
-        $this->active_prescription = Prescription::where('enccode', $enccode)->with('employee')->with('data_active')->has('data_active')->get();
-        $this->active_prescription_all = Prescription::where('enccode', $enccode)->get();
+        $this->active_prescription = Prescription::where('enccode', $enccode)->with('data_active')->has('data_active')->get();
+        $this->active_prescription_all = Prescription::where('enccode', $enccode)->with('data')->get();
         if ($this->encounter->toecode == 'ADM') {
             $past_log = EncounterLog::where('hpercode', $this->encounter->hpercode)
                 ->where(function ($query) {
@@ -116,8 +116,8 @@ class EncounterTransactionView extends Component
                 ->latest('encdate')
                 ->first();
             if ($past_log) {
-                $this->extra_prescriptions = Prescription::where('enccode', $past_log->enccode)->with('employee')->with('data_active')->has('data_active')->get();
-                $this->extra_prescriptions_all = Prescription::where('enccode', $past_log->enccode)->get();
+                $this->extra_prescriptions = Prescription::where('enccode', $past_log->enccode)->with('data_active')->has('data_active')->get();
+                $this->extra_prescriptions_all = Prescription::where('enccode', $past_log->enccode)->with('data')->get();
             }
         }
         $patient_room = PatientRoom::where('enccode', $enccode)->latest('hprdate')->first();

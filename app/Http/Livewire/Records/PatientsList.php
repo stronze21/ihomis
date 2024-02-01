@@ -75,7 +75,7 @@ class PatientsList extends Component
         $patients = $patients->orderBy('patlast');
 
         return view('livewire.records.patients-list', [
-            'patients' => $patients->paginate(15),
+            'patients' => $patients->take(10)->get(),
         ]);
     }
 
