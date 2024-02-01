@@ -44,7 +44,7 @@ class EncounterTransactionView extends Component
     public $remarks;
 
     public $charges;
-    public $encounter;
+    protected $encounter;
 
     public $selected_items = [];
     public $marked_items = false;
@@ -85,9 +85,12 @@ class EncounterTransactionView extends Component
 
         $this->dispatchBrowserEvent('issued');
 
+        $encounter = $this->encounter;
+
         return view('livewire.pharmacy.dispensing.encounter-transaction-view', compact(
             'rxos',
             'stocks',
+            'encounter',
         ));
     }
 
@@ -102,9 +105,29 @@ class EncounterTransactionView extends Component
         // $this->encounter = EncounterLog::where('enccode', $enccode)
         //     ->with('patient')->with('rxo')->with('active_prescription')->with('adm')->first();
 
-        $this->encounter = EncounterLog::where('enccode', $enccode)->first();
-        $this->mss = PatientMss::where('enccode', $enccode)->first();
-        $this->patient = Patient::find($this->encounter->hpercode);
+        // $this->encounter = EncounterLog::where('enccode', $enccode)->first();
+        $this->encounter = collect(DB::select('SELECT TOP 1 enctr.hpercode, enctr.toecode, enctr.enccode, enctr.encdate, diag.diagtext, pat.patlast, pat.patfirst, pat.patmiddle,
+                                                mss.mssikey, ward.wardname, room.rmname
+                                FROM henctr as enctr
+                                LEFT JOIN hencdiag as diag ON enctr.enccode = diag.enccode
+                                INNER JOIN hperson as pat ON enctr.hpercode = pat.hpercode
+                                LEFT JOIN hpatmss as mss ON enctr.enccode = mss.enccode
+                                LEFT JOIN hpatroom as patroom ON enctr.enccode = patroom.enccode
+                                LEFT JOIN hward as ward ON patroom.wardcode = ward.wardcode
+                                LEFT JOIN hroom as room ON patroom.rmintkey = room.rmintkey
+                                WHERE enctr.enccode = ?
+                                ORDER BY patroom.hprdate DESC
+                                ', [$enccode]))->first();
+        // dd($this->encounter);
+        // $this->mss = PatientMss::where('enccode', $enccode)->first();
+        // $this->patient = Patient::find($this->encounter->hpercode);
+        // $this->active_prescription = collect(DB::select('SELECT data.id, data.qty, data.remarks, data.empid, data.dmdcomb, data.dmdctr, drug.drug_concat, data.updated_at
+        //                                     FROM webapp.prescription as presc
+        //                                     INNER JOIN webapp.prescription_data as data ON presc.id = data.presc_id
+        //                                     INNER JOIN hospital.hdmhdr as drug ON presc.dmdcomb = data.dmdcomb AND presc.dmdctr = data.dmdctr
+        //                                     WHERE presc.enccode = ? AND data.stat = ?
+        //                                 '), [$enccode, 'A'])->all();
+        // dd($this->active_prescription);
         $this->active_prescription = Prescription::where('enccode', $enccode)->with('data_active')->has('data_active')->get();
         $this->active_prescription_all = Prescription::where('enccode', $enccode)->with('data')->get();
         if ($this->encounter->toecode == 'ADM') {
@@ -120,11 +143,11 @@ class EncounterTransactionView extends Component
                 $this->extra_prescriptions_all = Prescription::where('enccode', $past_log->enccode)->with('data')->get();
             }
         }
-        $patient_room = PatientRoom::where('enccode', $enccode)->latest('hprdate')->first();
-        if ($patient_room) {
-            $this->wardname = Ward::select('wardname')->where('wardcode', $patient_room->wardcode)->first();
-            $this->rmname = Room::select('rmname')->where('rmintkey', $patient_room->rmintkey)->first();
-        }
+        // $patient_room = PatientRoom::where('enccode', $enccode)->latest('hprdate')->first();
+        // if ($patient_room) {
+        //     $this->wardname = Ward::select('wardname')->where('wardcode', $patient_room->wardcode)->first();
+        //     $this->rmname = Room::select('rmname')->where('rmintkey', $patient_room->rmintkey)->first();
+        // }
 
         if (!$this->hpercode) {
             $this->hpercode = $this->encounter->hpercode;
@@ -174,8 +197,8 @@ class EncounterTransactionView extends Component
             })
             ->get();
         if ($this->encounter->toecode == 'ADM' or $this->encounter->toecode == 'OPDAD' or $this->encounter->toecode == 'ERADM') {
-            if ($this->mss) {
-                switch ($this->mss->mssikey) {
+            if ($this->encounter) {
+                switch ($this->encounter->mssikey) {
                     case 'MSSA11111999':
                     case 'MSSB11111999':
                         $this->type = 'pay';
@@ -336,8 +359,8 @@ class EncounterTransactionView extends Component
         $total_deduct = $this->order_qty;
 
         if ($this->encounter->toecode == 'ADM' or $this->encounter->toecode == 'OPDAD' or $this->encounter->toecode == 'ERADM') {
-            if ($this->mss) {
-                switch ($this->mss->mssikey) {
+            if ($this->encounter) {
+                switch ($this->encounter->mssikey) {
                     case 'MSSA11111999':
                     case 'MSSB11111999':
                         $this->type = 'pay';

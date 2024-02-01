@@ -50,21 +50,22 @@
                     <thead class="sticky font-bold bg-gray-200" wire:ignore>
                         <tr>
                             <td colspan="4" class="w-1/3 border border-black"><span>Hospital #: </span> <span
-                                    class="fw-bold">{{ $patient->hpercode ?? $patient->id }}</span></td>
+                                    class="fw-bold">{{ $encounter->hpercode }}</span></td>
                             <td colspan="7" class="w-2/3 border border-black">
                                 <span>Diagnosis: </span>
                                 <div class="text-xs font-light">
-                                    <p class="break-words">{{ $encounter->diag->diagtext ?? 'N/A' }}</p>
+                                    {{-- <p class="break-words">{{ $encounter->diag->diagtext ?? 'N/A' }}</p> --}}
+                                    <p class="break-words">{{ $encounter->diagtext ?? 'N/A' }}</p>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td colspan="3" class="w-1/3 border border-black"><span>Last Name: </span> <span
-                                    class="fw-bold">{{ $patient->patlast }}</span></td>
+                                    class="fw-bold">{{ $encounter->patlast }}</span></td>
                             <td colspan="5" class="w-1/3 border border-black"><span>First Name: </span> <span
-                                    class="fw-bold">{{ $patient->patfirst }}</span></td>
+                                    class="fw-bold">{{ $encounter->patfirst }}</span></td>
                             <td colspan="3" class="w-1/3 border border-black"><span>Middle Name: </span> <span
-                                    class="fw-bold">{{ $patient->patmiddle }}</span></td>
+                                    class="fw-bold">{{ $encounter->patmiddle }}</span></td>
                         </tr>
                         <tr>
                             <td colspan="5" class="w-1/3 border border-black">
@@ -72,8 +73,8 @@
                                     <div class="flex space-x-2">
                                         <span>Room/Encounter Type: </span>
                                         @if ($encounter->toecode == 'ADM' or $encounter->toecode == 'OPDAD' or $encounter->toecode == 'ERADM')
-                                            <div> {{ $wardname ? $wardname->wardname : '' }}</div>
-                                            <div class="text-sm">{{ $rmname ? $rmname->rmname : '' }} /
+                                            <div> {{ $encounter->wardname }}</div>
+                                            <div class="text-sm">{{ $encounter->rmname }} /
                                             </div>
                                         @endif
                                         {{ $encounter->toecode }}
@@ -88,33 +89,33 @@
                             <td colspan="11" class="border border-black">Patient Classification:
                                 @php
                                     $class = '---';
-                                    if ($mss) {
-                                        switch ($mss->mssikey) {
-                                            case 'MSSA11111999':
-                                            case 'MSSB11111999':
-                                                $class = 'Pay';
-                                                break;
+                                    // if ($mss) {
+                                    switch ($encounter->mssikey) {
+                                        case 'MSSA11111999':
+                                        case 'MSSB11111999':
+                                            $class = 'Pay';
+                                            break;
 
-                                            case 'MSSC111111999':
-                                                $class = 'PP1';
-                                                break;
+                                        case 'MSSC111111999':
+                                            $class = 'PP1';
+                                            break;
 
-                                            case 'MSSC211111999':
-                                                $class = 'PP2';
-                                                break;
+                                        case 'MSSC211111999':
+                                            $class = 'PP2';
+                                            break;
 
-                                            case 'MSSC311111999':
-                                                $class = 'PP3';
-                                                break;
+                                        case 'MSSC311111999':
+                                            $class = 'PP3';
+                                            break;
 
-                                            case 'MSSD11111999':
-                                                $class = 'Indigent';
-                                                break;
+                                        case 'MSSD11111999':
+                                            $class = 'Indigent';
+                                            break;
 
-                                            default:
-                                                $class = '---';
-                                        }
+                                        default:
+                                            $class = '---';
                                     }
+                                    // }
                                 @endphp
                                 <span class="uppercase">{{ $class }}</span>
                             </td>
@@ -326,10 +327,27 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white">
+
+                        {{-- @foreach ($active_prescription as $presc)
+                            <tr class="hover" wire:key="select-rx-item-{{ $loop->iteration }}">
+                                <td class="text-xs">
+                                    {{ date('Y-m-d', strtotime($presc->updated_at)) }}
+                                    {{ date('h:i A', strtotime($presc->updated_at)) }}
+                                </td>
+                                <td class="text-xs cursor-pointer"
+                                    onclick="select_rx_item({{ $presc->id }}, `{{ $presc->drug_concat }}`, '{{ $presc->qty }}', '{{ $presc->empid }}', '{{ $presc->dmdcomb }}', '{{ $presc->dmdctr }}')">
+                                    {{ $presc->drug_concat }}</td>
+                                <td class="text-xs">{{ $presc->qty }}</td>
+                                <td class="text-xs">{{ $presc->remark }}</td>
+                                <td class="text-xs">{{ $presc->employee->fullname() }}</td>
+                                <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
+                                        onclick="select_rx_item_inactive({{ $presc->id }}, '{{ $presc->drug_concat }}', '{{ $presc->qty }}', '{{ $presc->empid }}', '{{ $presc->dmdcomb }}', '{{ $presc->dmdctr }}')"><i
+                                            class="las la-sliders-h"></i></button></td>
+                            </tr>
+                        @endforeach --}}
                         @forelse($active_prescription as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
-                                <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $presc_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $presc_data->dm->generic->gendesc }})" --}} {{-- ondblclick="select_rx_item_inactive({{ $presc_data->id }}, '{{ $presc_data->dm->drug_concat() }}', '{{ $presc_data->qty }}', '{{ $presc->empid }}', '{{ $presc_data->dmdcomb }}', '{{ $presc_data->dmdctr }}')" --}}
-                                    wire:key="select-rx-item-{{ $loop->iteration }}">
+                                <tr class="hover" wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
                                         {{ date('Y-m-d', strtotime($presc_data->updated_at)) }}
                                         {{ date('h:i A', strtotime($presc_data->updated_at)) }}
