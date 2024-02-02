@@ -25,6 +25,11 @@
                             <i class="mr-1 las la-lg la-file-prescription"></i> {{ __('Prescriptions') }}
                         </x-jet-nav-link>
                     @endcan
+                    @can('view-prescriptions')
+                        <x-jet-nav-link class="ml-2" href="{{ route('dispensing.rxo.pending') }}" :active="request()->routeIs('dispensing.rxo.pending')">
+                            <i class="mr-1 las la-lg la-pause-circle"></i> {{ __('Pending Orders') }}
+                        </x-jet-nav-link>
+                    @endcan
                     @can('view-stocks')
                         <x-jet-nav-link class="ml-2" href="{{ route('dmd.stk') }}" :active="request()->routeIs('dmd.stk')">
                             <i class="mr-1 las la-lg la-pills"></i> {{ __('Stocks') }}

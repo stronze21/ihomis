@@ -109,26 +109,27 @@
                     <button class="btn btn-xs btn-error" wire:click="walk_in()">Continue as WALK IN</button>
                 @endif
             </div>
-            <table class="table w-full table-fixed table-sm table-hover table-bordered table-compact">
+            <table class="w-full p-1 text-xs rounded-lg bg-base-100">
                 <thead class="sticky top-0 border-b ">
                     <tr>
                         <th>Type</th>
                         <th class="text-end">Admission Date/Time</th>
-                        <th class="text-end">Status</th>
+                        {{-- <th class="text-end">Status</th> --}}
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($enc_list as $enc)
-                        <tr class="{{ $enc->encstat != 'A' ? 'table-light' : 'table-success' }}"
+                        <tr class="{{ $enc->encstat != 'A' ? 'bg-red-100 hover:bg-red-300' : 'bg-green-100 hover:bg-green-300' }} border hover"
                             wire:click="view_enctr('{{ $enc->enccode }}')" wire:key="view_enctr-{{ $enc->enccode }}"
                             style="cursor: pointer">
                             <td>{{ $enc->toecode ?? '' }}</td>
                             {{-- <td>{{$enc->enclock ?? ''}}</td> --}}
                             <td class="text-end">
-                                {!! $enc->diagtext ?? 'No Diagnosis' !!} <br>
-                                <small class="text-muted">{{ date('F j, Y H:i a', strtotime($enc->encdate)) }}</small>
+                                <small class="text-end">{!! $enc->diagtext ?? 'No Diagnosis' !!}</small> <br>
+                                <small
+                                    class="text-muted text-end">{{ date('F j, Y H:i a', strtotime($enc->encdate)) }}</small>
                             </td>
-                            <td class="text-end">{{ $enc->encstat == 'A' ? 'Active' : 'Inactive' }}</td>
+                            {{-- <td class="text-end">{{ $enc->encstat == 'A' ? 'Active' : 'Inactive' }}</td> --}}
                         </tr>
                     @empty
                         <tr>

@@ -90,12 +90,18 @@ class PatientsList extends Component
         //     ->latest('encdate')
         //     ->first();
 
-        $this->enc_list = EncounterLog::where('hpercode', $hpercode)
-            ->where('toecode', '<>', 'WALKN')
-            ->where('toecode', '<>', '32')
-            ->where('enclock', 'N')
-            ->latest('encdate')
-            ->get();
+        // $this->enc_list = EncounterLog::where('hpercode', $hpercode)
+        //     ->where('toecode', '<>', 'WALKN')
+        //     ->where('toecode', '<>', '32')
+        //     ->where('enclock', 'N')
+        //     ->latest('encdate')
+        //     ->get();
+
+        $this->enc_list = DB::select("SELECT enctr.enccode, enctr.encstat, enctr.toecode, diag.diagtext, enctr.encdate
+                                    FROM henctr enctr
+                                    LEFT JOIN hencdiag diag ON enctr.enccode = diag.enccode
+                                    WHERE enctr.toecode <> 'WALKN' AND enctr.toecode <> '32' AND enctr.enclock = 'N' AND enctr.hpercode = ?
+                                ", [$hpercode]);
 
         $this->hpercode = $hpercode;
         // if ($encounter) {

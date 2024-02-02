@@ -31,6 +31,7 @@ use App\Http\Livewire\Pharmacy\Reports\IoTransIssuedReport;
 use App\Http\Livewire\Pharmacy\Reports\IoTransReceivedReport;
 use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedDepartments;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
+use App\Http\Livewire\Pharmacy\Dispensing\PendingOrders;
 use App\Http\Livewire\Pharmacy\Drugs\StockPullOutList;
 use App\Http\Livewire\Pharmacy\References\PndfGenerics;
 use App\Http\Livewire\Pharmacy\Reports\DailyStockCard;
@@ -85,6 +86,7 @@ Route::middleware([
     Route::name('dispensing.')->prefix('dispensing')->group(function () {
         Route::get('/encounter/trans/{enccode}', EncounterTransactionView::class)->name('view.enctr');
         Route::get('/encounter/charge/{pcchrgcod}', RxoChargeSlip::class)->name('rxo.chargeslip');
+        Route::get('/pending-orders', PendingOrders::class)->name('rxo.pending');
     });
 
     Route::name('delivery.')->prefix('delivery')->group(function () {
