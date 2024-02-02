@@ -161,7 +161,7 @@
                                     <input type="checkbox"
                                         class="checkbox{{ '-' . ($rxo->pcchrgcod ?? 'blank') }}{{ date('mdY', strtotime($rxo->dodate)) }}"
                                         wire:model.defer="selected_items" wire:key="item-{{ $rxo->docointkey }}"
-                                        value="{{ $rxo->docointkey }}" />
+                                        name="docointkey" value="{{ $rxo->docointkey }}" />
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">
                                     <div class="flex flex-col align-center">
@@ -475,13 +475,14 @@
     <script>
         $('input:checkbox').change(function() {
             if ($(this).is(':checked')) {
-                var all_checkbox = $('.' + this.className);
-                if (all_checkbox.length > 1) {
-                    for (a = 1; a < all_checkbox.length; a++) {
-                        all_checkbox[a].click();
-                    }
-                }
-
+                $('.' + this.className).prop('checked', true);
+                var myArray = []
+                var value = ''
+                $('input[name="docointkey"]:checked').each(function() {
+                    value = $(this).val();
+                    myArray.push(value)
+                })
+                @this.set('selected_items', myArray);
             }
         });
         document.addEventListener('keydown', e => {

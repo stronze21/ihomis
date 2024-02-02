@@ -57,7 +57,7 @@ class EncounterTransactionView extends Component
     public $rx_charge_code;
 
     public $patient_room, $wardname, $rmname;
-    public $code ;
+    public $code;
     public $encdate;
     public $diagtext;
     public $patlast;
@@ -125,7 +125,7 @@ class EncounterTransactionView extends Component
                                 ORDER BY patroom.hprdate DESC
                                 ', [$enccode]))->first();
 
-// dd($this->encounter);
+        // dd($this->encounter);
         // $this->mss = PatientMss::where('enccode', $enccode)->first();
         // $this->patient = Patient::find($this->encounter->hpercode);
         // $this->active_prescription = collect(DB::select('SELECT data.id, data.qty, data.remarks, data.empid, data.dmdcomb, data.dmdctr, drug.drug_concat, data.updated_at
@@ -213,37 +213,37 @@ class EncounterTransactionView extends Component
             })
             ->get();
         if ($this->toecode == 'ADM' or $this->toecode == 'OPDAD' or $this->toecode == 'ERADM') {
-                switch ($this->mssikey) {
-                    case 'MSSA11111999':
-                    case 'MSSB11111999':
-                        $this->type = 'pay';
-                        break;
-
-                    case 'MSSC111111999':
-                        $this->type = 'pay';
-                        $class = 'PP1';
-                        break;
-
-                    case 'MSSC211111999':
-                        $class = 'PP2';
-                        break;
-
-                    case 'MSSC311111999':
-                        $class = 'PP3';
-                        break;
-
-                    case 'MSSD11111999':
-                        $this->type = 'service';
-                        break;
-
-                    default:
-                        $this->type = 'service';
-                }
-                if ($this->bnb) {
+            switch ($this->mssikey) {
+                case 'MSSA11111999':
+                case 'MSSB11111999':
                     $this->type = 'pay';
-                } else {
+                    break;
+
+                case 'MSSC111111999':
+                    $this->type = 'pay';
+                    $class = 'PP1';
+                    break;
+
+                case 'MSSC211111999':
+                    $class = 'PP2';
+                    break;
+
+                case 'MSSC311111999':
+                    $class = 'PP3';
+                    break;
+
+                case 'MSSD11111999':
                     $this->type = 'service';
-                }
+                    break;
+
+                default:
+                    $this->type = 'service';
+            }
+            if ($this->bnb) {
+                $this->type = 'pay';
+            } else {
+                $this->type = 'service';
+            }
         } else {
             if ($this->ems) {
                 $this->type = 'ems';
@@ -362,7 +362,7 @@ class EncounterTransactionView extends Component
 
     public function add_item($dmdcomb, $dmdctr, $chrgcode, $loc_code, $dmdprdte, $id, $available, $exp_date)
     {
-// dd($this->encounter);
+        // dd($this->encounter);
         $with_rx = false;
         if ($dmdcomb == $this->rx_dmdcomb and $dmdctr == $this->rx_dmdctr) {
             $with_rx = true;
