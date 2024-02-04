@@ -26,7 +26,6 @@ class ListDrugHomis extends Component
             ->with('form')
             ->with('route')
             ->with('strength')
-            // ->whereRelation('sub', 'dmhdrsub', 'DRUME')
             ->whereRelation('generic', 'gendesc', 'LIKE', '%' . $this->search . '%');
 
         $generics = DrugGeneric::where('genstat', 'A')->get();
@@ -45,7 +44,6 @@ class ListDrugHomis extends Component
 
     public function new_drug()
     {
-
     }
 
     public function updatingSearch()

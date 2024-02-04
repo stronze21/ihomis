@@ -38,7 +38,8 @@ class IoTransListRequestor extends Component
     {
         $trans = InOutTransaction::with('drug')->with('location')
             ->with('charge')
-            ->where('loc_code', session('pharm_location_id'));
+            ->where('loc_code', session('pharm_location_id'))
+            ->latest();
 
         $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', DB::raw('SUM(stock_bal) as "avail"'), 'drug_concat')
             ->whereRelation('location', 'description', 'LIKE', '%Warehouse%')
@@ -47,7 +48,7 @@ class IoTransListRequestor extends Component
             ->groupBy('dmdcomb', 'dmdctr', 'drug_concat');
 
         return view('livewire.pharmacy.drugs.io-trans-list-requestor', [
-            'trans' => $trans->latest()->paginate(20),
+            'trans' => $trans->paginate(20),
             'drugs' => $drugs->get(),
         ]);
     }
