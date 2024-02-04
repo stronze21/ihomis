@@ -69,7 +69,7 @@ class StockList extends Component
                 'pharm_locations.description',
             )
             ->orderBy('drug_concat', 'ASC')
-            ->get();
+            ->paginate(20);
 
         return view('livewire.pharmacy.drugs.stock-list', [
             'stocks' => $stocks,

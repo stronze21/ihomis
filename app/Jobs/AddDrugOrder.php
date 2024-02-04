@@ -2,15 +2,16 @@
 
 namespace App\Jobs;
 
-use Livewire\Component;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
+use App\Models\Pharmacy\Dispensing\DrugOrder;
 use App\Models\Pharmacy\Drugs\DrugStock;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Models\Pharmacy\Dispensing\DrugOrder;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
+use Illuminate\Queue\SerializesModels;
+use Livewire\Component;
 
 class AddDrugOrder implements ShouldQueue
 {
@@ -19,6 +20,13 @@ class AddDrugOrder implements ShouldQueue
     protected $enccode, $hpercode;
     protected $order_qty, $unit_price;
     protected $dm, $sc, $ems, $maip, $wholesale, $pay, $medicare, $service, $caf, $govt, $type, $employeeid;
+
+
+    public function middleware(): array
+    {
+        return [(new WithoutOverlapping())];
+    }
+
     /**
      * Create a new job instance.
      *

@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 
 class LogIoTransReceive implements ShouldQueue
@@ -16,6 +17,12 @@ class LogIoTransReceive implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $to, $dmdcomb, $dmdctr, $chrgcode, $date_logged, $dmdprdte, $retail_price, $time_logged, $qty, $stock_id, $exp_date, $drug_concat;
+
+
+    public function middleware(): array
+    {
+        return [(new WithoutOverlapping())];
+    }
 
     /**
      * Create a new job instance.
