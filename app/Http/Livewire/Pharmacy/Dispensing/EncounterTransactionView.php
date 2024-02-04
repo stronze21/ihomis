@@ -108,10 +108,6 @@ class EncounterTransactionView extends Component
 
         $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
 
-        // $this->encounter = EncounterLog::where('enccode', $enccode)
-        //     ->with('patient')->with('rxo')->with('active_prescription')->with('adm')->first();
-
-        // $this->encounter = EncounterLog::where('enccode', $enccode)->first();
         $encounter = collect(DB::select('SELECT TOP 1 enctr.hpercode, enctr.toecode, enctr.enccode, enctr.encdate, diag.diagtext, pat.patlast, pat.patfirst, pat.patmiddle,
                                                 mss.mssikey, ward.wardname, room.rmname
                                 FROM henctr as enctr
@@ -137,24 +133,41 @@ class EncounterTransactionView extends Component
         // dd($this->active_prescription);
         $this->active_prescription = Prescription::where('enccode', $enccode)->with('data_active')->has('data_active')->get();
         $this->active_prescription_all = Prescription::where('enccode', $enccode)->with('data')->get();
-        if ($encounter->toecode == 'ADM') {
-            $past_log = EncounterLog::where('hpercode', $encounter->hpercode)
-                ->where(function ($query) {
-                    $query->where('toecode', 'ERADM')
-                        ->orWhere('toecode', 'OPDAD');
-                })
-                ->latest('encdate')
-                ->first();
-            if ($past_log) {
-                $this->extra_prescriptions = Prescription::where('enccode', $past_log->enccode)->with('data_active')->has('data_active')->get();
-                $this->extra_prescriptions_all = Prescription::where('enccode', $past_log->enccode)->with('data')->get();
-            }
+        $past_log = null;
+        switch ($encounter->toecode) {
+            case 'ADM':
+                $past_log = EncounterLog::where('hpercode', $encounter->hpercode)
+                    ->where(function ($query) {
+                        $query->where('toecode', 'ERADM')
+                            ->orWhere('toecode', 'OPDAD');
+                    })
+                    ->latest('encdate')
+                    ->first();
+                break;
+
+            case 'OPDAD':
+                $past_log = EncounterLog::where('hpercode', $encounter->hpercode)
+                    ->where(function ($query) {
+                        $query->where('toecode', 'OPD');
+                    })
+                    ->latest('encdate')
+                    ->first();
+                break;
+
+            case 'ERADM':
+                $past_log = EncounterLog::where('hpercode', $encounter->hpercode)
+                    ->where(function ($query) {
+                        $query->where('toecode', 'ER');
+                    })
+                    ->latest('encdate')
+                    ->first();
+                break;
         }
-        // $patient_room = PatientRoom::where('enccode', $enccode)->latest('hprdate')->first();
-        // if ($patient_room) {
-        //     $this->wardname = Ward::select('wardname')->where('wardcode', $patient_room->wardcode)->first();
-        //     $this->rmname = Room::select('rmname')->where('rmintkey', $patient_room->rmintkey)->first();
-        // }
+
+        if ($past_log) {
+            $this->extra_prescriptions = Prescription::where('enccode', $past_log->enccode)->with('data_active')->has('data_active')->get();
+            $this->extra_prescriptions_all = Prescription::where('enccode', $past_log->enccode)->with('data')->get();
+        }
 
         if (!$this->hpercode) {
             $this->hpercode = $encounter->hpercode;

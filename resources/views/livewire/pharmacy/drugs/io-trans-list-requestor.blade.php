@@ -54,7 +54,7 @@
                 @forelse ($trans as $tran)
                     <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}"
                         @if ($tran->trans_stat == 'Requested') onclick="cancel_tx({{ $tran->id }})" @endif
-                        @if ($tran->trans_stat == 'Issued' and session('pharm_location_id') == $tran->loc_code) @can('receive-requested-drugs') onclick="receive_issued('{{ $tran->id }}', '{{ $tran->drug->drug_concat() }}', '{{ number_format($tran->issued_qty) }}')" @endcan @endif>
+                        @if ($tran->trans_stat == 'Issued' and session('pharm_location_id') == $tran->loc_code) @can('receive-requested-drugs') onclick="receive_issued('{{ $tran->id }}', `{{ $tran->drug->drug_concat() }}`, '{{ number_format($tran->issued_qty) }}')" @endcan @endif>
                         <th>{{ $tran->trans_no }}</th>
                         <td>{{ $tran->created_at() }}</td>
                         <td>{{ $tran->location->description }}</td>
@@ -62,7 +62,7 @@
                         <td>{{ number_format($tran->requested_qty) }}</td>
                         <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
                         <td>@php
-                            if($tran->trans_stat == 'Issued' OR $tran->trans_stat == 'Received'){
+                            if ($tran->trans_stat == 'Issued' or $tran->trans_stat == 'Received') {
                                 echo $tran->items->first()->charge->chrgdesc;
                             }
                         @endphp</td>

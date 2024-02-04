@@ -67,48 +67,48 @@
     <!-- Put this part before </body> tag -->
     <input type="checkbox" id="new_generic" class="modal-toggle" />
     <div class="modal">
-        <div class="modal-box relative">
-            <label for="new_generic" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+        <div class="relative modal-box">
+            <label for="new_generic" class="absolute btn btn-sm btn-circle right-2 top-2">✕</label>
             <h3 class="text-lg font-bold">Create new Generic</h3>
-            <p class="space-y-2 flex flex-col">
-                <label class="form-control w-full">
+            <p class="flex flex-col space-y-2">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Generic Code</span>
+                        <span class="label-text">Generic Code</span>
                     </div>
-                    <input type="text" class="input input-bordered w-full" wire:model.defer="gencode" />
+                    <input type="text" class="w-full input input-bordered" wire:model.defer="gencode" />
                     @error('gencode')
                         <span class="text-sm text-red-600">{{ $message }}</span>
                     @enderror
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Generic Description</span>
+                        <span class="label-text">Generic Description</span>
                     </div>
-                    <input type="text" class="input input-bordered w-full" wire:model.defer="gendesc" />
+                    <input type="text" class="w-full input input-bordered" wire:model.defer="gendesc" />
                     @error('gendesc')
                         <span class="text-sm text-red-600">{{ $message }}</span>
                     @enderror
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Rationale</span>
+                        <span class="label-text">Rationale</span>
                     </div>
-                    <input type="text" class="input input-bordered w-full" wire:model.defer="rationale" />
+                    <input type="text" class="w-full input input-bordered" wire:model.defer="rationale" />
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Recommendations</span>
+                        <span class="label-text">Recommendations</span>
                     </div>
-                    <input type="text" class="input input-bordered w-full" wire:model.defer="monitor" />
+                    <input type="text" class="w-full input input-bordered" wire:model.defer="monitor" />
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Interactions</span>
+                        <span class="label-text">Interactions</span>
                     </div>
-                    <input type="text" class="input input-bordered w-full" wire:model.defer="interactions" />
+                    <input type="text" class="w-full input input-bordered" wire:model.defer="interactions" />
                 </label>
 
-                <button class="btn btn-sm btn-primary ml-auto mt-3" wire:click="new_generic">Save</button>
+                <button class="mt-3 ml-auto btn btn-sm btn-primary" wire:click="new_generic">Save</button>
             </p>
         </div>
     </div>
@@ -116,92 +116,92 @@
 
     <input type="checkbox" id="new_drug" class="modal-toggle" />
     <div class="modal">
-        <div class="modal-box relative">
-            <label for="new_drug" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+        <div class="relative modal-box">
+            <label for="new_drug" class="absolute btn btn-sm btn-circle right-2 top-2">✕</label>
             <h3 class="text-lg font-bold">Create new Drug/Medicine</h3>
-            <p class="space-y-2 flex flex-col">
-                <label class="form-control w-full">
+            <p class="flex flex-col space-y-2">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Drug Classification</span>
+                        <span class="label-text">Drug Classification</span>
                     </div>
-                    <select class="select select-bordered w-full" wire:model.defer="dmdrxot" >
-                      <option value="OTC" selected>Over The Counter</option>
-                      <option value="RXX">With Prescription</option>
+                    <select class="w-full select select-bordered" wire:model.defer="dmdrxot">
+                        <option value="OTC" selected>Over The Counter</option>
+                        <option value="RXX">With Prescription</option>
                     </select>
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Generic</span>
+                        <span class="label-text">Generic</span>
                     </div>
-                    <select class="select select-bordered w-full" wire:model.defer="grpcode">
-                      <option disabled selected></option>
-                      @foreach ($generics as $gen)
-                        <option value="{{ $gen->gencode }}">{{ $gen->gendesc }}</option>
-                      @endforeach
+                    <select class="w-full select select-bordered" wire:model.defer="grpcode">
+                        <option disabled selected></option>
+                        @foreach ($generics as $gen)
+                            <option value="{{ $gen->gencode }}">{{ $gen->gendesc }}</option>
+                        @endforeach
                     </select>
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Brand Name</span>
+                        <span class="label-text">Brand Name</span>
                     </div>
-                    <input type="text" class="input input-bordered w-full" wire:model.defer="brandname" />
+                    <input type="text" class="w-full input input-bordered" wire:model.defer="brandname" />
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Strength</span>
+                        <span class="label-text">Strength</span>
                     </div>
-                    <input type="text" class="input input-bordered w-full" wire:model.defer="dmdnost" />
+                    <input type="text" class="w-full input input-bordered" wire:model.defer="dmdnost" />
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Strength Description</span>
+                        <span class="label-text">Strength Description</span>
                     </div>
-                    <select class="select select-bordered w-full" wire:model.defer="strecode">
-                      <option disabled selected></option>
-                      @foreach ($strengths as $stre)
-                        <option value="{{ $stre->strecode }}">{{ $stre->stredesc }}</option>
-                      @endforeach
+                    <select class="w-full select select-bordered" wire:model.defer="strecode">
+                        <option disabled selected></option>
+                        @foreach ($strengths as $stre)
+                            <option value="{{ $stre->strecode }}">{{ $stre->stredesc }}</option>
+                        @endforeach
                     </select>
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Form</span>
+                        <span class="label-text">Form</span>
                     </div>
-                    <select class="select select-bordered w-full" wire:model.defer="formcode">
-                      <option disabled selected></option>
-                      @foreach ($forms as $form)
-                        <option value="{{ $form->formcode }}">{{ $form->formdesc }}</option>
-                      @endforeach
+                    <select class="w-full select select-bordered" wire:model.defer="formcode">
+                        <option disabled selected></option>
+                        @foreach ($forms as $form)
+                            <option value="{{ $form->formcode }}">{{ $form->formdesc }}</option>
+                        @endforeach
                     </select>
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Route</span>
+                        <span class="label-text">Route</span>
                     </div>
-                    <select class="select select-bordered w-full" wire:model.defer="rtecode">
-                      <option disabled selected></option>
-                      @foreach ($routes as $rte)
-                        <option value="{{ $rte->rtecode }}">{{ $rte->rtedesc }}</option>
-                      @endforeach
+                    <select class="w-full select select-bordered" wire:model.defer="rtecode">
+                        <option disabled selected></option>
+                        @foreach ($routes as $rte)
+                            <option value="{{ $rte->rtecode }}">{{ $rte->rtedesc }}</option>
+                        @endforeach
                     </select>
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">Remarks</span>
+                        <span class="label-text">Remarks</span>
                     </div>
-                    <input type="text" class="input input-bordered w-full" wire:model.defer="dmdrem" />
+                    <input type="text" class="w-full input input-bordered" wire:model.defer="dmdrem" />
                 </label>
-                <label class="form-control w-full">
+                <label class="w-full form-control">
                     <div class="label">
-                    <span class="label-text">PNDF</span>
+                        <span class="label-text">PNDF</span>
                     </div>
-                    <select class="select select-bordered w-full" wire:model.defer="dmdpndf" >
-                      <option value="Y">YES</option>
-                      <option value="N">NO</option>
+                    <select class="w-full select select-bordered" wire:model.defer="dmdpndf">
+                        <option value="Y">YES</option>
+                        <option value="N">NO</option>
                     </select>
                 </label>
 
-                <button class="btn btn-sm btn-primary ml-auto mt-3" wire:click="new_generic">Save</button>
+                <button class="mt-3 ml-auto btn btn-sm btn-primary" wire:click="new_generic">Save</button>
             </p>
         </div>
     </div>

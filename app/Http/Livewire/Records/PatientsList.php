@@ -101,6 +101,7 @@ class PatientsList extends Component
                                     FROM henctr enctr
                                     LEFT JOIN hencdiag diag ON enctr.enccode = diag.enccode
                                     WHERE enctr.toecode <> 'WALKN' AND enctr.toecode <> '32' AND enctr.enclock = 'N' AND enctr.hpercode = ?
+                                    ORDER BY enctr.encdate DESC
                                 ", [$hpercode]);
 
         $this->hpercode = $hpercode;

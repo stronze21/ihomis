@@ -23,8 +23,8 @@ use App\Models\Pharmacy\Drugs\InOutTransactionItem;
 
 class IoTransListRequestor extends Component
 {
-    use WithPagination;
     use LivewireAlert;
+    use WithPagination;
 
     protected $listeners = ['add_request', 'cancel_tx', 'receive_issued', 'refreshComponent' => '$refresh', 'add_more_request'];
 
