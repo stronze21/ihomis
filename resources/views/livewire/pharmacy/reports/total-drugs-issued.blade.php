@@ -26,6 +26,10 @@
                         class="las la-lg la-file-excel"></i> Export</button>
             </div>
             <div class="ml-2">
+                <button onclick="printMe()" class="btn btn-sm btn-primary"><i class="las la-lg la-print"></i>
+                    Print</button>
+            </div>
+            <div class="ml-2">
                 <div class="form-control">
                     <label class="input-group">
                         <span>Location</span>
@@ -42,7 +46,7 @@
                     <label class="input-group">
                         <span>From</span>
                         <input type="datetime-local" class="w-full input input-sm input-bordered"
-                            max="{{ $date_to }}" wire:model.lazy="date_from" />
+                            wire:model.lazy="date_from" />
                     </label>
                 </div>
             </div>
@@ -51,7 +55,7 @@
                     <label class="input-group">
                         <span>To</span>
                         <input type="datetime-local" class="w-full input input-sm input-bordered"
-                            min="{{ $date_from }}" wire:model.lazy="date_to" />
+                            wire:model.lazy="date_to" />
                     </label>
                 </div>
             </div>
@@ -70,36 +74,38 @@
                 </div>
             </div>
         </div>
-        <table class="table bg-white shadow-md table-fixed table-compact" id="table">
-            <thead class="font-bold bg-gray-200">
-                <tr class="text-center">
-                    <td class="text-sm border">Item Description</td>
-                    <td class="text-sm border">Expiry Date</td>
-                    <td class="text-sm border">QTY</td>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($drugs_issued as $rxi)
-                    @php
-                        $concat = explode('_,', $rxi->drug_concat);
-                        $drug = implode('', $concat);
-                    @endphp
-                    <tr classs="border border-black">
-                        <td class="text-sm border">
-                            <div class="flex flex-col">
-                                <div class="text-xs text-slate-600">{{ $rxi->chrgdesc ?? '' }}</div>
-                                <div class="font-bold">{{ $concat[0] }}</div>
-                                <div class="ml-10 text-xs text-slate-800">
-                                    {{ $concat[1] }}</div>
-                            </div>
-                        </td>
-                        <td class="text-sm border">{{ $rxi->exp_date }}</td>
-                        <td class="text-sm text-right border">{{ $rxi->qty }}</td>
+        <div id="print">
+            <table class="table bg-white shadow-md table-fixed table-compact" id="table">
+                <thead class="font-bold bg-gray-200">
+                    <tr class="text-center">
+                        <td class="text-sm border">Item Description</td>
+                        <td class="text-sm border">Expiry Date</td>
+                        <td class="text-sm border">QTY</td>
                     </tr>
-                @empty
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse ($drugs_issued as $rxi)
+                        @php
+                            $concat = explode('_,', $rxi->drug_concat);
+                            $drug = implode('', $concat);
+                        @endphp
+                        <tr classs="border border-black">
+                            <td class="text-sm border">
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-slate-600">{{ $rxi->chrgdesc ?? '' }}</div>
+                                    <div class="font-bold">{{ $concat[0] }}</div>
+                                    <div class="ml-10 text-xs text-slate-800">
+                                        {{ $concat[1] }}</div>
+                                </div>
+                            </td>
+                            <td class="text-sm border">{{ $rxi->exp_date }}</td>
+                            <td class="text-sm text-right border">{{ $rxi->qty }}</td>
+                        </tr>
+                    @empty
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         <div class="mt-2">
         </div>
     </div>
@@ -140,5 +146,17 @@
             "pageLength": 1000000,
             "bInfo": false,
         });
+
+        function printMe() {
+            var printContents = document.getElementById('print').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+            history.go(-1);
+        }
     </script>
 @endpush

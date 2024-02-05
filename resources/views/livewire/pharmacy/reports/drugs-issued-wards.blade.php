@@ -29,6 +29,10 @@
                             class="las la-lg la-file-excel"></i> Export</button>
                 </div>
                 <div class="ml-2">
+                    <button onclick="printMe()" class="btn btn-sm btn-primary"><i class="las la-lg la-print"></i>
+                        Print</button>
+                </div>
+                <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
                             <span>Ward</span>
@@ -75,37 +79,39 @@
                 </div>
             </div>
         </div>
-        <table class="table bg-white shadow-md table-fixed table-compact" id="table">
-            <thead class="font-bold bg-gray-200">
-                <tr>
-                    <td class="text-sm text-center uppercase border">#</td>
-                    <td class="text-sm border">Ward</td>
-                    <td class="text-sm border">Item Description</td>
-                    <td class="text-sm text-right border">TOTAL</td>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($drugs_issued as $rxi)
-                    @php
-                        $concat = implode(',', explode('_,', $rxi->drug_concat));
-                    @endphp
-                    <tr class="border border-black">
-                        <td class="text-sm text-right border">{{ $loop->iteration }}</td>
-                        <td class="text-sm border">{{ $rxi->wardname }}</td>
-                        <td class="text-sm border">
-                            <div class="flex flex-col">
-                                <div class="text-xs text-slate-500">
-                                    {{ $rxi->chrgdesc }}
-                                </div>
-                                <div class="text-sm font-bold">{{ $concat }}</div>
-                            </div>
-                        </td>
-                        <td class="text-sm text-right border">{{ number_format($rxi->qty) }}</td>
+        <div id="print">
+            <table class="table bg-white shadow-md table-fixed table-compact" id="table">
+                <thead class="font-bold bg-gray-200">
+                    <tr>
+                        <td class="text-sm text-center uppercase border">#</td>
+                        <td class="text-sm border">Ward</td>
+                        <td class="text-sm border">Item Description</td>
+                        <td class="text-sm text-right border">TOTAL</td>
                     </tr>
-                @empty
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse ($drugs_issued as $rxi)
+                        @php
+                            $concat = implode(',', explode('_,', $rxi->drug_concat));
+                        @endphp
+                        <tr class="border border-black">
+                            <td class="text-sm text-right border">{{ $loop->iteration }}</td>
+                            <td class="text-sm border">{{ $rxi->wardname }}</td>
+                            <td class="text-sm border">
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-slate-500">
+                                        {{ $rxi->chrgdesc }}
+                                    </div>
+                                    <div class="text-sm font-bold">{{ $concat }}</div>
+                                </div>
+                            </td>
+                            <td class="text-sm text-right border">{{ number_format($rxi->qty) }}</td>
+                        </tr>
+                    @empty
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Put this part before </body> tag -->
@@ -136,6 +142,18 @@
                     type: 'base64'
                 }) :
                 XLSX.writeFile(wb, fn || ('Ward Consumption Report.' + (type || 'xlsx')));
+        }
+
+        function printMe() {
+            var printContents = document.getElementById('print').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+            history.go(-1);
         }
     </script>
 @endpush

@@ -28,6 +28,10 @@
                     <button onclick="ExportToExcel('xlsx')" class="btn btn-sm btn-info"><i
                             class="las la-lg la-file-excel"></i> Export</button>
                 </div>
+                <div class="ml-2">
+                    <button onclick="printMe()" class="btn btn-sm btn-primary"><i class="las la-lg la-print"></i>
+                        Print</button>
+                </div>
                 {{-- <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
@@ -61,37 +65,39 @@
                 </div>
             </div>
         </div>
-        <table class="table bg-white shadow-md table-fixed table-compact" id="table">
-            <thead class="font-bold bg-gray-200">
-                <tr>
-                    <td class="text-sm uppercase border">#</td>
-                    <td class="text-sm border">Date Ordered</td>
-                    <td class="text-sm border">Hosp. #</td>
-                    <td class="text-sm border">Name of Patient</td>
-                    <td class="text-sm border">Charge Slip</td>
-                    <td class="text-sm text-right border">Total Items</td>
-                    <td class="text-sm text-right border">Amount</td>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($drugs_ordered as $rxo)
-                    <tr classs="border border-black">
-                        <td class="text-sm text-right border">{{ $loop->iteration }}</td>
-                        <td class="text-sm border">{{ date('F j, Y H:i A', strtotime($rxo->dodate)) }}</td>
-                        <td class="text-sm border">{{ $rxo->hpercode }}</td>
-                        <td class="text-sm border">{{ $rxo->patient->fullname() }}</td>
-                        <td class="text-sm border">{{ $rxo->pcchrgcod }}</td>
-                        <td class="text-sm text-right border">{{ $rxo->total_qty }}</td>
-                        <td class="text-sm text-right border">{{ $rxo->total_amount }}</td>
-                    </tr>
-                @empty
+        <div id="print">
+            <table class="table bg-white shadow-md table-fixed table-compact" id="table">
+                <thead class="font-bold bg-gray-200">
                     <tr>
-                        <td colspan="22" class="font-bold text-center uppercase bg-red-400 border border-black">No
-                            record found!</td>
+                        <td class="text-sm uppercase border">#</td>
+                        <td class="text-sm border">Date Ordered</td>
+                        <td class="text-sm border">Hosp. #</td>
+                        <td class="text-sm border">Name of Patient</td>
+                        <td class="text-sm border">Charge Slip</td>
+                        <td class="text-sm text-right border">Total Items</td>
+                        <td class="text-sm text-right border">Amount</td>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @forelse ($drugs_ordered as $rxo)
+                        <tr classs="border border-black">
+                            <td class="text-sm text-right border">{{ $loop->iteration }}</td>
+                            <td class="text-sm border">{{ date('F j, Y H:i A', strtotime($rxo->dodate)) }}</td>
+                            <td class="text-sm border">{{ $rxo->hpercode }}</td>
+                            <td class="text-sm border">{{ $rxo->patient->fullname() }}</td>
+                            <td class="text-sm border">{{ $rxo->pcchrgcod }}</td>
+                            <td class="text-sm text-right border">{{ $rxo->total_qty }}</td>
+                            <td class="text-sm text-right border">{{ $rxo->total_amount }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="22" class="font-bold text-center uppercase bg-red-400 border border-black">No
+                                record found!</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         <div class="mt-2">
             {{ $drugs_ordered->links() }}
         </div>
@@ -126,6 +132,18 @@
                     type: 'base64'
                 }) :
                 XLSX.writeFile(wb, fn || ('Ward Consumption Report.' + (type || 'xlsx')));
+        }
+
+        function printMe() {
+            var printContents = document.getElementById('print').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+            history.go(-1);
         }
     </script>
 @endpush

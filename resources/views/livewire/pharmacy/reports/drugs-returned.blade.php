@@ -29,6 +29,10 @@
                             class="las la-lg la-file-excel"></i> Export</button>
                 </div>
                 <div class="ml-2">
+                    <button onclick="printMe()" class="btn btn-sm btn-primary"><i class="las la-lg la-print"></i>
+                        Print</button>
+                </div>
+                <div class="ml-2">
                     <div class="form-control">
                         <label class="input-group">
                             <span>Location</span>
@@ -74,58 +78,61 @@
                 </div>
             </div>
         </div>
-        <table class="table bg-white shadow-md table-fixed table-compact" id="table">
-            <thead class="font-bold bg-gray-200">
-                <tr class="text-center">
-                    <td class="text-sm uppercase border">#</td>
-                    <td class="text-sm border">Item Description</td>
-                    <td class="text-sm border">QTY</td>
-                    <td class="text-sm border">Date/Time</td>
-                    <td class="text-sm border">Hosp #</td>
-                    <td class="text-sm border">CS #</td>
-                    <td class="text-sm border">Patient's Name</td>
-                    <td class="text-sm border">Location</td>
-                    <td class="text-sm border">Received By</td>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($drugs_returned as $rxr)
-                    <tr classs="border border-black">
-                        <td class="text-sm text-right border">{{ $loop->iteration }}</td>
-                        <td class="text-sm border">
-                            <div class="flex flex-col">
-                                <div class="text-sm font-bold">{{ $rxr->dm->generic->gendesc }}</div>
-                                <div class="ml-10 text-xs text-slate-800">
-                                    {{ $rxr->dm->dmdnost }}{{ $rxr->dm->strength->stredesc ?? '' }}
-                                    {{ $rxr->dm->form->formdesc ?? '' }}</div>
-                            </div>
-                        </td>
-                        <td class="text-sm text-right border">{{ $rxr->qty }}</td>
-                        <td class="text-sm border">{{ $rxr->return_date() }}</td>
-                        <td class="text-sm border">{{ $rxr->hpercode }}</td>
-                        <td class="text-sm border">{{ $rxr->pcchrgcod }}</td>
-                        <td class="text-sm border">{{ $rxr->patient->fullname() }}</td>
-                        <td class="text-sm border">
-                            @if ($rxr->adm_pat_room)
-                                <div class="flex-col">
-                                    <div>{{ $rxr->adm_pat_room->ward->wardname }}</div>
-                                    <div class="text-sm">{{ $rxr->adm_pat_room->room->rmname }}</div>
+        <div id="print">
+            <table class="table bg-white shadow-md table-fixed table-compact" id="table">
+                <thead class="font-bold bg-gray-200">
+                    <tr class="text-center">
+                        <td class="text-sm uppercase border">#</td>
+                        <td class="text-sm border">Item Description</td>
+                        <td class="text-sm border">QTY</td>
+                        <td class="text-sm border">Date/Time</td>
+                        <td class="text-sm border">Hosp #</td>
+                        <td class="text-sm border">CS #</td>
+                        <td class="text-sm border">Patient's Name</td>
+                        <td class="text-sm border">Location</td>
+                        <td class="text-sm border">Received By</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($drugs_returned as $rxr)
+                        <tr classs="border border-black">
+                            <td class="text-sm text-right border">{{ $loop->iteration }}</td>
+                            <td class="text-sm border">
+                                <div class="flex flex-col">
+                                    <div class="text-sm font-bold">{{ $rxr->dm->generic->gendesc }}</div>
+                                    <div class="ml-10 text-xs text-slate-800">
+                                        {{ $rxr->dm->dmdnost }}{{ $rxr->dm->strength->stredesc ?? '' }}
+                                        {{ $rxr->dm->form->formdesc ?? '' }}</div>
                                 </div>
-                            @else
-                                {{ $rxr->encounter->enctr_type() }}
-                            @endif
-                        </td>
-                        <td class="text-sm border">{{ $rxr->issuer ? $rxr->receiver->fullname() : $rxr->user->name }}
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="22" class="font-bold text-center uppercase bg-red-400 border border-black">No
-                            record found!</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+                            </td>
+                            <td class="text-sm text-right border">{{ $rxr->qty }}</td>
+                            <td class="text-sm border">{{ $rxr->return_date() }}</td>
+                            <td class="text-sm border">{{ $rxr->hpercode }}</td>
+                            <td class="text-sm border">{{ $rxr->pcchrgcod }}</td>
+                            <td class="text-sm border">{{ $rxr->patient->fullname() }}</td>
+                            <td class="text-sm border">
+                                @if ($rxr->adm_pat_room)
+                                    <div class="flex-col">
+                                        <div>{{ $rxr->adm_pat_room->ward->wardname }}</div>
+                                        <div class="text-sm">{{ $rxr->adm_pat_room->room->rmname }}</div>
+                                    </div>
+                                @else
+                                    {{ $rxr->encounter->enctr_type() }}
+                                @endif
+                            </td>
+                            <td class="text-sm border">
+                                {{ $rxr->issuer ? $rxr->receiver->fullname() : $rxr->user->name }}
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="22" class="font-bold text-center uppercase bg-red-400 border border-black">No
+                                record found!</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
         <div class="mt-2">
             {{ $drugs_returned->links() }}
         </div>
@@ -160,6 +167,18 @@
                     type: 'base64'
                 }) :
                 XLSX.writeFile(wb, fn || ('Ward Consumption Report.' + (type || 'xlsx')));
+        }
+
+        function printMe() {
+            var printContents = document.getElementById('print').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+            history.go(-1);
         }
     </script>
 @endpush

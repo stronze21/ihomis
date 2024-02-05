@@ -29,11 +29,11 @@ class PendingOrders extends Component
         $date_to = Carbon::parse($this->date_from)->endOfDay()->format('Y-m-d H:i:s');
 
         $drugs_ordered = collect(DB::select("
-        SELECT rxo.enccode, MIN(rxo.dodate) as dodate, rxo.hpercode, pat.patlast, pat.patfirst, pat.patmiddle, COUNT(docointkey) as total_order, sum(rxo.pcchrgamt) as total_amount
+        SELECT rxo.enccode, MIN(rxo.dodate) as dodate, rxo.hpercode, pat.patlast, pat.patfirst, pat.patmiddle, COUNT(docointkey) as total_order, sum(rxo.pcchrgamt) as total_amount, rxo.entryby
             FROM hrxo rxo
             JOIN hperson pat ON rxo.hpercode = pat.hpercode
             WHERE   (dodate BETWEEN ? and ?) AND ((rxo.estatus = 'U' OR rxo.estatus = 'P') OR (rxo.estatus = 'S' AND (rxo.pcchrgcod IS NULL OR rxo.pcchrgcod = '')) AND rxo.loc_code = ?)
-            GROUP BY pat.patlast, pat.patfirst, pat.patmiddle, rxo.hpercode, rxo.enccode
+            GROUP BY pat.patlast, pat.patfirst, pat.patmiddle, rxo.hpercode, rxo.enccode, rxo.entryby
             ORDER BY rxo.dodate
             ", [$date_from, $date_to, $this->location_id]))->all(10);
 

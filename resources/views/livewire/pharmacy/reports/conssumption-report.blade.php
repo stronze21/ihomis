@@ -26,6 +26,10 @@
                         class="las la-lg la-file-excel"></i> Export</button>
             </div>
             <div class="ml-2">
+                <button onclick="printMe()" class="btn btn-sm btn-primary"><i class="las la-lg la-print"></i>
+                    Print</button>
+            </div>
+            <div class="ml-2">
                 <div class="form-control">
                     <label class="input-group">
                         <span class="whitespace-nowrap">Month & Year</span>
@@ -49,143 +53,133 @@
                 </div>
             </div>
         </div>
-        <table class="text-xs bg-white shadow-md table-fixed table-compact" id="table">
-            <thead class="font-bold bg-gray-200">
-                <tr class="text-center uppercase">
-                    <td class="w-2/12 text-xs border border-black">Source of Fund</td>
-                    <td class="text-xs border border-black" colspan="2">Beg. Bal.</td>
-                    <td class="text-xs border border-black" colspan="2">Total Purchases</td>
-                    <td class="text-xs border border-black" colspan="3">Total Avail. For Sale</td>
-                    <td class="text-xs border border-black" colspan="1"></td>
-                    <td class="text-xs border border-black" colspan="15">Issuances</td>
-                    <td class="text-xs border border-black" colspan="2">Ending Bal.</td>
-                </tr>
-                <tr class="text-center">
-                    <td class="text-xs uppercase border border-black cursor-pointer" onclick="sortTable(0)"
-                        rowspan="2">
-                        {{ $current_charge }} <span class="ml-1"><i class="las la-sort"></i></span></td>
-                    <td class="text-xs border border-black" rowspan="2">QTY.</td>
-                    <td class="text-xs border border-black" rowspan="2">Amount</td>
-                    <td class="text-xs border border-black" rowspan="2">QTY.</td>
-                    <td class="text-xs border border-black" rowspan="2">AMT.</td>
-                    <td class="text-xs border border-black" rowspan="2">QTY.</td>
-                    <td class="text-xs border border-black" rowspan="2">Unit <br> Cost</td>
-                    <td class="text-xs border border-black" rowspan="2">Total <br> Cost</td>
-                    <td class="text-xs border border-black" rowspan="2">Returns</td>
-                    <td class="text-xs border border-black" rowspan="2">EMS</td>
-                    <td class="text-xs border border-black" rowspan="2">MAIP</td>
-                    <td class="text-xs border border-black" rowspan="2">W.S.</td>
-                    <td class="text-xs border border-black" rowspan="2">Pay</td>
-                    <td class="text-xs border border-black" rowspan="1" colspan="2">Inpatient</td>
-                    <td class="text-xs border border-black" rowspan="2">CAF</td>
-                    <td class="text-xs border border-black" rowspan="2">PCSO</td>
-                    <td class="text-xs border border-black" rowspan="2">PHIC</td>
-                    <td class="text-xs border border-black" rowspan="2">Kon. <br> Pkg.</td>
-                    <td class="text-xs border border-black" rowspan="2">Issued <br> Total</td>
-                    <td class="text-xs border border-black" rowspan="2">Selling <br> Price</td>
-                    <td class="text-xs border border-black" rowspan="2">Total <br> Sales</td>
-                    <td class="text-xs border border-black" rowspan="2">COGS</td>
-                    <td class="text-xs border border-black" rowspan="2">Profit</td>
-                    <td class="text-xs border border-black" rowspan="2">QTY.</td>
-                    <td class="text-xs border border-black" rowspan="2">Amount</td>
-                </tr>
-                <tr class="text-center uppercase">
-                    <td class="text-xs border border-black">Non-Basic</td>
-                    <td class="text-xs border border-black">Basic</td>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($drugs_issued as $rxi)
-                    @php
-                        $available = $rxi->beg_bal + $rxi->purchased;
-                        $unit_cost = $rxi->acquisition_cost;
-                        $available_amount = ($rxi->beg_bal + $rxi->purchased) * $unit_cost;
-                        $total_sales = $rxi->issue_qty * $rxi->dmselprice;
-                        $total_qty_issued = $rxi->issue_qty;
-                        $total_cogs = $total_qty_issued * $unit_cost;
-
-                        $unit_sales_cost = $total_qty_issued * $unit_cost;
-                        $unit_sales = $total_qty_issued * $rxi->dmselprice;
-                        $total_profit = $unit_sales - $unit_sales_cost;
-
-                        $beg_bal = $rxi->beg_bal;
-                        $purchased = $rxi->purchased;
-                        $issued = $rxi->issue_qty;
-
-                        $ending_balance = $beg_bal + $purchased - $issued;
-                    @endphp
-                    {{-- @php
-                        $available = $rxi->beg_bal + $rxi->purchased;
-                        $unit_cost = $rxi->acquisition_cost;
-                        $available_amount = ($rxi->beg_bal + $rxi->purchased) * $unit_cost;
-                        $total_sales = $rxi->issue_qty * $rxi->dmselprice;
-                        $total_qty_issued = $rxi->issue_qty;
-                        $total_cogs = $total_qty_issued * $unit_cost;
-
-                        $unit_sales_cost = $total_qty_issued * $unit_cost;
-                        $unit_sales = $total_qty_issued * $rxi->dmselprice;
-                        $total_profit = $unit_sales - $unit_sales_cost;
-
-                        $beg_bal = $rxi->beg_bal;
-                        $purchased = $rxi->purchased;
-                        $issued = $rxi->issue_qty;
-
-                        $ending_balance = $beg_bal + $purchased - $issued;
-                    @endphp --}}
-                    <tr classs="border border-black">
-                        <td class="text-xs border border-black">
-                            <div class="flex flex-col">
-                                <div class="text-sm font-bold">{{ $rxi->gendesc }}</div>
-                                <div class="ml-10 text-xs text-slate-800">
-                                    {{ $rxi->dmdnost }}{{ $rxi->stredesc ?? '' }}
-                                    {{ $rxi->formdesc ?? '' }}</div>
-                            </div>
-                        </td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->beg_bal) }}</td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->beg_bal * $rxi->acquisition_cost, 2) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->purchased) }}</td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->purchased * $rxi->acquisition_cost, 2) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($available) }}</td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->acquisition_cost, 2) }}</td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($available_amount, 2) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->return_qty) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->ems) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->maip) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->wholesale) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->opdpay) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->pay) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->service) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->caf) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->pcso) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->phic) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->konsulta) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($rxi->issue_qty) }}</td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($rxi->dmselprice, 2) }}</td>
-                        <td class="text-xs text-right border border-black">{{ number_format($total_sales, 2) }}
-                        </td>
-                        <td class="text-xs text-right border border-black">{{ number_format($total_cogs, 2) }}
-                        </td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($total_profit, 2) }}
-                        </td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($ending_balance, 2) }}</td>
-                        <td class="text-xs text-right border border-black">
-                            {{ number_format($ending_balance * $rxi->acquisition_cost, 2) }}</td>
+        <div id="print">
+            <table class="text-xs bg-white shadow-md table-fixed table-compact" id="table">
+                <thead class="font-bold bg-gray-200">
+                    <tr class="text-center uppercase">
+                        <td class="w-2/12 text-xs border border-black">Source of Fund</td>
+                        <td class="text-xs border border-black" colspan="2">Beg. Bal.</td>
+                        <td class="text-xs border border-black" colspan="2">Total Purchases</td>
+                        <td class="text-xs border border-black" colspan="3">Total Avail. For Sale</td>
+                        <td class="text-xs border border-black" colspan="1"></td>
+                        <td class="text-xs border border-black" colspan="15">Issuances</td>
+                        <td class="text-xs border border-black" colspan="2">Ending Bal.</td>
                     </tr>
-                @empty
-                    <tr>
-                        <td colspan="25" class="font-bold text-center uppercase bg-red-400 border border-black">No
-                            record found!</td>
+                    <tr class="text-center">
+                        <td class="text-xs uppercase border border-black cursor-pointer" onclick="sortTable(0)"
+                            rowspan="2">
+                            {{ $current_charge }} <span class="ml-1"><i class="las la-sort"></i></span></td>
+                        <td class="text-xs border border-black" rowspan="2">QTY.</td>
+                        <td class="text-xs border border-black" rowspan="2">Amount</td>
+                        <td class="text-xs border border-black" rowspan="2">QTY.</td>
+                        <td class="text-xs border border-black" rowspan="2">AMT.</td>
+                        <td class="text-xs border border-black" rowspan="2">QTY.</td>
+                        <td class="text-xs border border-black" rowspan="2">Unit <br> Cost</td>
+                        <td class="text-xs border border-black" rowspan="2">Total <br> Cost</td>
+                        <td class="text-xs border border-black" rowspan="2">Returns</td>
+                        <td class="text-xs border border-black" rowspan="2">EMS</td>
+                        <td class="text-xs border border-black" rowspan="2">MAIP</td>
+                        <td class="text-xs border border-black" rowspan="2">W.S.</td>
+                        <td class="text-xs border border-black" rowspan="2">Pay</td>
+                        <td class="text-xs border border-black" rowspan="1" colspan="2">Inpatient</td>
+                        <td class="text-xs border border-black" rowspan="2">CAF</td>
+                        <td class="text-xs border border-black" rowspan="2">PCSO</td>
+                        <td class="text-xs border border-black" rowspan="2">PHIC</td>
+                        <td class="text-xs border border-black" rowspan="2">Kon. <br> Pkg.</td>
+                        <td class="text-xs border border-black" rowspan="2">Issued <br> Total</td>
+                        <td class="text-xs border border-black" rowspan="2">Selling <br> Price</td>
+                        <td class="text-xs border border-black" rowspan="2">Total <br> Sales</td>
+                        <td class="text-xs border border-black" rowspan="2">COGS</td>
+                        <td class="text-xs border border-black" rowspan="2">Profit</td>
+                        <td class="text-xs border border-black" rowspan="2">QTY.</td>
+                        <td class="text-xs border border-black" rowspan="2">Amount</td>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                    <tr class="text-center uppercase">
+                        <td class="text-xs border border-black">Non-Basic</td>
+                        <td class="text-xs border border-black">Basic</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($drugs_issued as $rxi)
+                        @php
+                            $available = $rxi->beg_bal + $rxi->purchased;
+                            $unit_cost = $rxi->acquisition_cost;
+                            $available_amount = ($rxi->beg_bal + $rxi->purchased) * $unit_cost;
+                            $total_sales = $rxi->issue_qty * $rxi->dmselprice;
+                            $total_qty_issued = $rxi->issue_qty;
+                            $total_cogs = $total_qty_issued * $unit_cost;
+
+                            $unit_sales_cost = $total_qty_issued * $unit_cost;
+                            $unit_sales = $total_qty_issued * $rxi->dmselprice;
+                            $total_profit = $unit_sales - $unit_sales_cost;
+
+                            $beg_bal = $rxi->beg_bal;
+                            $purchased = $rxi->purchased;
+                            $issued = $rxi->issue_qty;
+
+                            $ending_balance = $beg_bal + $purchased - $issued;
+                        @endphp
+                        <tr classs="border border-black">
+                            <td class="text-xs border border-black">
+                                <div class="flex flex-col">
+                                    <div class="text-sm font-bold">{{ $rxi->gendesc }}</div>
+                                    <div class="ml-10 text-xs text-slate-800">
+                                        {{ $rxi->dmdnost }}{{ $rxi->stredesc ?? '' }}
+                                        {{ $rxi->formdesc ?? '' }}</div>
+                                </div>
+                            </td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->beg_bal) }}</td>
+                            <td class="text-xs text-right border border-black">
+                                {{ number_format($rxi->beg_bal * $rxi->acquisition_cost, 2) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->purchased) }}
+                            </td>
+                            <td class="text-xs text-right border border-black">
+                                {{ number_format($rxi->purchased * $rxi->acquisition_cost, 2) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($available) }}</td>
+                            <td class="text-xs text-right border border-black">
+                                {{ number_format($rxi->acquisition_cost, 2) }}</td>
+                            <td class="text-xs text-right border border-black">
+                                {{ number_format($available_amount, 2) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->return_qty) }}
+                            </td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->ems) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->maip) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->wholesale) }}
+                            </td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->opdpay) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->pay) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->service) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->caf) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->pcso) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->phic) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->konsulta) }}
+                            </td>
+                            <td class="text-xs text-right border border-black">{{ number_format($rxi->issue_qty) }}
+                            </td>
+                            <td class="text-xs text-right border border-black">
+                                {{ number_format($rxi->dmselprice, 2) }}</td>
+                            <td class="text-xs text-right border border-black">{{ number_format($total_sales, 2) }}
+                            </td>
+                            <td class="text-xs text-right border border-black">{{ number_format($total_cogs, 2) }}
+                            </td>
+                            <td class="text-xs text-right border border-black">
+                                {{ number_format($total_profit, 2) }}
+                            </td>
+                            <td class="text-xs text-right border border-black">
+                                {{ number_format($ending_balance, 2) }}</td>
+                            <td class="text-xs text-right border border-black">
+                                {{ number_format($ending_balance * $rxi->acquisition_cost, 2) }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="25" class="font-bold text-center uppercase bg-red-400 border border-black">
+                                No
+                                record found!</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -259,6 +253,18 @@
                     }
                 }
             }
+        }
+
+        function printMe() {
+            var printContents = document.getElementById('print').innerHTML;
+            var originalContents = document.body.innerHTML;
+
+            document.body.innerHTML = printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+            history.go(-1);
         }
     </script>
 @endpush

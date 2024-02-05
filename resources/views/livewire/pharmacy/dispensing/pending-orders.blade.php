@@ -61,6 +61,8 @@
                             class="ml-1"><i class="las la-sort"></i></span></td>
                     <td class="text-sm text-right cursor-pointer" onclick="sortTable(5)">Amount <span class="ml-1"><i
                                 class="las la-sort"></i></span></td>
+                    <td class="text-sm text-right cursor-pointer" onclick="sortTable(5)">Entry By <span
+                            class="ml-1"><i class="las la-sort"></i></span></td>
                 </tr>
             </thead>
             <tbody id="admittedTable">
@@ -74,6 +76,9 @@
                         </td>
                         <td class="text-sm text-right border">{{ $rxo->total_order }}</td>
                         <td class="text-sm text-right border">{{ $rxo->total_amount }}</td>
+                        <td class="text-sm text-right border">
+                            {{ $rxo->entryby }}
+                        </td>
                     </tr>
                 @empty
                     <tr>
