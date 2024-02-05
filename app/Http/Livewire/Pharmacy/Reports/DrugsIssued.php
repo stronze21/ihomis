@@ -70,7 +70,7 @@ class DrugsIssued extends Component
         WHERE issuedfrom = ?
         AND rxo.loc_code = ?
         AND issuedte BETWEEN ? AND ?
-        ORDER BY rxi.issuedte DESC", [$filter_charge[0], $this->location_id, $date_from, $date_to]);
+        ORDER BY hdr.drug_concat ASC, rxi.issuedte DESC", [$filter_charge[0], $this->location_id, $date_from, $date_to]);
 
         $locations = PharmLocation::all();
 

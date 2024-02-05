@@ -82,15 +82,15 @@
             <table class="w-full bg-white shadow-md table-sm" id="table">
                 <thead class="font-bold bg-gray-200">
                     <tr class="text-center">
-                        <td class="text-sm uppercase border">#</td>
-                        <td class="text-sm border">Item Description</td>
-                        <td class="text-sm border">QTY</td>
-                        <td class="text-sm border">Date/Time</td>
-                        <td class="text-sm border">Hosp #</td>
-                        <td class="text-sm border">CS #</td>
-                        <td class="text-sm border">Patient's Name</td>
-                        <td class="text-sm border">Location</td>
-                        <td class="text-sm border">Issued By</td>
+                        <td class="text-xs uppercase border">#</td>
+                        <td class="text-xs border">Item Description</td>
+                        <td class="text-xs border">QTY</td>
+                        <td class="text-xs border">Date/Time</td>
+                        <td class="text-xs border">Hosp #</td>
+                        <td class="text-xs border">CS #</td>
+                        <td class="text-xs border">Patient's Name</td>
+                        <td class="text-xs border">Location</td>
+                        <td class="text-xs border">Issued By</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -127,20 +127,20 @@
                             $concat = implode(',', explode('_,', $rxi->drug_concat));
                         @endphp
                         <tr classs="border border-black">
-                            <td class="text-sm text-right border">{{ $loop->iteration }}</td>
-                            <td class="text-sm border">
+                            <td class="text-xs text-right border">{{ $loop->iteration }}</td>
+                            <td class="text-xs border">
                                 <div class="text-xs">{{ $concat }}</div>
                             </td>
-                            <td class="text-sm text-right border">{{ number_format($rxi->qty) }}</td>
-                            <td class="text-sm border">{{ date('Y-m-d h:i A', strtotime($rxi->issuedte)) }}</td>
-                            <td class="text-sm border">{{ $rxi->hpercode }}</td>
-                            <td class="text-sm border">{{ $rxi->pcchrgcod }}</td>
-                            <td class="text-sm border">
+                            <td class="text-xs text-right border">{{ number_format($rxi->qty) }}</td>
+                            <td class="text-xs border">{{ date('Y-m-d h:i A', strtotime($rxi->issuedte)) }}</td>
+                            <td class="text-xs border">{{ $rxi->hpercode }}</td>
+                            <td class="text-xs border">{{ $rxi->pcchrgcod }}</td>
+                            <td class="text-xs border">
                                 {{ $rxi->patlast . ', ' . $rxi->patfirst . ' ' . $rxi->patmiddle }}</td>
-                            <td class="text-sm border">
+                            <td class="text-xs border">
                                 <div>{{ $rxi->wardname }} ({{ $rxi->rmname }})</div>
                             </td>
-                            <td class="text-sm border">
+                            <td class="text-xs border">
                                 @if ($rxi->lastname and $rxi->firstname)
                                     {{ $rxi->lastname . ', ' . $rxi->firstname . ' ' . $rxi->middlename }}
                                 @else
