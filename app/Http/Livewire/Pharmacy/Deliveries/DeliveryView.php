@@ -266,7 +266,7 @@ class DeliveryView extends Component
 
             $log->save();
             $add_to->save();
-            LogDrugDelivery::dispatch($item->pharm_location_id, $add_to->dmdcomb, $add_to->dmdctr, $add_to->exp_date, $add_to->chrgcode, $item->qty, $item->drug->drug_concat());
+            LogDrugDelivery::dispatch($item->pharm_location_id, $add_to->dmdcomb, $add_to->dmdctr, $add_to->exp_date, $add_to->chrgcode, $item->qty, $item->drug->drug_concat(), now());
             $updated = true;
         }
         if ($updated) {

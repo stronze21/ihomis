@@ -15,7 +15,7 @@ use Illuminate\Queue\SerializesModels;
 class LogDrugDelivery implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    public $pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty, $drug_concat;
+    public $pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty, $drug_concat, $date;
 
     public function middleware(): array
     {
@@ -26,7 +26,7 @@ class LogDrugDelivery implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty, $drug_concat)
+    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $exp_date, $chrgcode, $qty, $drug_concat, $date)
     {
         $this->onQueue('rx_delivery');
         $this->pharm_location_id = $pharm_location_id;
@@ -36,6 +36,7 @@ class LogDrugDelivery implements ShouldQueue
         $this->chrgcode = $chrgcode;
         $this->qty = $qty;
         $this->drug_concat = $drug_concat;
+        $this->date = $date;
     }
 
     /**
@@ -45,7 +46,7 @@ class LogDrugDelivery implements ShouldQueue
      */
     public function handle()
     {
-        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
+        $date = Carbon::parse($this->date)->startOfMonth()->format('Y-m-d');
 
         $card = DrugStockCard::firstOrNew([
             'chrgcode' => $this->chrgcode,

@@ -94,7 +94,8 @@
                 </tfoot>
             </table>
             <div class="flex flex-col py-0 my-0 text-left text-xs/4 whitespace-nowrap">
-                <div>Issued by: {{ $rxo_header->employee ? $rxo_header->employee->fullname() : $rxo_header->entry_by }}
+                <div>Issued by:
+                    {{ $rxo_header->employee ? $rxo_header->employee->fullname() : ($rxo_header->user ? $rxo_header->user->name : $rxo_header->entry_by) }}
                 </div>
                 <div><span>Time: {{ \Carbon\Carbon::create($rxo_header->dodate)->format('h:i A') }}</span></div>
                 <div><span>Verified by Nurse/N.A.: _________________________</span></div>

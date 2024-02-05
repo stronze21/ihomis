@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use App\Models\UserSession;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +42,10 @@ class InitializeMonthlyConsumption extends Command
      */
     public function handle()
     {
-
+        $sessions = UserSession::where('user_id', '<>', '1')->get();
+        foreach ($sessions as $session) {
+            $session->delete();
+        }
         $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
         $stocks = DrugStock::select('id', 'stock_bal', 'dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode', 'loc_code', 'dmdprdte', 'retail_price')->with('current_price')->where('stock_bal', '>', 0)->get();
         foreach ($stocks as $stock) {

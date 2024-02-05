@@ -17,7 +17,7 @@ class LogDrugTransaction implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date, $drug_concat;
+    protected $pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date, $drug_concat, $date;
 
 
     public function middleware(): array
@@ -30,7 +30,7 @@ class LogDrugTransaction implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date, $drug_concat)
+    public function __construct($pharm_location_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $dmdprdte, $unit_cost, $retail_price, $qty, $stock_id, $exp_date, $drug_concat, $date)
     {
         $this->onQueue('stocklogger');
         $this->pharm_location_id = $pharm_location_id;
@@ -45,6 +45,7 @@ class LogDrugTransaction implements ShouldQueue
         $this->stock_id = $stock_id;
         $this->exp_date = $exp_date;
         $this->drug_concat = $drug_concat;
+        $this->date = $date;
     }
 
     /**
@@ -66,7 +67,7 @@ class LogDrugTransaction implements ShouldQueue
             'unit_cost' => $this->unit_cost,
             'unit_price' => $this->retail_price,
         ]);
-        $log->time_logged = now();
+        $log->time_logged = $this->date;
         $log->beg_bal += $this->qty;
 
         $log->save();

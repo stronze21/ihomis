@@ -19,7 +19,7 @@ class LogDrugStockIssue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date;
+    public $stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date, $date;
 
 
     public function middleware(): array
@@ -32,7 +32,7 @@ class LogDrugStockIssue implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date)
+    public function __construct($stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date, $date)
     {
         $this->onQueue('rx_issue_logger');
         $this->stock_id = $stock_id;
@@ -56,6 +56,7 @@ class LogDrugStockIssue implements ShouldQueue
         $this->retail_price = $retail_price;
         $this->concat = $concat;
         $this->stock_date = $stock_date;
+        $this->date = $date;
     }
 
     /**
@@ -99,7 +100,7 @@ class LogDrugStockIssue implements ShouldQueue
             'dmdprdte' => $this->dmdprdte,
         ]);
 
-        $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
+        $date = Carbon::parse($this->date)->startOfMonth()->format('Y-m-d');
 
         $log = DrugStockLog::firstOrNew([
             'loc_code' => $this->loc_code,
@@ -110,7 +111,7 @@ class LogDrugStockIssue implements ShouldQueue
             'dmdprdte' => $this->dmdprdte,
             'unit_price' => $this->retail_price,
         ]);
-        $log->time_logged = now();
+        $log->time_logged = $this->date;
         $log->issue_qty += $this->trans_qty;
 
         $log->wholesale += $issued_drug->wholesale;

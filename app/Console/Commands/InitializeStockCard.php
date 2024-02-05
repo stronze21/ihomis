@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockCard;
+use App\Models\UserSession;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -40,6 +41,10 @@ class InitializeStockCard extends Command
      */
     public function handle()
     {
+        $sessions = UserSession::where('user_id', '<>', '1')->get();
+        foreach ($sessions as $session) {
+            $session->delete();
+        }
 
         $stocks = DrugStock::select('id', 'stock_bal', 'dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode', 'loc_code')->where('stock_bal', '>', 0)->get();
 
@@ -58,16 +63,16 @@ class InitializeStockCard extends Command
 
 
             $card = DrugStockCard::whereNull('reference')
-            ->whereNull('rec')
-            ->where('chrgcode', $stock->chrgcode)
-            ->where('loc_code', $stock->loc_code)
-            ->where('dmdcomb', $stock->dmdcomb)
-            ->where('dmdctr', $stock->dmdctr)
-            ->where('drug_concat', $stock->drug_concat)
-            ->where('exp_date', $stock->exp_date)
-            ->first();
+                ->whereNull('rec')
+                ->where('chrgcode', $stock->chrgcode)
+                ->where('loc_code', $stock->loc_code)
+                ->where('dmdcomb', $stock->dmdcomb)
+                ->where('dmdctr', $stock->dmdctr)
+                ->where('drug_concat', $stock->drug_concat)
+                ->where('exp_date', $stock->exp_date)
+                ->first();
 
-            if($card){
+            if ($card) {
                 $card->reference = $stock->stock_bal + $card->iss + $card->rec;
                 $card->bal = $stock->stock_bal;
                 $card->save();

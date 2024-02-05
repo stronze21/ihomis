@@ -21,7 +21,7 @@ class LogDrugOrderIssue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris, $prescription_data_id;
+    public $docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris, $prescription_data_id, $date;
 
 
     public function middleware(): array
@@ -34,7 +34,7 @@ class LogDrugOrderIssue implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris, $prescription_data_id)
+    public function __construct($docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris, $prescription_data_id, $date)
     {
         $this->onQueue('rxo_issue_logger');
         $this->docointkey = $docointkey;
@@ -49,6 +49,7 @@ class LogDrugOrderIssue implements ShouldQueue
         $this->pchrgup = $pchrgup;
         $this->ris = $ris;
         $this->prescription_data_id = $prescription_data_id;
+        $this->date = $date;
     }
 
     /**
@@ -102,8 +103,8 @@ class LogDrugOrderIssue implements ShouldQueue
             'dmdcomb' => $this->dmdcomb,
             'dmdctr' => $this->dmdctr,
         ], [
-            'issuedte' => now(),
-            'issuetme' => now(),
+            'issuedte' => $this->date,
+            'issuetme' => $this->date,
             'qty' => $this->pchrgqty,
             'issuedby' => $this->employeeid,
             'status' => 'A', //A
@@ -112,7 +113,7 @@ class LogDrugOrderIssue implements ShouldQueue
             'confdl' => 'N', //N
             'entryby' => $this->employeeid,
             'locacode' => 'PHARM', //PHARM
-            'dmdprdte' => now(),
+            'dmdprdte' => $this->date,
             'issuedfrom' => $this->orderfrom,
             'pcchrgcod' => $this->pcchrgcod,
             'chrgcode' => $this->orderfrom,

@@ -2,18 +2,19 @@
 
 namespace App\Models\Pharmacy\Dispensing;
 
-use App\Models\Pharmacy\Drug;
 use App\Models\Hospital\Employee;
-use Awobaz\Compoships\Compoships;
-use App\Models\References\ChargeCode;
-use App\Models\Record\Patients\Patient;
-use Illuminate\Database\Eloquent\Model;
-use App\Models\Pharmacy\Drugs\DrugStock;
-use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
+use App\Models\Pharmacy\Drug;
+use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Record\Encounters\EncounterLog;
+use App\Models\Record\Patients\Patient;
+use App\Models\Record\Prescriptions\Prescription;
 use App\Models\Record\Prescriptions\PrescriptionData;
+use App\Models\References\ChargeCode;
+use App\Models\User;
+use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class DrugOrder extends Model
 {
@@ -111,5 +112,10 @@ class DrugOrder extends Model
     public function order_by()
     {
         return $this->belongsTo(Employee::class, 'order_by', 'employeeid');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'entryby', 'employeeid');
     }
 }
