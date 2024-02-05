@@ -96,7 +96,6 @@
             window.print();
 
             document.body.innerHTML = originalContents;
-            history.go(-1);
         }
     </script>
 @endpush

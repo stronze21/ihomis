@@ -3723,6 +3723,12 @@ html {
   width: -moz-min-content !important;
   width: min-content !important;
 }
+.w-1\/4 {
+  width: 25% !important;
+}
+.w-2\/4 {
+  width: 50% !important;
+}
 .min-w-0 {
   min-width: 0px !important;
 }
@@ -3985,9 +3991,6 @@ html {
 .rounded-xl {
   border-radius: 0.75rem !important;
 }
-.rounded-sm {
-  border-radius: 0.125rem !important;
-}
 .rounded-b-none {
   border-bottom-right-radius: 0px !important;
   border-bottom-left-radius: 0px !important;
@@ -4082,10 +4085,6 @@ html {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(59 130 246 / var(--tw-bg-opacity)) !important;
 }
-.bg-error {
-  --tw-bg-opacity: 1 !important;
-  background-color: hsl(var(--er) / var(--tw-bg-opacity)) !important;
-}
 .bg-gray-100 {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity)) !important;
@@ -4105,6 +4104,10 @@ html {
 .bg-gray-800 {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(31 41 55 / var(--tw-bg-opacity)) !important;
+}
+.bg-green-100 {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(220 252 231 / var(--tw-bg-opacity)) !important;
 }
 .bg-green-500 {
   --tw-bg-opacity: 1 !important;
@@ -4154,17 +4157,9 @@ html {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(100 116 139 / var(--tw-bg-opacity)) !important;
 }
-.bg-success {
-  --tw-bg-opacity: 1 !important;
-  background-color: hsl(var(--su) / var(--tw-bg-opacity)) !important;
-}
 .bg-white {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity)) !important;
-}
-.bg-green-100 {
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(220 252 231 / var(--tw-bg-opacity)) !important;
 }
 .bg-opacity-25 {
   --tw-bg-opacity: 0.25 !important;
@@ -4598,6 +4593,10 @@ html {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(243 244 246 / var(--tw-bg-opacity)) !important;
 }
+.hover\:bg-gray-300:hover {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(209 213 219 / var(--tw-bg-opacity)) !important;
+}
 .hover\:bg-gray-50:hover {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(249 250 251 / var(--tw-bg-opacity)) !important;
@@ -4606,9 +4605,17 @@ html {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity)) !important;
 }
+.hover\:bg-green-300:hover {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(134 239 172 / var(--tw-bg-opacity)) !important;
+}
 .hover\:bg-indigo-600:hover {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(79 70 229 / var(--tw-bg-opacity)) !important;
+}
+.hover\:bg-red-300:hover {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(252 165 165 / var(--tw-bg-opacity)) !important;
 }
 .hover\:bg-red-500:hover {
   --tw-bg-opacity: 1 !important;
@@ -4617,26 +4624,6 @@ html {
 .hover\:bg-red-600:hover {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(220 38 38 / var(--tw-bg-opacity)) !important;
-}
-.hover\:bg-green-300:hover {
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(134 239 172 / var(--tw-bg-opacity)) !important;
-}
-.hover\:bg-red-300:hover {
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(252 165 165 / var(--tw-bg-opacity)) !important;
-}
-.hover\:bg-green-200:hover {
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(187 247 208 / var(--tw-bg-opacity)) !important;
-}
-.hover\:bg-gray-200:hover {
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(229 231 235 / var(--tw-bg-opacity)) !important;
-}
-.hover\:bg-gray-300:hover {
-  --tw-bg-opacity: 1 !important;
-  background-color: rgb(209 213 219 / var(--tw-bg-opacity)) !important;
 }
 .hover\:text-gray-400:hover {
   --tw-text-opacity: 1 !important;

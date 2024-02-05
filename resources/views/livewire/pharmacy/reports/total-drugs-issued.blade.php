@@ -74,13 +74,13 @@
                 </div>
             </div>
         </div>
-        <div id="print">
-            <table class="table bg-white shadow-md table-fixed table-compact" id="table">
+        <div id="print" class="mx-auto max-w-screen-2xl">
+            <table class="table w-full bg-white shadow-md table-fixed" id="table">
                 <thead class="font-bold bg-gray-200">
                     <tr class="text-center">
-                        <td class="text-sm border">Item Description</td>
-                        <td class="text-sm border">Expiry Date</td>
-                        <td class="text-sm border">QTY</td>
+                        <td class="w-2/4 text-sm border">Item Description</td>
+                        <td class="w-1/4 text-sm border">Expiry Date</td>
+                        <td class="w-1/4 text-sm border">QTY</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -156,7 +156,6 @@
             window.print();
 
             document.body.innerHTML = originalContents;
-            history.go(-1);
         }
     </script>
 @endpush
