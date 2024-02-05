@@ -79,7 +79,7 @@
             </div>
         </div>
         <div id="print" class="w-full">
-            <table class="table w-full bg-white shadow-md table-sm" id="table">
+            <table class="w-full bg-white shadow-md table-sm" id="table">
                 <thead class="font-bold bg-gray-200">
                     <tr class="text-center">
                         <td class="text-sm uppercase border">#</td>
@@ -95,7 +95,7 @@
                 </thead>
                 <tbody>
                     @forelse ($drugs_issued as $rxi)
-                        <tr classs="border border-black">
+                        {{-- <tr classs="border border-black">
                             <td class="text-sm text-right border">{{ $loop->iteration }}</td>
                             <td class="text-sm border">
                                 <div class="flex flex-col">
@@ -122,6 +122,31 @@
                             </td>
                             <td class="text-sm border">{{ $rxi->issuer ? $rxi->issuer->fullname() : $rxi->user->name }}
                             </td>
+                        </tr> --}}
+                        @php
+                            $concat = implode(',', explode('_,', $rxi->drug_concat));
+                        @endphp
+                        <tr classs="border border-black">
+                            <td class="text-sm text-right border">{{ $loop->iteration }}</td>
+                            <td class="text-sm border">
+                                <div class="text-xs">{{ $concat }}</div>
+                            </td>
+                            <td class="text-sm text-right border">{{ number_format($rxi->qty) }}</td>
+                            <td class="text-sm border">{{ date('Y-m-d h:i A', strtotime($rxi->issuedte)) }}</td>
+                            <td class="text-sm border">{{ $rxi->hpercode }}</td>
+                            <td class="text-sm border">{{ $rxi->pcchrgcod }}</td>
+                            <td class="text-sm border">
+                                {{ $rxi->patlast . ', ' . $rxi->patfirst . ' ' . $rxi->patmiddle }}</td>
+                            <td class="text-sm border">
+                                <div>{{ $rxi->wardname }} ({{ $rxi->rmname }})</div>
+                            </td>
+                            <td class="text-sm border">
+                                @if ($rxi->lastname and $rxi->firstname)
+                                    {{ $rxi->lastname . ', ' . $rxi->firstname . ' ' . $rxi->middlename }}
+                                @else
+                                    {{ $rxi->name }}
+                                @endif
+                            </td>
                         </tr>
                     @empty
                     @endforelse
@@ -129,7 +154,7 @@
             </table>
         </div>
         <div class="mt-2">
-            {{ $drugs_issued->links() }}
+            {{-- {{ $drugs_issued->links() }} --}}
         </div>
     </div>
 

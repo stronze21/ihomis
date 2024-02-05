@@ -50,13 +50,27 @@ class DrugsIssued extends Component
 
         $filter_charge = explode(',', $this->filter_charge);
 
-        $drugs_issued = DrugOrderIssue::with('dm')->with('patient')->with('issuer')->with('adm_pat_room')->with('encounter')
-            ->where('issuedfrom', $filter_charge[0])
-            ->whereRelation('main_order', 'loc_code', $this->location_id)
-            ->whereBetween('issuedte', [$date_from, $date_to])
-            ->latest('issuedte')
-            ->paginate(15);
+        // $drugs_issued = DrugOrderIssue::with('dm')->with('patient')->with('issuer')->with('adm_pat_room')->with('encounter')
+        //     ->where('issuedfrom', $filter_charge[0])
+        //     ->whereRelation('main_order', 'loc_code', $this->location_id)
+        //     ->whereBetween('issuedte', [$date_from, $date_to])
+        //     ->latest('issuedte')
+        //     ->get();
 
+        $drugs_issued = DB::select("SELECT rxi.qty, rxi.hpercode, rxi.pcchrgcod, rxi.issuedte, hdr.drug_concat, ward.wardname, room.rmname, pat.patlast, pat.patfirst, pat.patmiddle, emp2.name, emp.firstname, emp.lastname, emp.middlename
+        FROM hrxoissue rxi
+        INNER JOIN hrxo rxo ON rxi.docointkey = rxo.docointkey
+        INNER JOIN hperson as pat ON rxi.hpercode = pat.hpercode
+        LEFT JOIN hpersonal as emp ON rxi.issuedby = emp.employeeid
+        LEFT JOIN pharm_users as emp2 ON rxi.issuedby = emp2.employeeid
+        INNER JOIN hospital.dbo.hdmhdr hdr ON rxo.dmdcomb = hdr.dmdcomb AND rxo.dmdctr = hdr.dmdctr
+        LEFT JOIN hpatroom patroom ON rxo.enccode = patroom.enccode
+        LEFT JOIN hward ward ON patroom.wardcode = ward.wardcode
+        LEFT JOIN hroom room ON patroom.rmintkey = room.rmintkey
+        WHERE issuedfrom = ?
+        AND rxo.loc_code = ?
+        AND issuedte BETWEEN ? AND ?
+        ORDER BY rxi.issuedte DESC", [$filter_charge[0], $this->location_id, $date_from, $date_to]);
 
         $locations = PharmLocation::all();
 
