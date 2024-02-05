@@ -122,6 +122,7 @@
                         <tr classs="border border-black">
                             <td class="text-xs border border-black">
                                 <div class="flex flex-col">
+                                    <div class="text-xs">{{ $rxi->location }}</div>
                                     <div class="text-sm font-bold">{{ $rxi->gendesc }}</div>
                                     <div class="ml-10 text-xs text-slate-800">
                                         {{ $rxi->dmdnost }}{{ $rxi->stredesc ?? '' }}

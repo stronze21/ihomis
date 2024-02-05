@@ -17,21 +17,27 @@ class DrugsChargeSlips extends Component
 
     public $date_from, $date_to, $location_id = "";
 
-    public function updatingFilterCharge(){ $this->resetPage(); }
-    public function updatingMonth(){ $this->resetPage(); }
+    public function updatingFilterCharge()
+    {
+        $this->resetPage();
+    }
+    public function updatingMonth()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
-        $this->date_from = Carbon::parse($this->date_from)->startOfWeek()->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
+        $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
 
         $hrxo = DrugOrder::from('hrxo as hrxo')
-                                    ->selectRaw("hrxo.pcchrgcod, hrxo.hpercode, SUM(hrxo.pchrgqty) as total_qty, SUM(hrxo.pcchrgamt) as total_amount, MAX(hrxo.dodate) as dodate")
-                                    ->with('patient')
-                                    ->where('hrxo.estatus', '<>', 'U')
-                                    ->where('hrxo.pcchrgcod', '<>', '')
-                                    ->whereBetween('hrxo.dodate', [$this->date_from, $this->date_to])
-                                    ->groupBy('hrxo.pcchrgcod', 'hrxo.hpercode');
+            ->selectRaw("hrxo.pcchrgcod, hrxo.hpercode, SUM(hrxo.pchrgqty) as total_qty, SUM(hrxo.pcchrgamt) as total_amount, MAX(hrxo.dodate) as dodate")
+            ->with('patient')
+            ->where('hrxo.estatus', '<>', 'U')
+            ->where('hrxo.pcchrgcod', '<>', '')
+            ->whereBetween('hrxo.dodate', [$date_from, $date_to])
+            ->groupBy('hrxo.pcchrgcod', 'hrxo.hpercode');
 
         $drugs_ordered = $this->location_id ? $hrxo->where('hrxo.loc_code', $this->location_id) : $hrxo;
 

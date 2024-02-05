@@ -74,8 +74,8 @@
                 </div>
             </div>
         </div>
-        <div id="print">
-            <table class="text-xs bg-white shadow-md table-fixed table-compact" id="table">
+        <div id="print" class="w-full">
+            <table class="table w-full bg-white shadow-md table-sm" id="table">
                 <thead class="font-bold bg-gray-200">
                     <tr class="text-center uppercase">
                         <td class="w-2/12 text-xs border border-black">Source of Fund</td>

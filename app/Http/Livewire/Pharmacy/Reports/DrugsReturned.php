@@ -29,8 +29,8 @@ class DrugsReturned extends Component
 
     public function render()
     {
-        $this->date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
+        $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
@@ -42,7 +42,7 @@ class DrugsReturned extends Component
         $drugs_returned = DrugOrderReturn::with('dm')->with('patient')->with('receiver')->with('adm_pat_room')->with('encounter')
             ->where('returnfrom', $filter_charge[0])
             ->whereRelation('main_order', 'loc_code', $this->location_id)
-            ->whereBetween('returndate', [$this->date_from, $this->date_to])
+            ->whereBetween('returndate', [$date_from, $date_to])
             ->latest('returndate')
             ->paginate(15);
 

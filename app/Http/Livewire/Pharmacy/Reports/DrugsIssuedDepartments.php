@@ -18,10 +18,9 @@ class DrugsIssuedDepartments extends Component
 
     public function render()
     {
-        $date_from = Carbon::parse($this->date_from)->startOfDay()->format('Y-m-d H:i:s');
-        $date_to = Carbon::parse($this->date_to)->endOfDay()->format('Y-m-d H:i:s');
-        // $this->date_from = Carbon::parse($this->date_from)->startOfWeek()->format('Y-m-d H:i:s');
-        // $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
+        $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
+
         if (!$this->deptcode) {
             $this->deptcode = null;
         }

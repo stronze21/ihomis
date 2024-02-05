@@ -36,8 +36,8 @@
         </div>
     </div>
     <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
-        <div id="print">
-            <table class="table w-full table-compact" id="table">
+        <div id="print" class="w-full">
+            <table class="table w-full bg-white shadow-md table-sm" id="table">
                 <thead>
                     <tr>
                         <th class="w-1/12">Reference</th>

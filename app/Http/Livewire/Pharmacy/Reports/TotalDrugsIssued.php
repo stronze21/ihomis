@@ -28,8 +28,8 @@ class TotalDrugsIssued extends Component
 
     public function render()
     {
-        $this->date_from = Carbon::parse($this->date_from)->startOfWeek()->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
+        $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
@@ -48,16 +48,7 @@ class TotalDrugsIssued extends Component
                                     AND rx.loc_code = ?
                                     GROUP BY drug.drug_concat, charge.chrgdesc, rx.exp_date
                                     ORDER BY drug.drug_concat ASC
-                                    ", [$this->date_from, $this->date_to, $filter_charge[0] ?? '%%', $this->location_id]);
-
-        // $drugs_issued = DrugOrder::select(DB::raw('SUM(qty) as qty, dmdctr, dmdcomb, orderfrom, docointkey'))
-        //     ->with('dm')
-        //     ->where('orderfrom', $filter_charge[0])
-        //     ->whereRelation('loc_code', $this->location_id)
-        //     ->whereBetween('issuedte', [$this->date_from, $this->date_to])
-        //     ->latest('issuedte')
-        //     ->groupBy('dmdcomb', 'dmdctr', 'exp_date', 'orderfrom', 'loc_code')
-        //     ->get();
+                                    ", [$date_from, $date_to, $filter_charge[0] ?? '%%', $this->location_id]);
 
         $locations = PharmLocation::all();
 
@@ -71,6 +62,8 @@ class TotalDrugsIssued extends Component
 
     public function mount()
     {
+        $this->date_from = Carbon::parse(now())->startOfDay()->format('Y-m-d H:i:s');
+        $this->date_to = Carbon::parse(now())->endOfDay()->format('Y-m-d H:i:s');
         $this->location_id = session('pharm_location_id');
         $this->drugs = Drug::where('dmdstat', 'A')
             // ->whereHas('sub', function ($query) {

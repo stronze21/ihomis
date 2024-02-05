@@ -79,8 +79,8 @@
                 </div>
             </div>
         </div>
-        <div id="print">
-            <table class="table bg-white shadow-md table-fixed table-compact" id="table">
+        <div id="print" class="w-full">
+            <table class="table w-full bg-white shadow-md table-sm" id="table">
                 <thead class="font-bold bg-gray-200">
                     <tr>
                         <td class="text-sm text-center uppercase border">#</td>

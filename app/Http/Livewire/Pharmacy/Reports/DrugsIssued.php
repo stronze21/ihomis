@@ -57,6 +57,7 @@ class DrugsIssued extends Component
             ->latest('issuedte')
             ->paginate(15);
 
+
         $locations = PharmLocation::all();
 
         return view('livewire.pharmacy.reports.drugs-issued', [

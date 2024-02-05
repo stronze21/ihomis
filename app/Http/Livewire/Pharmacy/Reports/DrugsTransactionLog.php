@@ -17,8 +17,8 @@ class DrugsTransactionLog extends Component
 
     public function render()
     {
-        $this->date_from = Carbon::parse($this->date_from)->startOfWeek()->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
+        $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
 
         $charge_codes = ChargeCode::where('bentypcod', 'DRUME')
             ->where('chrgstat', 'A')
@@ -52,7 +52,7 @@ class DrugsTransactionLog extends Component
                                         SUM(pdsl.return_qty) as return_qty
                                         ")
             ->where('chrgcode', $filter_charge[0])
-            ->whereBetween('time_logged', [$this->date_from, $this->date_to])
+            ->whereBetween('time_logged', [$date_from, $date_to])
             ->with('charge')->with('drug')
             ->groupBy('pdsl.dmdcomb', 'pdsl.dmdctr', 'pdsl.chrgcode')
             ->groupBy('pdsl.dmdprdte')

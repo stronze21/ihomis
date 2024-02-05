@@ -30,42 +30,8 @@ class ConssumptionReport extends Component
 
         $filter_charge = explode(',', $this->filter_charge);
 
-        // $drugs_issued = DrugStockIssue::from('pharm_drug_stock_issues as pdsi')
-        //                             ->join('hcharge as hc', 'hc.chrgcode', 'pdsi.chrgcode')
-        //                             ->join('pharm_drug_stocks as pds', 'pdsi.stock_id', 'pds.id', 'pds.retail_price')
-        //                             ->selectRaw("MAX(hc.chrgdesc) chrgdesc, pdsi.dmdcomb, pdsi.dmdctr, MAX(pdsi.stock_id), SUM(pds.beg_bal) as beg_bal, SUM(pds.stock_bal) as stock_bal, pds.retail_price")
-        //                             ->selectRaw("SUM(pdsi.sc_pwd) as sc_pwd, SUM(pdsi.ems) as ems, SUM(pdsi.maip) as maip, SUM(pdsi.wholesale) as wholesale, SUM(pdsi.pay) as pay")
-        //                             ->selectRaw("SUM(pdsi.medicare) as medicare, SUM(pdsi.service) as service, SUM(pdsi.govt_emp) as govt_emp, SUM(pdsi.caf) as caf")
-        //                             ->selectRaw("SUM(pdsi.qty) as qty, SUM(pdsi.pcchrgamt) as pcchrgamt")
-        //                             ->with('drug')
-        //                             ->where('pdsi.loc_code', $this->location_id)
-        //                             ->whereBetween('pdsi.created_at', [$this->date_from, $this->date_to])
-        //                             ->groupBy('pdsi.dmdcomb', 'pdsi.dmdctr', 'pdsi.chrgcode')
-        //                             ->groupBy('pds.dmdcomb', 'pds.dmdctr', 'pds.chrgcode', 'pds.retail_price')
-        //                             ->get();
-
-        // $drugs_issued = DrugStockLog::from('pharm_drug_stock_logs as pdsl')
-        //     ->selectRaw("chrgcode, pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
-        //                                 pdsl.purchased as purchased,
-        //                                 pdsl.beg_bal as beg_bal,
-        //                                 pdsl.ems as ems,
-        //                                 pdsl.maip as maip,
-        //                                 pdsl.wholesale as wholesale,
-        //                                 pdsl.pay as pay,
-        //                                 pdsl.service as service,
-        //                                 pdsl.konsulta as konsulta,
-        //                                 pdsl.pcso as pcso,
-        //                                 pdsl.phic as phic,
-        //                                 pdsl.caf as caf,
-        //                                 pdsl.issue_qty as issue_qty,
-        //                                 pdsl.return_qty as return_qty
-        //                                 ")
-        //     ->where('chrgcode', $filter_charge[0])
-        //     ->where('date_logged', $date_from)
-        //     ->with('charge')->with('drug')
-        //     ->get();
-
         $drugs_issued = DB::select('SELECT pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
+                                        pdsl.loc_code,
                                         pdsl.purchased as purchased,
                                         pdsl.beg_bal as beg_bal,
                                         pdsl.ems as ems,
@@ -85,7 +51,8 @@ class ConssumptionReport extends Component
                                         gen.gendesc,
                                         drug.dmdnost,
                                         price.acquisition_cost,
-                                        price.dmselprice
+                                        price.dmselprice,
+                                        loc.description as location
                                     FROM [pharm_drug_stock_logs] as [pdsl]
                                     INNER JOIN hdmhdr as drug ON pdsl.dmdcomb = drug.dmdcomb AND pdsl.dmdctr = drug.dmdctr
                                     INNER JOIN hdruggrp as grp ON drug.grpcode = grp.grpcode
@@ -93,6 +60,7 @@ class ConssumptionReport extends Component
                                     INNER JOIN hstre as stre ON drug.strecode = stre.strecode
                                     INNER JOIN hform as frm ON drug.formcode = frm.formcode
                                     INNER JOIN hdmhdrprice as price ON pdsl.dmdprdte = price.dmdprdte
+                                    INNER JOIN pharm_locations as loc ON pdsl.loc_code = loc.id
                                     WHERE [chrgcode] = ? and [date_logged] = ?
                                     ORDER BY gen.gendesc ASC', [$filter_charge[0], $date_from]);
 

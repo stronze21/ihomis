@@ -18,8 +18,8 @@ class DrugsIssuedWards extends Component
 
     public function render()
     {
-        $this->date_from = Carbon::parse($this->date_from)->startOfWeek()->format('Y-m-d H:i:s');
-        $this->date_to = Carbon::parse($this->date_to)->endOfWeek()->format('Y-m-d H:i:s');
+        $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
+        $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
 
         $drugs_issued = DB::select("SELECT ward.wardname, drug.drug_concat, charge.chrgdesc, SUM(rxo.qty) as qty
                                     FROM hospital.dbo.hrxoissue rxo
@@ -33,7 +33,7 @@ class DrugsIssuedWards extends Component
                                     AND rxo.chrgcode LIKE ?
                                     GROUP BY ward.wardname, drug.drug_concat, charge.chrgdesc
                                     ORDER BY ward.wardname ASC, drug.drug_concat ASC
-                                    ", [$this->date_from, $this->date_to, $this->wardcode ?? '%%', $this->filter_charge ?? '%%']);
+                                    ", [$date_from, $date_to, $this->wardcode ?? '%%', $this->filter_charge ?? '%%']);
 
         return view('livewire.pharmacy.reports.drugs-issued-wards', compact(
             'drugs_issued',

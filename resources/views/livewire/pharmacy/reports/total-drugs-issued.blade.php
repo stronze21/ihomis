@@ -75,12 +75,12 @@
             </div>
         </div>
         <div id="print" class="mx-auto max-w-screen-2xl">
+            {{ $current_charge }}
             <table class="table w-full bg-white shadow-md table-fixed" id="table">
                 <thead class="font-bold bg-gray-200">
                     <tr class="text-center">
-                        <td class="w-2/4 text-sm border">Item Description</td>
-                        <td class="w-1/4 text-sm border">Expiry Date</td>
-                        <td class="w-1/4 text-sm border">QTY</td>
+                        <td class="w-5/6 text-sm border">Item Description</td>
+                        <td class="w-1/6 text-sm border">QTY</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,13 +92,11 @@
                         <tr classs="border border-black">
                             <td class="text-sm border">
                                 <div class="flex flex-col">
-                                    <div class="text-xs text-slate-600">{{ $rxi->chrgdesc ?? '' }}</div>
-                                    <div class="font-bold">{{ $concat[0] }}</div>
-                                    <div class="ml-10 text-xs text-slate-800">
-                                        {{ $concat[1] }}</div>
+                                    <div><span class="font-bold">{{ $concat[0] }} {{ $concat[1] }}</span>
+                                        <small> exp: {{ $rxi->exp_date }} </small>
+                                    </div>
                                 </div>
                             </td>
-                            <td class="text-sm border">{{ $rxi->exp_date }}</td>
                             <td class="text-sm text-right border">{{ $rxi->qty }}</td>
                         </tr>
                     @empty
