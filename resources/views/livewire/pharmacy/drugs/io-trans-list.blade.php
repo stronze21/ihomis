@@ -32,7 +32,8 @@
                 <tr>
                     <th class="w-1/12">Reference</th>
                     <th class="w-1/12">Date Requested</th>
-                    <th class="w-1/12">Requestor</th>
+                    <th class="w-1/12">Request By</th>
+                    <th class="w-1/12">Request From</th>
                     <th class="w-6/12">Item Requested</th>
                     <th class="w-1/12">Requested QTY</th>
                     <th class="w-1/12">Issued QTY</th>
@@ -43,11 +44,12 @@
             <tbody>
                 @forelse ($trans as $tran)
                     <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}"
-                        @if ($tran->trans_stat == 'Requested') @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
+                        @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
                         @if ($tran->trans_stat == 'Issued' and session('pharm_location_name') != 'Warehouse') onclick="cancel_issued({{ $tran->id }})" @endif>
                         <th>{{ $tran->trans_no }}</th>
                         <td>{{ $tran->created_at() }}</td>
-                        <td>{{ $tran->location->description }}</td>
+                        <td class="text-xs">{{ $tran->location->description }}</td>
+                        <td class="text-xs">{{ $tran->from_location ? $tran->from_location->description : '' }}</td>
                         <td>{{ $tran->drug->drug_concat() }}</td>
                         <td>{{ number_format($tran->requested_qty) }}</td>
                         <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>

@@ -86,7 +86,14 @@ class IoTransList extends Component
     {
         $this->selected_request = $txn;
         $this->issue_qty = $txn->requested_qty;
-        $this->available_drugs = $txn->warehouse_stock_charges->all();
+        $this->available_drugs = DrugStock::with('charge')->with('drug')
+            ->select('chrgcode', DB::raw('SUM(stock_bal) as "avail"'))
+            ->where('loc_code', $txn->request_from)->where('stock_bal', '>', '0')
+            ->where('exp_date', '>', now())
+            ->where('dmdcomb', $txn->dmdcomb)
+            ->where('dmdctr', $txn->dmdctr)
+            ->groupBy('chrgcode')
+            ->get();
         $this->dispatchBrowserEvent('toggleIssue');
     }
 
@@ -102,13 +109,13 @@ class IoTransList extends Component
 
         $issue_qty = $this->issue_qty;
         $issued_qty = 0;
-        $warehouse_id = PharmLocation::where('description', 'LIKE', '%' . 'Warehouse')->first()->id;
+        $location_id = PharmLocation::find($this->selected_request->request_from)->id;
 
         $available_qty = DrugStock::where('dmdcomb', $this->selected_request->dmdcomb)
             ->where('dmdctr', $this->selected_request->dmdctr)
             ->where('chrgcode', $this->chrgcode)
             ->where('exp_date', '>', date('Y-m-d'))
-            ->where('loc_code', $warehouse_id)
+            ->where('loc_code', $location_id)
             ->where('stock_bal', '>', '0')
             ->groupBy('chrgcode')
             ->sum('stock_bal');
@@ -119,7 +126,7 @@ class IoTransList extends Component
                 ->where('dmdctr', $this->selected_request->dmdctr)
                 ->where('chrgcode', $this->chrgcode)
                 ->where('exp_date', '>', date('Y-m-d'))
-                ->where('loc_code', $warehouse_id)
+                ->where('loc_code', $location_id)
                 ->where('stock_bal', '>', '0')
                 ->oldest('exp_date')
                 ->get();
@@ -143,7 +150,7 @@ class IoTransList extends Component
                         'iotrans_id' => $this->selected_request->id,
                         'dmdcomb' => $this->selected_request->dmdcomb,
                         'dmdctr' => $this->selected_request->dmdctr,
-                        'from' => session('pharm_location_id'),
+                        'from' => $this->selected_request->request_from,
                         'to' => $this->selected_request->loc_code,
                         'chrgcode' => $stock->chrgcode,
                         'exp_date' => $stock->exp_date,
@@ -154,7 +161,7 @@ class IoTransList extends Component
                         'dmdprdte' => $stock->dmdprdte,
                     ]);
                     $stock->save();
-                    LogIoTransIssue::dispatch($warehouse_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty, $stock->exp_date, $stock->drug_concat());
+                    LogIoTransIssue::dispatch($location_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty, $stock->exp_date, $stock->drug_concat());
                 }
             }
             $this->selected_request->issued_qty = $issued_qty;

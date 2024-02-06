@@ -25,6 +25,7 @@ class InOutTransaction extends Model
         'dmdcomb',
         'dmdctr',
         'loc_code',
+        'request_from',
         'chrgcode',
         'requested_qty',
         'issued_qty',
@@ -63,6 +64,11 @@ class InOutTransaction extends Model
     public function location()
     {
         return $this->belongsTo(PharmLocation::class, 'loc_code', 'id');
+    }
+
+    public function from_location()
+    {
+        return $this->belongsTo(PharmLocation::class, 'request_from', 'id');
     }
 
     public function charge()
