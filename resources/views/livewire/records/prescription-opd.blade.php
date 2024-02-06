@@ -40,10 +40,17 @@
         </div>
     </div> --}}
     <div class="flex justify-end">
+        <div class="w-full max-w-xs form-control ">
+            <label for="patient_name">
+                <span class="label-text">Patient</span>
+            </label>
+            <input type="text" placeholder="Patient Name" class="w-full input input-sm input-bordered"
+                id="patient_name" />
+        </div>
         <div class="ml-2">
             <div class="form-control">
-                <label class="input-group">
-                    <span>From</span>
+                <label>
+                    <span>Date</span>
                     <input type="date" class="w-full input input-sm input-bordered"
                         max="{{ date('Y-m-d', strtotime('+1 day')) }}" wire:model.lazy="filter_date" />
                 </label>
@@ -70,11 +77,12 @@
                         <th>Order Type</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tableBody">
                     @forelse ($prescriptions as $rx)
                         <tr wire:key="view-enctr-{{ $rx->enccode }}-{{ $loop->iteration }}"
-                            wire:click="view_enctr('{{ $rx->enccode }}')" class="cursor-pointer hover">
-                            <td>
+                            class="cursor-pointer hover clickable-row content @if ($rx->basic) has-basic @elseif ($rx->g24) has-g24 @elseif ($rx->or) has-or @else has-none @endif"
+                            data-href="{{ route('dispensing.view.enctr', ['enccode' => Crypt::encrypt(str_replace(' ', '--', $rx->enccode))]) }}">
+                            <td class="whitespace-nowrap">
                                 <div class="flex-col">
                                     <div>{{ \Carbon\Carbon::parse($rx->opddate)->format('Y/m/d') }}</div>
                                     <div>{{ \Carbon\Carbon::parse($rx->opdtime)->format('g:i A') }}</div>
@@ -93,11 +101,7 @@
                             <td class="whitespace-nowrap">
                                 <div class="flex-col">
                                     <div>
-                                        @if ($rx->licno)
-                                            {{ $rx->empprefix . ' ' . $rx->lastname . ', ' . $rx->firstname . ' ' . mb_substr($rx->middlename, 0, 1) . '.' }}
-                                        @else
-                                            N/A
-                                        @endif
+                                        Out Patient Department
                                     </div>
                                     <div>{{ $rx->tsdesc }}</div>
                                 </div>
@@ -145,8 +149,19 @@
     </div>
 </div>
 
-@push('script')
+@push('scripts')
     <script>
+        $(document).ready(function() {
+
+            $("#patient_name").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                console.log('asdasds')
+                $("#tableBody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+
         function sortTable(n) {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
             table = document.getElementById("dataTable");
@@ -201,5 +216,13 @@
                 }
             }
         }
+
+
+        $(document).ready(function($) {
+            $(".clickable-row").click(function() {
+                let url = $(this).data("href");
+                $('<a  rel="noopener noreferrer" href="' + url + '" target="blank"></a>')[0].click();
+            });
+        });
     </script>
 @endpush

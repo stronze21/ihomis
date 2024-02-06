@@ -376,7 +376,6 @@ class EncounterTransactionView extends Component
 
     public function add_item($dmdcomb, $dmdctr, $chrgcode, $loc_code, $dmdprdte, $id, $available, $exp_date)
     {
-        // dd($this->encounter);
         $with_rx = false;
         if ($dmdcomb == $this->rx_dmdcomb and $dmdctr == $this->rx_dmdctr) {
             $with_rx = true;
@@ -508,17 +507,7 @@ class EncounterTransactionView extends Component
     {
         $has_delete = false;
         $items = DrugOrder::whereIn('docointkey', $this->selected_items)
-            ->where('estatus', 'U')->get();
-
-        foreach ($items as $item) {
-            if ($item->prescription_data_id) {
-                DB::connection('webapp')->table('webapp.dbo.prescription_data')
-                    ->where('id', $item->prescription_data_id)
-                    ->update(['stat' => 'A']);
-            }
-            $item->delete();
-            $has_delete = true;
-        }
+            ->where('estatus', 'U')->orWhereNull('pcchrgcod')->delete();
 
         $this->reset('selected_items');
 

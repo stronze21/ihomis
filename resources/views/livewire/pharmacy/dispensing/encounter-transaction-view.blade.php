@@ -161,7 +161,7 @@
                                     <input type="checkbox"
                                         class="checkbox{{ '-' . ($rxo->pcchrgcod ?? 'blank') }}{{ date('mdY', strtotime($rxo->dodate)) }}"
                                         wire:model.defer="selected_items" wire:key="item-{{ $rxo->docointkey }}"
-                                        name="docointkey" value="{{ $rxo->docointkey }}" />
+                                        name="docointkey" value="{{ $rxo->docointkey ?? 'blank' }}" />
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">
                                     <div class="flex flex-col align-center">
@@ -584,10 +584,6 @@
             placeholder: 'Fund Source',
         });
 
-        // $('#filter_charge_code').on('change', function() {
-        //     @this.set('charge_code', $('#filter_charge_code').select2('val'));
-        // });
-
         function charge_items() {
             Swal.fire({
                 title: 'Are you sure?',
@@ -621,24 +617,6 @@
                 }
             })
         }
-
-        // function issue_order() {
-        //     Swal.fire({
-        //         title: 'Are you sure?',
-        //         showCancelButton: true,
-        //         confirmButtonText: 'Continue',
-        //         html: `
-    //                 <i data-feather="x-circle" class="w-16 h-16 mx-auto mt-3 text-danger"></i>
-    //                 <div class="mt-2 text-slate-500" id="inf">Issue all charged items. Continue?</div>
-    //             `,
-        //     }).then((result) => {
-        //         /* Read more about isConfirmed, isDenied below */
-        //         if (result.isConfirmed) {
-        //             Livewire.emit('issue_order')
-        //         }
-        //     })
-        // }
-
 
         @if ($toecode == 'OPD' or $toecode == 'WALKN')
             function issue_order() {
