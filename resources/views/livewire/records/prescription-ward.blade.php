@@ -69,11 +69,13 @@
             <table class="table w-full mb-3 table-compact" wire:ignore id="dataTable">
                 <thead>
                     <tr>
-                        <th class="cursor-pointer" onclick="sortTable(0)">Date Admitted <span class="ml-1"><i
+                        <th class="cursor-pointer" onclick="sortTable(0)"># <span class="ml-1"><i
                                     class="las la-sort"></i></span></th>
-                        <th class="cursor-pointer" onclick="sortTable(1)">Patient Name <span class="ml-1"><i
+                        <th class="cursor-pointer" onclick="sortTable(1)">Date Admitted <span class="ml-1"><i
                                     class="las la-sort"></i></span></th>
-                        <th class="cursor-pointer" onclick="sortTable(2)">Department <span class="ml-1"><i
+                        <th class="cursor-pointer" onclick="sortTable(2)">Patient Name <span class="ml-1"><i
+                                    class="las la-sort"></i></span></th>
+                        <th class="cursor-pointer" onclick="sortTable(3)">Department <span class="ml-1"><i
                                     class="las la-sort"></i></span></th>
                         <th>Patient Classification</th>
                         <th>Rx Tag</th>
@@ -84,6 +86,7 @@
                         <tr wire:key="view-enctr-{{ $rx->enccode }}-{{ $loop->iteration }}"
                             class="cursor-pointer hover clickable-row content {{ Illuminate\Support\Str::slug($rx->wardname, '-') }}@if ($rx->basic) has-basic @elseif ($rx->g24) has-g24 @elseif ($rx->or) has-or @else has-none @endif"
                             data-href="{{ route('dispensing.view.enctr', ['enccode' => Crypt::encrypt(str_replace(' ', '--', $rx->enccode))]) }}">
+                            <td>{{ $loop->iteration }}</td>
                             <td>
                                 <div class="flex-col">
                                     <div>{{ Carbon\Carbon::parse($rx->admdate)->format('Y/m/d') }}</div>

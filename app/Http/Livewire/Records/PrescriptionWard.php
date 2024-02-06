@@ -88,13 +88,11 @@ class PrescriptionWard extends Component
                                 (SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND data.order_type = 'OR') 'or'
                             FROM hospital.dbo.henctr enctr RIGHT JOIN webapp.dbo.prescription rx ON enctr.enccode = rx.enccode
                                 LEFT JOIN hospital.dbo.hadmlog adm ON enctr.enccode = adm.enccode
-                                RIGHT JOIN hospital.dbo.hpatroom pat_room ON rx.enccode = pat_room.enccode
-                                RIGHT JOIN hospital.dbo.hroom room ON pat_room.rmintkey = room.rmintkey
-                                RIGHT JOIN hospital.dbo.hward ward ON pat_room.wardcode = ward.wardcode
+                                RIGHT JOIN hward ward ON (SELECT TOP(1) wardcode FROM hpatroom WHERE enccode = enctr.enccode AND patrmstat = 'A' ORDER BY hprtime DESC) = ward.wardcode
+                                RIGHT JOIN hroom room ON (SELECT TOP(1) rmintkey FROM hpatroom WHERE enccode = enctr.enccode AND patrmstat = 'A' ORDER BY hprtime DESC) = room.rmintkey
                                 RIGHT JOIN hospital.dbo.hperson pt ON enctr.hpercode = pt.hpercode
                                 LEFT JOIN hospital.dbo.hpatmss mss ON enctr.enccode = mss.enccode
                             WHERE (toecode = 'ADM' OR toecode = 'OPDAD' OR toecode = 'ERADM' OR toecode = 'ER' OR toecode = 'OPD')
-                            AND pat_room.patrmstat = 'A'
                             AND rx.stat = 'A'
                             ORDER BY pt.patlast ASC, pt.patfirst ASC, pt.patmiddle ASC, rx.created_at DESC
                             ");
