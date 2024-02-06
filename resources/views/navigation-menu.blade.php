@@ -21,9 +21,15 @@
                         </x-jet-nav-link>
                     @endcan
                     @can('view-prescriptions')
-                        <x-jet-nav-link class="ml-2" href="{{ route('rx.ward') }}" :active="request()->routeIs('rx.*')">
-                            <i class="mr-1 las la-lg la-file-prescription"></i> {{ __('Prescriptions') }}
-                        </x-jet-nav-link>
+                        @if (session('pharm_location_name') == 'OPD Pharmacy')
+                            <x-jet-nav-link class="ml-2" href="{{ route('rx.ward') }}" :active="request()->routeIs('rx.*')">
+                                <i class="mr-1 las la-lg la-file-prescription"></i> {{ __('Prescriptions') }}
+                            </x-jet-nav-link>
+                        @else
+                            <x-jet-nav-link class="ml-2" href="{{ route('rx.opd') }}" :active="request()->routeIs('rx.*')">
+                                <i class="mr-1 las la-lg la-file-prescription"></i> {{ __('Prescriptions') }}
+                            </x-jet-nav-link>
+                        @endif
                     @endcan
                     @can('view-prescriptions')
                         <x-jet-nav-link class="ml-2" href="{{ route('dispensing.rxo.pending') }}" :active="request()->routeIs('dispensing.rxo.pending')">
