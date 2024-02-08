@@ -55,5 +55,6 @@ class HrxoSecondary extends Model
         'qtyissued',
         'qtybal',
         'pcchrgcod',
+        'transferred',
     ];
 }
