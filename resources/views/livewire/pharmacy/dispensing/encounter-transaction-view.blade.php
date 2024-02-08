@@ -814,7 +814,7 @@
                                 <label class="label">
                                     <span class="label-text">Quantity</span>
                                 </label>
-                                <input id="order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+                                <input id="order_qty" type="number" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
                             </div>
                             <div class="w-full">
                                 <div class="w-full form-control">
@@ -935,7 +935,7 @@
                             <label class="label">
                                 <span class="label-text">Quantity</span>
                             </label>
-                            <input id="order_qty" type="number" value="1" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
+                            <input id="order_qty" type="number" class="box-border w-64 h-32 p-4 text-7xl input input-bordered" />
                         </div>
                         <div class="w-full">
                             <div class="w-full form-control">
@@ -1040,7 +1040,7 @@
                             <label class="label">
                                 <span class="label-text">Issued Qty</span>
                             </label>
-                            <input id="order_qty" type="number" value="1" class="w-full input input-bordered disabled bg-slate-200" readonly tabindex='-1' />
+                            <input id="order_qty" type="number" class="w-full input input-bordered disabled bg-slate-200" readonly tabindex='-1' />
                         </div>
 
                         <div class="w-full px-2 mb-3 form-control">
