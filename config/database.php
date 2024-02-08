@@ -81,7 +81,7 @@ return [
         'hospital' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '192.168.1.101'),
+            'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '1433'),
             'database' => env('DB_DATABASE', 'hospital'),
             'username' => env('DB_USERNAME', 'pharmacy'),
@@ -96,7 +96,7 @@ return [
         'webapp' => [
             'driver' => 'sqlsrv',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '192.168.1.101'),
+            'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '1433'),
             'database' => env('DB_DATABASE_2', 'webapp'),
             'username' => env('DB_USERNAME_2', 'pharmacy'),

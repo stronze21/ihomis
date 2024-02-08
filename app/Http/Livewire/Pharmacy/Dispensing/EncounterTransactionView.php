@@ -370,7 +370,7 @@ class EncounterTransactionView extends Component
                     $rxo->qtyissued = $rxo->pchrgqty;
                     $rxo->tx_type = $this->type;
                     $rxo->save();
-                    HrxoCreate::dispatch($rxo->docointkey);
+                    HrxoCreate::dispatch($rxo->docointkey)->onQueue('high');
                     LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id, now());
                 }
             } else {

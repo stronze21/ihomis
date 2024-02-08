@@ -39,7 +39,6 @@ class DrugOrder extends Model
         'prescription_data_id',
         'prescribed_by',
         'remarks',
-        'hidden',
     ];
 
     public function enctr()
