@@ -370,7 +370,7 @@ class EncounterTransactionView extends Component
                     $rxo->qtyissued = $rxo->pchrgqty;
                     $rxo->tx_type = $this->type;
                     $rxo->save();
-                    HrxoCreate::dispatch($rxo->docointkey)->onQueue('high');
+                    HrxoCreate::dispatch($rxo->docointkey);
                     LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id, now());
                 }
             } else {
@@ -567,8 +567,8 @@ class EncounterTransactionView extends Component
 
     public function delete_item()
     {
-        $has_delete = false;
-        $items = DrugOrder::whereIn('docointkey', $this->selected_items)
+        $has_delete = true;
+        $items = HrxoSecondary::whereIn('docointkey', $this->selected_items)
             ->where(function ($query) {
                 $query->where('estatus', 'U')->orWhereNull('pcchrgcod');
             })->delete();

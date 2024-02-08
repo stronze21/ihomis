@@ -86,8 +86,6 @@ class HrxoCreate implements ShouldQueue
             'prescribed_by' => $hrxo2->prescribed_by,
             'hidden' => '1',
         ]);
-        $hrxo2->transferred = true;
-        $hrxo2->save();
         // $created = DB::insert(
         //     'INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
         //             rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,

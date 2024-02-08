@@ -56,7 +56,6 @@ class CreateHrxoSecondariesTable extends Migration
             $table->integer('qtyissued')->nullable();
             $table->integer('qtybal')->nullable();
             $table->string('pcchrgcod')->nullable();
-            $table->boolean('transferred')->default(false)->nullable();
             $table->timestamps();
         });
     }
