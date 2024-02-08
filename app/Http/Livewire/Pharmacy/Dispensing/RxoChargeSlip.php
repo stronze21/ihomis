@@ -41,7 +41,7 @@ class RxoChargeSlip extends Component
         $rxo2 =  HrxoSecondary::where('pcchrgcod', $pcchrgcod)->latest('dodate')->get();
 
         if ($rxo2->isEmpty()) {
-            $rxo2 = DB::select('SELECT hrxo.*, drug_concat FROM hrxo JOIN hdmhdr ON hrxo.dmdcomb = hdmhdr.dmdcomb AND hrxo.dmdctr = hdmhdr.dmdctr WHERE pcchrgcod = ?', [$pcchrgcod]);
+            $rxo2 = DB::select('SELECT hrxo.*, drug_concat, entryby FROM hrxo JOIN hdmhdr ON hrxo.dmdcomb = hdmhdr.dmdcomb AND hrxo.dmdctr = hdmhdr.dmdctr WHERE pcchrgcod = ?', [$pcchrgcod]);
         }
 
         $patient = Patient::find($rxo2[0]->hpercode);
