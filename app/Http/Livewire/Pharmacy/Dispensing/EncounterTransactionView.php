@@ -567,8 +567,8 @@ class EncounterTransactionView extends Component
 
     public function delete_item()
     {
-        $has_delete = false;
-        $items = DrugOrder::whereIn('docointkey', $this->selected_items)
+        $has_delete = true;
+        $items = HrxoSecondary::whereIn('docointkey', $this->selected_items)
             ->where(function ($query) {
                 $query->where('estatus', 'U')->orWhereNull('pcchrgcod');
             })->delete();
