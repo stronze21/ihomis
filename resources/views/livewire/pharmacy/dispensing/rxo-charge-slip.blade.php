@@ -23,21 +23,29 @@
                 </div>
                 <div class="flex flex-col text-left whitespace-nowrap">
                     <div>Dep't./Section: <span class="font-semibold">
-                            {{ $rxo[0]->prescription_data ? ($rxo[0]->prescription_data->employee->dept ? $rxo[0]->prescription_data->employee->dept->deptname : '') : '' }}</span>
+                            {{ $emp->dept ? $emp->dept->deptname : '' }}</span>
                     </div>
                     <div>Date/Time: <span
                             class="font-semibold">{{ date('F j, Y h:i A', strtotime($rxo_header->dodate)) }}</span>
                     </div>
-                    <div>Patient's Name: <span class="font-semibold">{{ $rxo_header->patient->fullname() }}</span></div>
-                    <div>Hosp Number: <span class="font-semibold">{{ $rxo_header->patient->hpercode }}</span></div>
+                    {{-- <div>Patient's Name: <span class="font-semibold">{{ $rxo_header->patient->fullname() }}</span></div> --}}
+                    <div>Patient's Name: <span class="font-semibold">{{ $patient->fullname() }}</span></div>
+                    <div>Hosp Number: <span class="font-semibold">{{ $patient->hpercode }}</span></div>
+                    {{-- <div>Hosp Number: <span class="font-semibold">{{ $rxo_header->patient->hpercode }}</span></div> --}}
                     <div>Ward:
                         <span class="font-semibold">{{ $wardname ? $wardname->wardname : '' }}</span>
                         <span class="font-semibold">{{ $room_name ? $room_name->rmname : '' }}
                             / {{ $toecode }}</span>
                     </div>
 
-                    <div>Ordering Physician: <span
-                            class="font-semibold">{{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . ($rxo[0]->prescription_data ? $rxo[0]->prescription_data->employee->fullname() : '') : 'N/A' }}</span>
+                    <div>Ordering Physician:
+                        {{-- <span class="font-semibold">
+                            {{ $prescription && $prescription->adm_pat_room ? 'Dr. ' . ($rxo[0]->prescription_data ? $rxo[0]->prescription_data->employee->fullname() : '') : 'N/A' }}
+                        </span> --}}
+
+                        <span class="font-semibold">
+                            {{ $dr ? 'Dr. ' . $dr->fullname() : 'N/A' }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -54,9 +62,13 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $pcchrgamt = 0;
+                    @endphp
                     @foreach ($rxo as $item)
                         @php
-                            $concat = implode(',', explode('_,', $item->dm->drug_concat));
+                            // $concat = implode(',', explode('_,', $item->dm->drug_concat));
+                            $concat = implode(',', explode('_,', $item->drug_concat));
                         @endphp
                         <tr class="border-t border-black border-x">
                             <td class="!text-2xs font-semibold text-wrap" colspan="4">{{ $concat }}</td>
@@ -75,10 +87,11 @@
                                 $returned_qty += $item->returns->sum('qty');
                             }
                             if ($item->estatus == 'S') {
-                                $total_issued += $item->qtyissued;
+                                $total_issued += 1;
                             } else {
-                                $total_issued += $item->pchrgqty;
+                                $total_issued += 1;
                             }
+                            $pcchrgamt += $item->pcchrgamt;
                         @endphp
                     @endforeach
                 </tbody>
@@ -89,13 +102,14 @@
                         @endif
                         <td colspan="2">{{ number_format($total_issued) }}
                             ITEMS</td>
-                        <td colspan="2">TOTAL {{ number_format((float) $rxo->sum('pcchrgamt'), 2) }}</td>
+                        <td colspan="2">TOTAL {{ number_format((float) $pcchrgamt, 2) }}</td>
                     </tr>
                 </tfoot>
             </table>
             <div class="flex flex-col py-0 my-0 text-left text-xs/4 whitespace-nowrap">
                 <div>Issued by:
-                    {{ $rxo_header->employee ? $rxo_header->employee->fullname() : ($rxo_header->user ? $rxo_header->user->name : $rxo_header->entry_by) }}
+                    {{ $emp ? $emp->fullname() : $rxo[0]->entry_by }}
+                    {{-- {{ $rxo_header->employee ? $rxo_header->employee->fullname() : ($rxo_header->user ? $rxo_header->user->name : $rxo_header->entry_by) }} --}}
                 </div>
                 <div><span>Time: {{ \Carbon\Carbon::create($rxo_header->dodate)->format('h:i A') }}</span></div>
                 <div><span>Verified by Nurse/N.A.: _________________________</span></div>

@@ -42,42 +42,6 @@ class PrescriptionOpd extends Component
                                 ORDER BY pt.patlast ASC, pt.patfirst ASC, pt.patmiddle ASC, rx.created_at DESC
                                 ", [$from, $to]);
 
-        // $prescriptions = DB::table(DB::raw('hospital.dbo.henctr enctr'))
-        //     ->rightJoin(DB::raw('webapp.dbo.prescription rx'), 'enctr.enccode', 'rx.enccode')
-        //     ->rightJoin(DB::raw('hospital.dbo.hopdlog opd'), 'enctr.enccode', 'opd.enccode')
-        //     ->rightJoin(DB::raw('hospital.dbo.hperson pt'), 'opd.hpercode', 'pt.hpercode')
-        //     ->rightJoin(DB::raw('hospital.dbo.htypser ser'), 'opd.tscode', 'ser.tscode')
-        //     ->leftJoin(DB::raw('hospital.dbo.hprovider prov'), 'opd.licno', 'prov.licno')
-        //     ->leftJoin(DB::raw('hospital.dbo.hpersonal emp'), 'prov.employeeid', 'emp.employeeid')
-        //     ->select(
-        //         'opd.enccode',
-        //         'opd.enccode',
-        //         'opd.hpercode',
-        //         'opd.opddate',
-        //         'opd.opdtime',
-        //         'pt.patfirst',
-        //         'pt.patmiddle',
-        //         'pt.patlast',
-        //         'pt.patsuffix',
-        //         'prov.licno',
-        //         'emp.firstname',
-        //         'emp.middlename',
-        //         'emp.lastname',
-        //         'emp.empprefix',
-        //         'ser.tsdesc',
-        //         DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND (data.order_type = '' OR data.order_type IS NULL)) basic"),
-        //         DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND data.order_type = 'G24') g24"),
-        //         DB::raw("(SELECT COUNT(qty) FROM webapp.dbo.prescription_data data WHERE rx.id = data.presc_id AND data.stat = 'A' AND data.order_type = 'OR') 'or'")
-        //     )
-        //     ->where('pt.patstat', 'A')
-        //     ->where('rx.stat', 'A')
-        //     ->where('enctr.encstat', 'A')
-        //     ->whereBetween('created_at', [$from, $to])
-        //     ->orderBy('pt.patlast', 'ASC')
-        //     ->orderBy('pt.patfirst', 'ASC')
-        //     ->orderBy('pt.patmiddle', 'ASC')
-        //     ->orderByDesc('rx.created_at');
-
         return view('livewire.records.prescription-opd', [
             'prescriptions' => $prescriptions,
         ]);

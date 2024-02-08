@@ -151,6 +151,93 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white">
+                        @foreach ($rxos2 as $rxo2)
+                            @php
+                                $concat = explode('_,', $rxo2->drug_concat);
+                                $drug = implode('', $concat);
+                            @endphp
+                            <tr class="border">
+                                <td class="w-10 text-center">
+                                    <input type="checkbox"
+                                        class="checkbox{{ '-' . ($rxo2->pcchrgcod ?? 'blank') }}{{ date('mdY', strtotime($rxo2->dodate)) }}"
+                                        wire:model.defer="selected_items" wire:key="item-{{ $rxo2->docointkey }}"
+                                        name="docointkey" value="{{ $rxo2->docointkey }}" />
+                                </td>
+                                <td class="whitespace-nowrap w-min" title="View Charge Slip">
+                                    <div class="flex flex-col align-center">
+                                        @if ($rxo2->pcchrgcod)
+                                            <a rel="noopener noreferrer" class="font-semibold text-blue-600"
+                                                href="{{ route('dispensing.rxo.chargeslip', $rxo2->pcchrgcod) }}"
+                                                target="_blank">{{ $rxo2->pcchrgcod }}</a>
+                                        @endif
+                                        <span>{{ $rxo2->tx_type }}</span>
+                                    </div>
+                                </td>
+                                <td class="align-center whitespace-nowrap w-min">
+                                    <div class="flex flex-col">
+                                        <div>{{ date('m/d/Y', strtotime($rxo2->dodate)) }}</div>
+                                        <div>{{ date('h:i A', strtotime($rxo2->dodate)) }}</div>
+                                    </div>
+                                </td>
+                                <td class="w-max">
+                                    <div class="flex flex-col">
+                                        <div class="text-xs text-slate-600">{{ $rxo2->chrgdesc ?? '' }}</div>
+                                        <div class="text-sm font-bold whitespace-nowrap">{{ $concat[0] }}</div>
+                                        <div class="text-xs text-center text-slate-800">
+                                            {{ $concat[1] }}</div>
+                                    </div>
+                                </td>
+                                <td class="w-20 text-right">{{ number_format($rxo2->pchrgqty) }}</td>
+                                <td class="w-20 text-right whitespace-nowrap">
+                                    @if ($rxo2->estatus == 'S' and $rxo2->qtyissued > 0)
+                                        <span class="cursor-pointer tooltip" data-tip="Return"
+                                            onclick="return_issued('{{ $rxo2->docointkey }}', '{{ $concat[0] }} }}', {{ $rxo2->pchrgup }}, {{ $rxo2->qtyissued }})">
+                                            <i class="text-red-600 las la-lg la-undo-alt"></i>
+                                            {{ number_format($rxo2->qtyissued) }}
+                                        </span>
+                                    @else
+                                        {{ number_format($rxo2->qtyissued) }}
+                                    @endif
+                                </td>
+                                <td class="text-right w-min">{{ number_format($rxo2->pchrgup, 2) }}</td>
+                                <td class="text-right w-min total">{{ number_format($rxo2->pcchrgamt, 2) }}</td>
+                                <td>
+                                    <div class="form-control">
+                                        <label class="input-group">
+                                            @if ($selected_remarks == $rxo2->docointkey)
+                                                <input type="text" class="input input-bordered"
+                                                    value="{{ $rxo2->remarks }}" wire:model.lazy="new_remarks"
+                                                    wire:key="rem-input-{{ $rxo2->docointkey }}" />
+                                                <button class="btn-primary btn btn-square"
+                                                    wire:click="update_remarks()"
+                                                    wire:key="update-rem-{{ $rxo2->docointkey }}">
+                                                    <i class="las la-lg la-save"></i>
+                                                </button>
+                                            @else
+                                                <input type="text" class="input input-bordered"
+                                                    value="{{ $rxo2->remarks }}" disabled />
+                                                <button class="btn btn-square"
+                                                    wire:click="$set('selected_remarks', '{{ $rxo2->docointkey }}')"
+                                                    wire:key="set-rem-id-{{ $rxo2->docointkey }}">
+                                                    <i class="las la-lg la-edit"></i>
+                                                </button>
+                                            @endif
+
+                                        </label>
+                                    </div>
+                                </td>
+                                @php
+                                    if ($rxo2->estatus == 'U' || !$rxo2->pcchrgcod) {
+                                        $badge = '<span class="badge badge-sm badge-warning">Pending</span>';
+                                    } elseif ($rxo2->estatus == 'P' && $rxo2->pcchrgcod) {
+                                        $badge = '<span class="badge badge-sm badge-secondary">Charged</span>';
+                                    } elseif ($rxo2->estatus == 'S' && $rxo2->pcchrgcod) {
+                                        $badge = '<span class="badge badge-sm badge-success">Issued</span>';
+                                    }
+                                @endphp
+                                <td class="text-center w-min">{!! $badge !!}</td>
+                            </tr>
+                        @endforeach
                         @forelse ($rxos as $rxo)
                             @php
                                 $concat = explode('_,', $rxo->drug_concat);
@@ -276,8 +363,8 @@
                                 $drug = implode('', $concat);
                             @endphp
                             <tr class="cursor-pointer hover content {{ $stock->chrgcode }}"
-                                onclick="select_item('{{ $stock->id }}', `{{ $drug }}`, '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}')">
-                                <td class="break-words">
+                                onclick="select_item('{{ $stock->id }}', `{{ $stock->chrgdesc }}`, `{{ $drug }}`, '{{ $stock->dmselprice }}', '{{ $stock->dmdcomb }}', '{{ $stock->dmdctr }}', '{{ $stock->chrgcode }}', '{{ $stock->loc_code }}', '{{ $stock->dmdprdte }}', '{{ $stock->id }}', {{ $stock->stock_bal }}, '{{ $stock->exp_date }}', `{{ $stock->drug_concat }}`)">
+                                <td class="break-word">
                                     <div>
                                         <span class="text-xs text-slate-600">{{ $stock->chrgdesc }}</span>
 
@@ -328,28 +415,29 @@
                     </thead>
                     <tbody class="bg-white">
 
-                        {{-- @foreach ($active_prescription as $presc)
+                        @foreach ($active_prescription as $presc)
                             <tr class="hover" wire:key="select-rx-item-{{ $loop->iteration }}">
                                 <td class="text-xs">
                                     {{ date('Y-m-d', strtotime($presc->updated_at)) }}
                                     {{ date('h:i A', strtotime($presc->updated_at)) }}
                                 </td>
                                 <td class="text-xs cursor-pointer"
-                                    onclick="select_rx_item({{ $presc->id }}, `{{ $presc->drug_concat }}`, '{{ $presc->qty }}', '{{ $presc->empid }}', '{{ $presc->dmdcomb }}', '{{ $presc->dmdctr }}')">
+                                    onclick="select_rx_item({{ $presc->id }}, `{{ $presc->drug_concat }}`, '{{ $presc->qty }}', '{{ $presc->entry_by }}', '{{ $presc->dmdcomb }}', '{{ $presc->dmdctr }}')">
                                     {{ $presc->drug_concat }}</td>
                                 <td class="text-xs">{{ $presc->qty }}</td>
                                 <td class="text-xs">{{ $presc->remark }}</td>
-                                <td class="text-xs">{{ $presc->employee->fullname() }}</td>
+                                <td class="text-xs">
+                                    {{ $presc->lastname . ', ' . $presc->firstname . ' ' . $presc->middlename }}</td>
                                 <td class="text-xs cursor-pointer"><button class="btn btn-xs btn-error"
-                                        onclick="select_rx_item_inactive({{ $presc->id }}, '{{ $presc->drug_concat }}', '{{ $presc->qty }}', '{{ $presc->empid }}', '{{ $presc->dmdcomb }}', '{{ $presc->dmdctr }}')"><i
+                                        onclick="select_rx_item_inactive({{ $presc->id }}, '{{ $presc->drug_concat }}', '{{ $presc->qty }}', '{{ $presc->entry_by }}', '{{ $presc->dmdcomb }}', '{{ $presc->dmdctr }}')"><i
                                             class="las la-sliders-h"></i></button></td>
                             </tr>
-                        @endforeach --}}
-                        @forelse($active_prescription as $presc)
+                        @endforeach
+                        {{-- @forelse($active_prescription as $presc)
                             @forelse($presc->data_active->all() as $presc_data)
                                 <tr class="hover" wire:key="select-rx-item-{{ $loop->iteration }}">
                                     <td class="text-xs">
-                                        {{ date('Y-m-d', strtotime($presc_data->updated_at)) }}
+                                        {{ date('Y-m-d', strtotime($presc_data->updated_at)) }}asd
                                         {{ date('h:i A', strtotime($presc_data->updated_at)) }}
                                     </td>
                                     <td class="text-xs cursor-pointer"
@@ -368,7 +456,7 @@
                                 </tr>
                             @endforelse
                         @empty
-                        @endforelse
+                        @endforelse --}}
                         @foreach ($extra_prescriptions as $extra)
                             @forelse($extra->data_active->all() as $extra_data)
                                 <tr class="hover" {{-- wire:click.prefetch="$set('generic', '{{ $extra_data->dm->generic->gendesc }}')" --}} {{-- wire:click.prefetch="add_item({{ $extra_data->dm->generic->gendesc }})" --}} {{-- ondblclick="select_rx_item_inactive({{ $extra_data->id }}, '{{ $extra_data->dm->drug_concat() }}', '{{ $extra_data->qty }}', '{{ $extra->empid }}', '{{ $extra_data->dmdcomb }}', '{{ $extra_data->dmdctr }}')" --}}
@@ -715,11 +803,11 @@
                 })
             }
 
-            function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available,
-                exp_date) {
+            function select_item(dm_id, chrgdesc, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available,
+                exp_date, drug_concat) {
                 Swal.fire({
                     html: `
-                        <div class="text-xl font-bold">` + drug + `</div>
+                        <div class="text-xl font-bold">` + drug_concat + `</div>
                         <div class="flex w-full space-x-3">
                             <div class="w-full mb-3 form-control">
                                 <label class="label">
@@ -783,7 +871,7 @@
                         @this.set('remarks', remarks.value);
 
                         Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
-                            available, exp_date)
+                            available, exp_date, drug_concat, chrgdesc)
                     }
                 });
             }
@@ -963,8 +1051,8 @@
                 })
             }
 
-            function select_item(dm_id, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available,
-                exp_date) {
+            function select_item(dm_id, chrgdesc, drug, up, dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id, available,
+                exp_date, drug_concat) {
                 Swal.fire({
                     html: `
                     <div class="text-xl font-bold">` + drug + `</div>
@@ -1024,7 +1112,7 @@
                         @this.set('remarks', remarks.value);
 
                         Livewire.emit('add_item', dmdcomb, dmdctr, chrgcode, loc_code, dmdprdte, id,
-                            available, exp_date)
+                            available, exp_date, drug_concat, chrgdesc)
                     }
                 });
             }
