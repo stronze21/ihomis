@@ -188,7 +188,7 @@ class StockList extends Component
         $stock->dmdprdte = $dmdprdte;
 
         $stock->save();
-        LogDrugTransaction::dispatch(session('pharm_location_id'), $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty, $stock->id, $stock->exp_date, $drug->drug_concat(), date('Y-m-d'));
+        LogDrugTransaction::dispatch(session('pharm_location_id'), $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty, $stock->id, $stock->exp_date, $drug->drug_concat());
 
         $this->resetExcept('location_id', 'drugs', 'locations', 'charge_codes');
         $this->alert('success', 'Item beginning balance has been saved!');
