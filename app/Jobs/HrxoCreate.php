@@ -84,7 +84,7 @@ class HrxoCreate implements ShouldQueue
             'remarks' => $hrxo2->remarks, //added
             'prescription_data_id' => $hrxo2->prescription_data_id,
             'prescribed_by' => $hrxo2->prescribed_by,
-            'hidden' => true,
+            'hidden' => '1',
         ]);
         // $created = DB::insert(
         //     'INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
