@@ -442,53 +442,68 @@ class EncounterTransactionView extends Component
 
         if ($this->is_ris or $available >= $total_deduct) {
             $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
-            DB::insert(
-                'INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
-                    rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,
-                    has_tag, tx_type, ris, pchrgqty, pchrgup, pcchrgamt, dodate, dotime, dodtepost, dotmepost, dmdprdte, exp_date, loc_code, item_id, remarks, prescription_data_id, prescribed_by )
-                VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?, ? )',
-                [
-                    '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $chrgcode . $dmdcomb . $dmdctr,
-                    $enccode,
-                    $this->hpercode,
-                    '1',
-                    '1',
-                    $dmdcomb,
-                    '1',
-                    'A',
-                    'N',
-                    'N',
-                    'N',
-                    $dmdctr,
-                    'U',
-                    session('employeeid'),
-                    'NEWOR',
-                    'ACTIV',
-                    'PHARM',
-                    $chrgcode,
-                    'c',
-                    $this->type ? true : false,
-                    $this->type,
-                    $this->is_ris ? true : false,
-                    $this->order_qty,
-                    $this->unit_price,
-                    $this->order_qty * $this->unit_price,
-                    now(),
-                    now(),
-                    now(),
-                    now(),
-                    $dmdprdte,
-                    $exp_date,
-                    $loc_code,
-                    $id,
-                    $this->remarks ?? '',
-                    $with_rx ? $rx_id : null,
-                    $with_rx ? $empid : null,
-                ]
-            );
+            $docointkey = '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $chrgcode . $dmdcomb . $dmdctr;
+
+
+            $options = array("UID" => env('DB_USERNAME'), "PWD" => env('DB_PASSWORD'), "Database" => env('DB_DATABASE'));
+            $conn = sqlsrv_connect(env('DB_HOST'), $options);
+            $query = "INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
+                        rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,
+                        has_tag, tx_type, ris, pchrgqty, pchrgup, pcchrgamt, dodate, dotime, dodtepost, dotmepost, dmdprdte, exp_date, loc_code, item_id, remarks, prescription_data_id, prescribed_by )
+                        VALUES ( '" . $docointkey . "', '" . $enccode . "', '" . $this->hpercode . "', '1', '1', '" . $dmdcomb . "', '1', 'A',
+                            'N', 'N', 'N', '" . $dmdctr . "', 'U', '" . session('employeeid') . "', 'NEWOR', 'ACTIV', 'PHARM', '" . $chrgcode . "', 'c',
+                            '" . ($this->type ? true : false) . "', '" . $this->type . "', '" . ($this->is_ris ? true : false) . "', '" . $this->order_qty . "', '" . $this->unit_price . "',
+                            '" . $this->order_qty * $this->unit_price . "', '" . now() . "', '" . now() . "', '" . now() . "', '" . now() . "', '" . $dmdprdte . "', '" . $exp_date . "',
+                            '" . $loc_code . "', '" . $id . "', '" . ($this->remarks ?? '') . "', '" . ($with_rx ? $rx_id : null) . "', '" . ($with_rx ? $empid : null) . "' )";
+            $query_run = sqlsrv_query($conn, $query);
+
+            // DB::insert(
+            //     'INSERT INTO hospital.dbo.hrxo(docointkey, enccode, hpercode, rxooccid, rxoref, dmdcomb, repdayno1, rxostatus,
+            //         rxolock, rxoupsw, rxoconfd, dmdctr, estatus, entryby, ordcon, orderupd, locacode, orderfrom, issuetype,
+            //         has_tag, tx_type, ris, pchrgqty, pchrgup, pcchrgamt, dodate, dotime, dodtepost, dotmepost, dmdprdte, exp_date, loc_code, item_id, remarks, prescription_data_id, prescribed_by )
+            //     VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            //             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            //             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+            //             ?, ?, ?, ?, ?, ? )',
+            //     [
+            //         '0000040' . $this->hpercode . date('m/d/Yh:i:s', strtotime(now())) . $chrgcode . $dmdcomb . $dmdctr,
+            //         $enccode,
+            //         $this->hpercode,
+            //         '1',
+            //         '1',
+            //         $dmdcomb,
+            //         '1',
+            //         'A',
+            //         'N',
+            //         'N',
+            //         'N',
+            //         $dmdctr,
+            //         'U',
+            //         session('employeeid'),
+            //         'NEWOR',
+            //         'ACTIV',
+            //         'PHARM',
+            //         $chrgcode,
+            //         'c',
+            //         $this->type ? true : false,
+            //         $this->type,
+            //         $this->is_ris ? true : false,
+            //         $this->order_qty,
+            //         $this->unit_price,
+            //         $this->order_qty * $this->unit_price,
+            //         now(),
+            //         now(),
+            //         now(),
+            //         now(),
+            //         $dmdprdte,
+            //         $exp_date,
+            //         $loc_code,
+            //         $id,
+            //         $this->remarks ?? '',
+            //         $with_rx ? $rx_id : null,
+            //         $with_rx ? $empid : null,
+            //     ]
+            // );
             if ($with_rx) {
                 DB::connection('webapp')->table('webapp.dbo.prescription_data')
                     ->where('id', $rx_id)
@@ -505,9 +520,15 @@ class EncounterTransactionView extends Component
 
     public function delete_item()
     {
-        $has_delete = false;
-        $items = DrugOrder::whereIn('docointkey', $this->selected_items)
-            ->where('estatus', 'U')->orWhereNull('pcchrgcod')->delete();
+        $has_delete = true;
+        $options = array("UID" => env('DB_USERNAME'), "PWD" => env('DB_PASSWORD'), "Database" => env('DB_DATABASE'));
+        $conn = sqlsrv_connect(env('DB_HOST'), $options);
+        foreach ($this->selected_items as $docointkey) {
+            $query = "DELETE FROM hrxo WHERE docointkey = '" . $docointkey . "' AND (estatus = 'U' OR pcchrgcod IS NULL)";
+            $query_run = sqlsrv_query($conn, $query);
+        }
+        // $items = DrugOrder::whereIn('docointkey', $this->selected_items)
+        //     ->where('estatus', 'U')->orWhereNull('pcchrgcod')->delete();
 
         $this->reset('selected_items');
 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Livewire\Records;
 
+use App\Models\Pharmacy\Dispensing\DrugOrder;
+use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
 use Carbon\Carbon;
 use Livewire\Component;
 use App\Models\References\City;
@@ -13,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Record\Patients\Patient;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockCard;
+use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Record\Patients\Models\PatientAddress;
 
