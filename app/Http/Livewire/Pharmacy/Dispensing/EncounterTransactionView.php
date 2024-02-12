@@ -504,6 +504,7 @@ class EncounterTransactionView extends Component
             //         $with_rx ? $empid : null,
             //     ]
             // );
+
             if ($with_rx) {
                 DB::connection('webapp')->table('webapp.dbo.prescription_data')
                     ->where('id', $rx_id)
@@ -532,12 +533,8 @@ class EncounterTransactionView extends Component
 
         $this->reset('selected_items');
 
-        if ($has_delete) {
-            $this->emit('refresh');
-            $this->alert('success', 'Selected item/s deleted!');
-        } else {
-            $this->alert('error', 'Select pending items only!');
-        }
+        $this->emit('refresh');
+        $this->alert('success', 'Selected item/s deleted!');
     }
 
     public function return_issued(DrugOrder $item)

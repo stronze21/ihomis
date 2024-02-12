@@ -74,11 +74,7 @@
                             if ($view_returns) {
                                 $returned_qty += $item->returns->sum('qty');
                             }
-                            if ($item->estatus == 'S') {
-                                $total_issued += $item->qtyissued;
-                            } else {
-                                $total_issued += $item->pchrgqty;
-                            }
+                            $total_issued++;
                         @endphp
                     @endforeach
                 </tbody>
