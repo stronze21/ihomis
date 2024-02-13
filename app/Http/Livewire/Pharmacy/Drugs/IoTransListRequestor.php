@@ -48,7 +48,7 @@ class IoTransListRequestor extends Component
             ->latest();
 
         $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', 'drug_concat')
-            ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
+            ->where('exp_date', '>', now())
             ->orderBy('drug_concat', 'ASC')
             ->groupBy('dmdcomb', 'dmdctr', 'drug_concat');
 
