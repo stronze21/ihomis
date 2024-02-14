@@ -234,7 +234,6 @@ class IoTransListRequestor extends Component
         $txn->save();
 
         $this->alert('success', 'Transaction successful. All items received!');
-        $this->resetExcept('locations');
     }
 
     public function issue_request()

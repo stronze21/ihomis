@@ -29,7 +29,7 @@ class EmergencyPurchases extends Component
     {
         $drugs = Drug::where('dmdstat', 'A')
             // ->whereHas('sub', function ($query) {
-            //     // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD'));
+            //     // return $query->whereIn('dmhdrsub', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD', 'DRUMAE'));
             //     return $query->where('dmhdrsub', 'LIKE', '%DRUM%');
             // })
             ->whereNotNull('drug_concat')

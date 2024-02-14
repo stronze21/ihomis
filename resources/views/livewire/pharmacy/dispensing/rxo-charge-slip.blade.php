@@ -1,5 +1,6 @@
 @php
     $total_issued = 0;
+    $total_amt = 0;
 @endphp
 <div class="container max-w-xl mx-auto mt-5">
     <div class="flex justify-between mb-3 align-middle">
@@ -56,6 +57,8 @@
                 <tbody>
                     @foreach ($rxo as $item)
                         @php
+                            $amount = $item->pcchrgamt + $view_returns ? $item->pchrgup * $item->returns->sum('qty') : 0;
+                            $total_amt += $amount;
                             $concat = implode(',', explode('_,', $item->dm->drug_concat));
                         @endphp
                         <tr class="border-t border-black border-x">
@@ -68,11 +71,11 @@
                             <td class="text-right" colspan="2">
                                 {{ number_format($item->qtyissued ?? $item->pchrgqty, 0) }}</td>
                             <td class="text-right">{{ $item->pchrgup }}</td>
-                            <td class="text-right">{{ number_format($item->pcchrgamt, 2) }}</td>
+                            <td class="text-right">{{ number_format($amount, 2) }}</td>
                         </tr>
                         @php
                             if ($view_returns) {
-                                $returned_qty += $item->returns->sum('qty');
+                                $returned_qty = $item->returns->count();
                             }
                             $total_issued++;
                         @endphp
@@ -85,7 +88,7 @@
                         @endif
                         <td colspan="2">{{ number_format($total_issued) }}
                             ITEMS</td>
-                        <td colspan="2">TOTAL {{ number_format((float) $rxo->sum('pcchrgamt'), 2) }}</td>
+                        <td colspan="2">TOTAL {{ number_format($total_amt, 2) }}</td>
                     </tr>
                 </tfoot>
             </table>
