@@ -57,7 +57,7 @@
                 <tbody>
                     @foreach ($rxo as $item)
                         @php
-                            $amount = $item->pcchrgamt + $view_returns ? $item->pchrgup * $item->returns->sum('qty') : 0;
+                            $amount = $item->pcchrgamt + ($view_returns ? $item->pchrgup * $item->returns->sum('qty') : 0);
                             $total_amt += $amount;
                             $concat = implode(',', explode('_,', $item->dm->drug_concat));
                         @endphp
