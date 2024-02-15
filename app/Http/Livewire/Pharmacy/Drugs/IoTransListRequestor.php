@@ -36,10 +36,13 @@ class IoTransListRequestor extends Component
     public $received_qty = 0;
     public $available_drugs;
     public $locations, $location_id;
+    public $search;
 
     public function render()
     {
-        $trans = InOutTransaction::with('drug')->with('location')
+        $trans = InOutTransaction::whereHas('drug', function ($query) {
+            $query->where('drug_concat', 'like', '%' . $this->search . '%');
+        })->with('location')
             ->with('charge')
             ->where(function ($query) {
                 $query->where('loc_code', session('pharm_location_id'))
