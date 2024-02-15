@@ -2,26 +2,27 @@
 
 namespace App\Http\Livewire\Pharmacy\Drugs;
 
-use App\Events\IoTransEvent;
-use App\Events\IoTransNewRequest;
-use App\Events\IoTransRequestUpdated;
+use Carbon\Carbon;
+use App\Models\User;
+use Livewire\Component;
 use App\Events\UserUpdated;
+use App\Events\IoTransEvent;
+use Livewire\WithPagination;
 use App\Jobs\LogIoTransIssue;
+use App\Models\Pharmacy\Drug;
 use App\Jobs\LogIoTransReceive;
+use App\Events\IoTransNewRequest;
 use App\Models\Pharmacy\DrugPrice;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Events\IoTransRequestUpdated;
+use App\Models\Pharmacy\PharmLocation;
 use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Notifications\IoTranNotification;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Models\Pharmacy\Drugs\InOutTransaction;
 use App\Models\Pharmacy\Drugs\InOutTransactionItem;
-use App\Models\Pharmacy\PharmLocation;
-use App\Models\User;
-use App\Notifications\IoTranNotification;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
-use Livewire\Component;
-use Livewire\WithPagination;
 
 class IoTransListRequestor extends Component
 {
@@ -36,7 +37,7 @@ class IoTransListRequestor extends Component
     public $received_qty = 0;
     public $available_drugs;
     public $locations, $location_id;
-    public $search;
+    public $search, $dmdcomb;
 
     public function render()
     {
@@ -50,14 +51,14 @@ class IoTransListRequestor extends Component
             })
             ->latest();
 
-        $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', 'drug_concat')
-            ->where('exp_date', '>', now())
-            ->orderBy('drug_concat', 'ASC')
-            ->groupBy('dmdcomb', 'dmdctr', 'drug_concat');
+        $drugs = Drug::where('dmdstat', 'A')
+            ->whereNotNull('drug_concat')
+            ->has('generic')->orderBy('drug_concat', 'ASC')
+            ->get();
 
         return view('livewire.pharmacy.drugs.io-trans-list-requestor', [
             'trans' => $trans->paginate(20),
-            'drugs' => $drugs->get(),
+            'drugs' => $drugs,
         ]);
     }
 
@@ -69,17 +70,13 @@ class IoTransListRequestor extends Component
     public function add_request()
     {
         $this->validate(['stock_id' => ['required', 'numeric']]);
-        $stock = DrugStock::find($this->stock_id);
-        $dmdcomb = $stock->dmdcomb;
-        $dmdctr = $stock->dmdctr;
 
-        $current_qty = DrugStock::where('loc_code', $this->location_id)
-            ->where('dmdcomb', $dmdcomb)->where('dmdctr', $dmdctr)
-            ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
-            ->groupBy('dmdcomb', 'dmdctr')->sum('stock_bal');
+        $dm = explode(',', $this->dmdcomb);
+        $dmdcomb = $dm[0];
+        $dmdctr = $dm[1];
 
         $this->validate([
-            'requested_qty' => ['required', 'numeric', 'min:1', 'max:' . $current_qty],
+            'requested_qty' => ['required', 'numeric', 'min:1'],
             'remarks' => ['nullable', 'string'],
         ]);
 
@@ -106,19 +103,14 @@ class IoTransListRequestor extends Component
     public function add_more_request()
     {
         $this->validate(['stock_id' => ['required', 'numeric']]);
-        $stock = DrugStock::find($this->stock_id);
-        $dmdcomb = $stock->dmdcomb;
-        $dmdctr = $stock->dmdctr;
+
+        $dm = explode(',', $this->dmdcomb);
+        $dmdcomb = $dm[0];
+        $dmdctr = $dm[1];
 
         $past = InOutTransaction::where('loc_code', session('pharm_location_id'))->latest()->first();
 
-        $current_qty = DrugStock::where('loc_code', $past->request_from)
-            ->where('dmdcomb', $dmdcomb)->where('dmdctr', $dmdctr)
-            ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
-            ->groupBy('dmdcomb', 'dmdctr')->sum('stock_bal');
-
         $this->validate([
-            'requested_qty' => ['required', 'numeric', 'min:1', 'max:' . $current_qty],
             'remarks' => ['nullable', 'string'],
         ]);
 

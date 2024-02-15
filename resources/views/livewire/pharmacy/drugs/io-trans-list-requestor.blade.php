@@ -190,7 +190,7 @@
                         <select class="select select-bordered select2" id="stock_id">
                             <option disabled selected>Choose drug/medicine</option>
                             @foreach ($drugs as $drug)
-                                <option value="{{ $drug->id }}">{{ $drug->drug->drug_concat() }}</option>
+                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ implode(' ', explode('_,', $drug->drug_concat)) }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -245,7 +245,7 @@
                         <select class="select select-bordered select2" id="more_stock_id">
                             <option disabled selected>Choose drug/medicine</option>
                             @foreach ($drugs as $drug)
-                                <option value="{{ $drug->id }}">{{ $drug->drug->drug_concat() }}</option>
+                                <option value="{{ $drug->dmdcomb }},{{ $drug->dmdctr }}">{{ implode(' ', explode('_,', $drug->drug_concat)) }}</option>
                             @endforeach
                         </select>
                     </div>
