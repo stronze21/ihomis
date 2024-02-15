@@ -69,8 +69,6 @@ class IoTransListRequestor extends Component
 
     public function add_request()
     {
-        $this->validate(['stock_id' => ['required', 'numeric']]);
-
         $dm = explode(',', $this->dmdcomb);
         $dmdcomb = $dm[0];
         $dmdctr = $dm[1];
@@ -102,8 +100,6 @@ class IoTransListRequestor extends Component
 
     public function add_more_request()
     {
-        $this->validate(['stock_id' => ['required', 'numeric']]);
-
         $dm = explode(',', $this->dmdcomb);
         $dmdcomb = $dm[0];
         $dmdctr = $dm[1];
