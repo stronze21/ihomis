@@ -31,7 +31,7 @@ class EncounterTransactionView extends Component
 {
     use LivewireAlert;
 
-    protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'add_prescribed_item', 'delete_item', 'deactivate_rx'];
+    protected $listeners = ['charge_items', 'issue_order', 'add_item', 'return_issued', 'add_prescribed_item', 'delete_item', 'deactivate_rx', 'update_qty'];
 
     public $generic, $charge_code = [];
     public $enccode, $location_id, $hpercode, $toecode, $mssikey;
@@ -723,5 +723,19 @@ class EncounterTransactionView extends Component
         $data->stat = 'I';
         $data->save();
         $this->alert('success', 'Prescription updated!');
+    }
+
+    public function update_qty($docointkey)
+    {
+        $this->validate([
+            'order_qty' => ['required', 'numeric', 'min:1'],
+        ]);
+        DrugOrder::where('docointkey', $docointkey)
+            ->update([
+                'pchrgqty' => $this->order_qty,
+                'pchrgup' => $this->unit_price,
+                'pcchrgamt' =>  $this->order_qty * $this->unit_price
+            ]);
+        $this->alert('success', 'Order updated!');
     }
 }
