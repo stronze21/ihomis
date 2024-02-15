@@ -69,7 +69,7 @@ class IoTransListRequestor extends Component
 
     public function add_request()
     {
-        $dm = explode(',', $this->dmdcomb);
+        $dm = explode(',', $this->stock_id);
         $dmdcomb = $dm[0];
         $dmdctr = $dm[1];
 
@@ -100,7 +100,7 @@ class IoTransListRequestor extends Component
 
     public function add_more_request()
     {
-        $dm = explode(',', $this->dmdcomb);
+        $dm = explode(',', $this->stock_id);
         $dmdcomb = $dm[0];
         $dmdctr = $dm[1];
 
