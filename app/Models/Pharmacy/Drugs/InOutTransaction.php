@@ -101,6 +101,27 @@ class InOutTransaction extends Model
         return '<div class="flex justify-between">' . $status . " " . Carbon::parse($this->updated_at)->diffForHumans() . '</div>';
     }
 
+    public function stat()
+    {
+        if ($this->trans_stat == 'Requested') {
+            $status = '<span class="mr-2 badge bg-slate-500 hover">' . $this->trans_stat . '</span>';
+        } elseif ($this->trans_stat == 'Cancelled') {
+            $status = '<span class="mr-2 bg-red-500 badge hover">' . $this->trans_stat . '</span>';
+        } elseif ($this->trans_stat == 'Issued') {
+            $status = '<span class="mr-2 bg-blue-500 badge hover">' . $this->trans_stat . '</span>';
+        } elseif ($this->trans_stat == 'Received') {
+            $status = '<span class="mr-2 bg-green-500 badge hover">' . $this->trans_stat . '</span>';
+        }
+
+        return '<div class="flex justify-between">' . $status . '</div>';
+    }
+
+    public function updated_at2()
+    {
+
+        return Carbon::parse($this->updated_at)->format('M d, Y G:i A');
+    }
+
     public function items()
     {
         return $this->hasMany(InOutTransactionItem::class, 'iotrans_id', 'id');

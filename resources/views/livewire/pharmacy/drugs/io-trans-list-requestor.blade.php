@@ -46,8 +46,8 @@
                 <tr>
                     <th class="w-1/12">Reference</th>
                     <th class="w-1/12">Date Requested</th>
-                    <th class="w-1/12">Request By</th>
-                    <th class="w-1/12">Request From</th>
+                    <th class="w-1/12">Request FROM</th>
+                    <th class="w-1/12">Request TO</th>
                     <th class="w-6/12">Item Requested</th>
                     <th class="w-1/12">Requested QTY</th>
                     <th class="w-1/12">Issued QTY</th>
@@ -58,15 +58,20 @@
             </thead>
             <tbody>
                 @forelse ($trans as $tran)
-                    <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}"
-                        @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
-                        @if ($tran->trans_stat == 'Requested' and $tran->loc_code == session('pharm_location_id')) onclick="cancel_tx({{ $tran->id }})" @endif
-                        @if ($tran->trans_stat == 'Issued' and session('pharm_location_id') == $tran->loc_code) @can('receive-requested-drugs') onclick="receive_issued('{{ $tran->id }}', `{{ $tran->drug->drug_concat() }}`, '{{ number_format($tran->issued_qty) }}')" @endcan @endif>
-                        <th class="text-xs">{{ $tran->trans_no }}</th>
+                    <tr class="hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}">
+                        <th class="text-xs cursor-pointer" wire:click="view_trans('{{ $tran->trans_no }}')">
+                            <span class="text-blue-500"><i class="las la-lg la-eye"></i> {{ $tran->trans_no }}</span>
+                        </th>
                         <td class="text-xs">{{ $tran->created_at() }}</td>
                         <td class="text-xs">{{ $tran->location->description }}</td>
                         <td class="text-xs">{{ $tran->from_location ? $tran->from_location->description : '' }}</td>
-                        <td class="text-xs">{{ $tran->drug->drug_concat() }}</td>
+                        <td class="text-xs cursor-pointer"
+                            @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
+                            @if ($tran->trans_stat == 'Requested' and $tran->loc_code == session('pharm_location_id')) onclick="cancel_tx({{ $tran->id }})" @endif
+                            @if ($tran->trans_stat == 'Issued' and session('pharm_location_id') == $tran->loc_code) @can('receive-requested-drugs') onclick="receive_issued('{{ $tran->id }}', `{{ $tran->drug->drug_concat() }}`, '{{ number_format($tran->issued_qty) }}')" @endcan @endif>
+                            <span class="text-blue-500"><i class="las la-lg la-hand-pointer"></i>
+                                {{ $tran->drug->drug_concat() }}</span>
+                        </td>
                         <td class="text-xs">{{ number_format($tran->requested_qty) }}</td>
                         <td class="text-xs">{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
                         <td class="text-xs">
@@ -77,7 +82,9 @@
                             @endphp
                         </td>
                         <td class="text-xs">{!! $tran->updated_at() !!}</td>
-                        <td class="text-xs"></td>
+                        <td class="text-xs">
+
+                        </td>
                     </tr>
                 @empty
                     <tr>

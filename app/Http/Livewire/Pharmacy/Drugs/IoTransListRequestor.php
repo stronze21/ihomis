@@ -308,4 +308,9 @@ class IoTransListRequestor extends Component
             $this->alert('error', 'Failed to issue medicine. Selected fund source insufficient stock!');
         }
     }
+
+    public function view_trans($trans_no)
+    {
+        return $this->redirect(route('iotrans.view', ['reference_no' => $trans_no]));
+    }
 }

@@ -33,6 +33,7 @@ use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedDepartments;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 use App\Http\Livewire\Pharmacy\Dispensing\PendingOrders;
 use App\Http\Livewire\Pharmacy\Drugs\StockPullOutList;
+use App\Http\Livewire\Pharmacy\Drugs\ViewIotrans;
 use App\Http\Livewire\Pharmacy\References\PndfGenerics;
 use App\Http\Livewire\Pharmacy\Reports\DailyStockCard;
 use App\Http\Livewire\Pharmacy\Reports\DrugsReturnedSummary;
@@ -79,6 +80,7 @@ Route::middleware([
     });
 
     Route::name('iotrans.')->prefix('iotrans')->group(function () {
+        Route::get('/view/{reference_no}', ViewIotrans::class)->name('view');
         Route::get('/list', IoTransList::class)->name('list');
         Route::get('/requests', IoTransListRequestor::class)->name('requests');
     });
