@@ -35,6 +35,10 @@ class InOutTransaction extends Model
         'received_by',
         'trans_stat',
         'retail_price',
+        'remarks_request',
+        'remarks_issue',
+        'remarks_received',
+        'remarks_cancel',
     ];
 
 

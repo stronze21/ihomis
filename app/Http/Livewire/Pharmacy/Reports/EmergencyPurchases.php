@@ -44,6 +44,7 @@ class EmergencyPurchases extends Component
         $purchases = DrugEmergencyPurchase::with('drug')
             ->with('current_price')
             ->with('charge')
+            ->where('pharm_location_id', session('pharm_location_id'))
             ->paginate(15);
 
         return view('livewire.pharmacy.reports.emergency-purchases', [

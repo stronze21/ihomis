@@ -6,64 +6,66 @@ use Carbon\Carbon;
 use App\Models\User;
 use Livewire\Component;
 use App\Events\UserUpdated;
-use App\Events\IoTransEvent;
-use Livewire\WithPagination;
 use App\Jobs\LogIoTransIssue;
 use App\Models\Pharmacy\Drug;
 use App\Jobs\LogIoTransReceive;
 use App\Events\IoTransNewRequest;
-use App\Models\Pharmacy\DrugPrice;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use App\Events\IoTransRequestUpdated;
 use App\Models\Pharmacy\PharmLocation;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Notifications\IoTranNotification;
-use App\Models\Pharmacy\Drugs\DrugStockLog;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Models\Pharmacy\Drugs\InOutTransaction;
 use App\Models\Pharmacy\Drugs\InOutTransactionItem;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 
-class IoTransListRequestor extends Component
+class ViewIoTransDate extends Component
 {
     use LivewireAlert;
-    use WithPagination;
 
-    protected $listeners = ['add_request', 'cancel_tx', 'receive_issued', 'refreshComponent' => '$refresh', 'add_more_request', 'issue_request'];
-
-    public $stock_id, $requested_qty, $remarks;
+    protected $listeners = ['add_request', 'cancel_tx', 'receive_issued', 'issue_request'];
+    public $reference_no, $from, $to, $requested_qty, $remarks, $stock_id;
     public $selected_request, $chrgcode, $issue_qty = 0;
-    public $issued_qty = 0;
-    public $received_qty = 0;
     public $available_drugs;
     public $locations, $location_id;
-    public $search, $dmdcomb;
+    public $date;
+    public $search;
 
     public function render()
     {
-        $trans = InOutTransaction::whereHas('drug', function ($query) {
-            $query->where('drug_concat', 'like', '%' . $this->search . '%');
-        })->with('location')
+        $date_from = Carbon::parse($this->date)->startOfDay();
+        $date_to = Carbon::parse($this->date)->endOfDay();
+
+        $trans = InOutTransaction::whereBetween('created_at', [$date_from, $date_to])
+            ->whereHas('drug', function ($query) {
+                $query->where('drug_concat', 'like', '%' . $this->search . '%');
+            })->with('location')
             ->with('charge')
             ->where(function ($query) {
                 $query->where('loc_code', session('pharm_location_id'))
                     ->orWhere('request_from', session('pharm_location_id'));
             })
-            ->latest();
+            ->latest()->get();
 
         $drugs = Drug::where('dmdstat', 'A')
             ->whereNotNull('drug_concat')
             ->has('generic')->orderBy('drug_concat', 'ASC')
             ->get();
 
-        return view('livewire.pharmacy.drugs.io-trans-list-requestor', [
-            'trans' => $trans->paginate(20),
+        if (!$this->from && !$this->to) {
+            $this->from = $trans[0]->loc_code;
+            $this->to = $trans[0]->request_from;
+        }
+
+        return view('livewire.pharmacy.drugs.view-io-trans-date', [
+            'trans' => $trans,
             'drugs' => $drugs,
         ]);
     }
 
-    public function mount()
+    public function mount($date)
     {
+        $this->date = $date;
         $this->locations = PharmLocation::where('id', '<>', session('pharm_location_id'))->get();
     }
 
@@ -95,7 +97,7 @@ class IoTransListRequestor extends Component
         IoTransNewRequest::dispatch($location, $io_tx);
         $location->notify(new IoTranNotification($io_tx, session('user_id')));
 
-        $this->resetExcept('locations');
+        $this->resetExcept('locations', 'date', 'search');
         $this->alert('success', 'Request added!');
     }
 
@@ -128,7 +130,7 @@ class IoTransListRequestor extends Component
         IoTransNewRequest::dispatch($warehouse, $io_tx);
         $warehouse->notify(new IoTranNotification($io_tx, session('user_id')));
 
-        $this->resetExcept('locations');
+        $this->resetExcept('locations', 'date', 'search');
         $this->alert('success', 'Request added!');
     }
 
@@ -187,7 +189,7 @@ class IoTransListRequestor extends Component
         $txn->save();
 
         $this->alert('success', 'Transaction cancelled. All issued items has been returned to the warehouse!');
-        $this->resetExcept('locations');
+        $this->resetExcept('locations', 'date', 'search');
     }
 
     public function receive_issued(InOutTransaction $txn)
@@ -307,7 +309,7 @@ class IoTransListRequestor extends Component
             IoTransRequestUpdated::dispatch($this->selected_request, 'A requested drugs/medicine has been issued from the warehouse.');
             $this->dispatchBrowserEvent('toggleIssue');
             $this->alert('success', 'Request issued successfully!');
-            $this->resetExcept('locations');
+            $this->resetExcept('locations', 'date', 'search');
         } else {
             $this->alert('error', 'Failed to issue medicine. Selected fund source insufficient stock!');
         }
@@ -316,10 +318,5 @@ class IoTransListRequestor extends Component
     public function view_trans($trans_no)
     {
         return $this->redirect(route('iotrans.view', ['reference_no' => $trans_no]));
-    }
-
-    public function view_trans_date($date)
-    {
-        return $this->redirect(route('iotrans.view_date', ['date' => $date]));
     }
 }

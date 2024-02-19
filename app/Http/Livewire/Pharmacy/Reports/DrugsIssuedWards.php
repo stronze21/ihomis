@@ -31,9 +31,10 @@ class DrugsIssuedWards extends Component
                                     WHERE rxo.issuedte BETWEEN ? AND ?
                                     AND ward.wardcode LIKE ?
                                     AND rxo.chrgcode LIKE ?
+                                    AND rxo.loc_code = ?
                                     GROUP BY ward.wardname, drug.drug_concat, charge.chrgdesc
                                     ORDER BY ward.wardname ASC, drug.drug_concat ASC
-                                    ", [$date_from, $date_to, $this->wardcode ?? '%%', $this->filter_charge ?? '%%']);
+                                    ", [$date_from, $date_to, $this->wardcode ?? '%%', $this->filter_charge ?? '%%', session('pharm_location_id')]);
 
         return view('livewire.pharmacy.reports.drugs-issued-wards', compact(
             'drugs_issued',

@@ -36,9 +36,10 @@ class DrugsIssuedDepartments extends Component
                                     WHERE rxo.issuedte BETWEEN ? AND ?
                                     AND dept.deptcode LIKE ?
                                     AND rxo.chrgcode LIKE ?
+                                    AND rxo.loc_code = ?
                                     GROUP BY dept.deptname, drug.drug_concat, charge.chrgdesc
                                     ORDER BY dept.deptname ASC, drug.drug_concat ASC
-                                    ", [$date_from, $date_to, $this->deptcode ?? '%%', $this->filter_charge ?? '%%']);
+                                    ", [$date_from, $date_to, $this->deptcode ?? '%%', $this->filter_charge ?? '%%', session('pharm_location_id')]);
 
         return view('livewire.pharmacy.reports.drugs-issued-departments', compact(
             'drugs_issued',

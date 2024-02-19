@@ -13,8 +13,10 @@ class IoTransIssuedReport extends Component
 
     public function render()
     {
-        $trans = InOutTransaction::where('trans_stat', 'Issued')
-            ->orWhere('trans_stat', 'Received')
+        $trans = InOutTransaction::where(function ($query) {
+            $query->where('trans_stat', 'Issued')
+                ->orWhere('trans_stat', 'Received');
+        })->where('request_from', session('pharm_location_id'))
             ->with('drug')
             ->with('location')
             ->paginate(15);

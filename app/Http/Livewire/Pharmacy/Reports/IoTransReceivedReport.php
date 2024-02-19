@@ -14,6 +14,7 @@ class IoTransReceivedReport extends Component
     public function render()
     {
         $trans = InOutTransaction::where('trans_stat', 'Received')
+            ->where('loc_code', session('pharm_location_id'))
             ->with('drug')
             ->with('location')
             ->paginate(15);
