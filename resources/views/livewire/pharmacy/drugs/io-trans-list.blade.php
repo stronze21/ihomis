@@ -47,7 +47,11 @@
                         <th class="text-xs cursor-pointer" wire:click="view_trans('{{ $tran->trans_no }}')">
                             <span class="text-blue-500"><i class="las la-lg la-eye"></i> {{ $tran->trans_no }}</span>
                         </th>
-                        <td>{{ $tran->created_at() }}</td>
+                        <td class="text-xs cursor-pointer"
+                            wire:click="view_trans_date('{{ date('Y-m-d', strtotime($tran->created_at)) }}')">
+                            <span class="text-blue-500"><i class="las la-lg la-eye"></i>
+                                {{ $tran->created_at() }}</span>
+                        </td>
                         <td class="text-xs">{{ $tran->location->description }}</td>
                         <td class="text-xs">{{ $tran->from_location ? $tran->from_location->description : '' }}</td>
                         <td @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif

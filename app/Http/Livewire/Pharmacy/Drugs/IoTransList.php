@@ -233,4 +233,9 @@ class IoTransList extends Component
     {
         return $this->redirect(route('iotrans.view', ['reference_no' => $trans_no]));
     }
+
+    public function view_trans_date($date)
+    {
+        return $this->redirect(route('iotrans.view_date', ['date' => $date]));
+    }
 }
