@@ -224,4 +224,9 @@ class IoTransList extends Component
         $this->alert('success', 'Issued items successfully recalled!');
         $this->reset();
     }
+
+    public function view_trans($trans_no)
+    {
+        return $this->redirect(route('iotrans.view', ['reference_no' => $trans_no]));
+    }
 }

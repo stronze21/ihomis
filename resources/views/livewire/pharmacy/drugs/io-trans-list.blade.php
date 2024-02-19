@@ -43,14 +43,18 @@
             </thead>
             <tbody>
                 @forelse ($trans as $tran)
-                    <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}"
-                        @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
-                        @if ($tran->trans_stat == 'Issued' and session('pharm_location_name') != 'Warehouse') onclick="cancel_issued({{ $tran->id }})" @endif>
-                        <th>{{ $tran->trans_no }}</th>
+                    <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}">
+                        <th class="text-xs cursor-pointer" wire:click="view_trans('{{ $tran->trans_no }}')">
+                            <span class="text-blue-500"><i class="las la-lg la-eye"></i> {{ $tran->trans_no }}</span>
+                        </th>
                         <td>{{ $tran->created_at() }}</td>
                         <td class="text-xs">{{ $tran->location->description }}</td>
                         <td class="text-xs">{{ $tran->from_location ? $tran->from_location->description : '' }}</td>
-                        <td>{{ $tran->drug->drug_concat() }}</td>
+                        <td @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
+                            @if ($tran->trans_stat == 'Issued' and session('pharm_location_name') != 'Warehouse') onclick="cancel_issued({{ $tran->id }})" @endif>
+                            <span class="text-blue-500"><i class="las la-lg la-hand-pointer"></i>
+                                {{ $tran->drug->drug_concat() }}</span>
+                        </td>
                         <td>{{ number_format($tran->requested_qty) }}</td>
                         <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
                         <td>{!! $tran->updated_at() !!}</td>
