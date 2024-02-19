@@ -66,6 +66,7 @@
                     <th>Fund Source</th>
                     <th class="text-center">Status</th>
                     <th>Date Updated</th>
+                    <th>Remarks</th>
                 </tr>
             </thead>
             <tbody class="border">
@@ -90,6 +91,9 @@
                         </td>
                         <td>{!! $tran->stat() !!}</td>
                         <td>{{ $tran->updated_at2() }}</td>
+                        <td>
+                            {{ $trans->remarks_request }}
+                        </td>
                     </tr>
                 @empty
                     <tr>

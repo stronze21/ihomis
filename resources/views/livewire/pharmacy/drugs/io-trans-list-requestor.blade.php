@@ -53,7 +53,7 @@
                     <th class="w-1/12">Issued QTY</th>
                     <th class="w-1/12">Fund Source</th>
                     <th class="w-1/12">Updated At</th>
-                    <th>Actions</th>
+                    <th>Remarks</th>
                 </tr>
             </thead>
             <tbody>
@@ -87,7 +87,7 @@
                         </td>
                         <td class="text-xs">{!! $tran->updated_at() !!}</td>
                         <td class="text-xs">
-
+                            {{ $trans->remarks_request }}
                         </td>
                     </tr>
                 @empty

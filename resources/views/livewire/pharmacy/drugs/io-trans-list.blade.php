@@ -38,7 +38,7 @@
                     <th class="w-1/12">Requested QTY</th>
                     <th class="w-1/12">Issued QTY</th>
                     <th class="w-1/12">Updated At</th>
-                    <th>Actions</th>
+                    <th>Remarks</th>
                 </tr>
             </thead>
             <tbody>
@@ -62,7 +62,9 @@
                         <td>{{ number_format($tran->requested_qty) }}</td>
                         <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
                         <td>{!! $tran->updated_at() !!}</td>
-                        <td></td>
+                        <td>
+                            {{ $trans->remarks_request }}
+                        </td>
                     </tr>
                 @empty
                     <tr>
