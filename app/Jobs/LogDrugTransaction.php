@@ -78,7 +78,7 @@ class LogDrugTransaction implements ShouldQueue
             'dmdcomb' => $this->dmdcomb,
             'dmdctr' => $this->dmdctr,
             'exp_date' => $this->exp_date,
-            'stock_date' => $date,
+            'stock_date' => $this->date,
             'drug_concat' => $this->drug_concat,
         ]);
         $card->reference += $this->qty;

@@ -2,15 +2,16 @@
 
 namespace App\Jobs;
 
-use App\Models\Pharmacy\Drugs\DrugStockCard;
-use App\Models\Pharmacy\Drugs\DrugStockLog;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use App\Models\Pharmacy\Drugs\DrugStockLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Models\Pharmacy\Drugs\DrugStockCard;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\Middleware\WithoutOverlapping;
-use Illuminate\Queue\SerializesModels;
 
 class LogIoTransIssue implements ShouldQueue
 {
@@ -53,12 +54,13 @@ class LogIoTransIssue implements ShouldQueue
      */
     public function handle()
     {
+        $date = Carbon::parse($this->trans_date)->startOfMonth()->format('Y-m-d');
         $log = DrugStockLog::firstOrNew([
             'loc_code' => $this->warehouse_id,
             'dmdcomb' => $this->dmdcomb,
             'dmdctr' => $this->dmdctr,
             'chrgcode' => $this->chrgcode,
-            'date_logged' => $this->trans_date,
+            'date_logged' => $date,
             'unit_price' => $this->retail_price,
             'dmdprdte' => $this->dmdprdte,
         ]);

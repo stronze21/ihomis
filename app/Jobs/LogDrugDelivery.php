@@ -46,7 +46,7 @@ class LogDrugDelivery implements ShouldQueue
      */
     public function handle()
     {
-        $date = Carbon::parse($this->date)->startOfMonth()->format('Y-m-d');
+        $date = Carbon::parse($this->date)->format('Y-m-d');
 
         $card = DrugStockCard::firstOrNew([
             'chrgcode' => $this->chrgcode,

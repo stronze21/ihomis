@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Pharmacy\Drugs\DrugStockCard;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -53,12 +54,13 @@ class LogIoTransReceive implements ShouldQueue
      */
     public function handle()
     {
+        $date = Carbon::parse($this->date_logged)->startOfMonth()->format('Y-m-d');
         $log = DrugStockLog::firstOrNew([
             'loc_code' => $this->to,
             'dmdcomb' => $this->dmdcomb,
             'dmdctr' => $this->dmdctr,
             'chrgcode' => $this->chrgcode,
-            'date_logged' => $this->date_logged,
+            'date_logged' => $date,
             'dmdprdte' => $this->dmdprdte,
             'unit_price' => $this->retail_price,
         ]);
