@@ -72,6 +72,7 @@ class ViewIotrans extends Component
             'requested_by' => session('user_id'),
             'loc_code' => $this->from,
             'request_from' => $this->to,
+            'remarks_request' => $this->remarks,
         ]);
 
         $location = PharmLocation::find($this->to);
