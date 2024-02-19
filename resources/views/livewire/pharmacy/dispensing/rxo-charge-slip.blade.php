@@ -74,9 +74,6 @@
                             <td class="text-right">{{ number_format($amount, 2) }}</td>
                         </tr>
                         @php
-                            if ($view_returns) {
-                                $returned_qty = $item->returns->count();
-                            }
                             $total_issued++;
                         @endphp
                     @endforeach

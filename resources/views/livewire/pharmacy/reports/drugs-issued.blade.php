@@ -134,7 +134,11 @@
                             <td class="text-sm text-right border">{{ number_format($rxi->qty) }}</td>
                             <td class="text-sm border">{{ date('Y-m-d h:i A', strtotime($rxi->issuedte)) }}</td>
                             <td class="text-sm border">{{ $rxi->hpercode }}</td>
-                            <td class="text-sm border">{{ $rxi->pcchrgcod }}</td>
+                            <td class="text-sm border">
+                                <a rel="noopener noreferrer" class="font-semibold text-blue-600"
+                                    href="{{ route('dispensing.rxo.chargeslip', $rxi->pcchrgcod) }}"
+                                    target="_blank">{{ $rxi->pcchrgcod }}</a>
+                            </td>
                             <td class="text-sm border">
                                 {{ $rxi->patlast . ', ' . $rxi->patfirst . ' ' . $rxi->patmiddle }}</td>
                             <td class="text-sm border">
@@ -155,16 +159,6 @@
         </div>
         <div class="mt-2">
             {{-- {{ $drugs_issued->links() }} --}}
-            mt-2 </div>
-    </div>
-
-    <!-- Put this part before </body> tag -->
-    <input type="checkbox" id="my-modal" class="modal-toggle" wire:loading.attr="checked" />
-    <div classmodal-toggle <div class="modal-box">
-        <div>
-            modal <span>
-                modal-box <i class="las la-spinner la-lg animate-spin"></i>
-                las la-spinner la-lg animate-spinspan>
         </div>
     </div>
 </div>

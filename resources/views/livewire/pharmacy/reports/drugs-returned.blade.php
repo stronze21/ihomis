@@ -108,7 +108,11 @@
                             <td class="text-sm text-right border">{{ $rxr->qty }}</td>
                             <td class="text-sm border">{{ $rxr->return_date() }}</td>
                             <td class="text-sm border">{{ $rxr->hpercode }}</td>
-                            <td class="text-sm border">{{ $rxr->pcchrgcod }}</td>
+                            <td class="text-sm border">
+                                <a rel="noopener noreferrer" class="font-semibold text-blue-600"
+                                    href="{{ route('dispensing.rxo.chargeslip', $rxr->pcchrgcod) }}"
+                                    target="_blank">{{ $rxr->pcchrgcod }}</a>
+                            </td>
                             <td class="text-sm border">{{ $rxr->patient->fullname() }}</td>
                             <td class="text-sm border">
                                 @if ($rxr->adm_pat_room)

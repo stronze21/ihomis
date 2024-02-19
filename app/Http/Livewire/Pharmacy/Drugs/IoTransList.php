@@ -38,7 +38,11 @@ class IoTransList extends Component
     public function render()
     {
         $trans = InOutTransaction::with('drug')->with('location')
-            ->with('charge');
+            ->with('charge')
+            ->where(function ($query) {
+                $query->where('loc_code', session('pharm_location_id'))
+                    ->orWhere('request_from', session('pharm_location_id'));
+            });
 
         $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', DB::raw('SUM(stock_bal) as "avail"'))
             ->whereRelation('location', 'description', 'LIKE', '%Warehouse%')

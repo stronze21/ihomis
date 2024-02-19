@@ -85,7 +85,11 @@
                             <td class="text-sm border">{{ date('F j, Y H:i A', strtotime($rxo->dodate)) }}</td>
                             <td class="text-sm border">{{ $rxo->hpercode }}</td>
                             <td class="text-sm border">{{ $rxo->patient->fullname() }}</td>
-                            <td class="text-sm border">{{ $rxo->pcchrgcod }}</td>
+                            <td class="text-sm border">
+                                <a rel="noopener noreferrer" class="font-semibold text-blue-600"
+                                    href="{{ route('dispensing.rxo.chargeslip', $rxo->pcchrgcod) }}"
+                                    target="_blank">{{ $rxo->pcchrgcod }}</a>
+                            </td>
                             <td class="text-sm text-right border">{{ $rxo->total_qty }}</td>
                             <td class="text-sm text-right border">{{ $rxo->total_amount }}</td>
                         </tr>
