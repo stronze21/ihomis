@@ -63,7 +63,7 @@
                         <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
                         <td>{!! $tran->updated_at() !!}</td>
                         <td>
-                            {{ $trans->remarks_request }}
+                            {{ $tran->remarks_request }}
                         </td>
                     </tr>
                 @empty

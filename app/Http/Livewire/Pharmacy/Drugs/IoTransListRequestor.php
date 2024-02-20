@@ -50,7 +50,6 @@ class IoTransListRequestor extends Component
                     ->orWhere('request_from', session('pharm_location_id'));
             })
             ->latest();
-
         $drugs = Drug::where('dmdstat', 'A')
             ->whereNotNull('drug_concat')
             ->has('generic')->orderBy('drug_concat', 'ASC')
