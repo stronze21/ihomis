@@ -82,8 +82,8 @@ Route::middleware([
     });
 
     Route::name('iotrans.')->prefix('iotrans')->group(function () {
-        Route::get('/view/{date}', ViewIoTransDate::class)->name('view_date');
-        Route::get('/view/{reference_no}', ViewIotrans::class)->name('view');
+        Route::get('/view-date/{date}', ViewIoTransDate::class)->name('view_date');
+        Route::get('/view-ref/{reference_no}', ViewIotrans::class)->name('view');
         Route::get('/list', IoTransList::class)->name('list');
         Route::get('/requests', IoTransListRequestor::class)->name('requests');
     });

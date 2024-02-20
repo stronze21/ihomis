@@ -92,7 +92,7 @@
                         <td>{!! $tran->stat() !!}</td>
                         <td>{{ $tran->updated_at2() }}</td>
                         <td>
-                            {{ $trans->remarks_request }}
+                            {{ $tran->remarks_request }}
                         </td>
                     </tr>
                 @empty
