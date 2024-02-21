@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Pharmacy\Drugs\ConsumptionLogDetail;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
 use App\Models\UserSession;

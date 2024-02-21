@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Livewire\Dashboard;
 use App\Http\Livewire\Pusher;
 use Illuminate\Support\Facades\Route;
 use App\Http\Livewire\Trash\SampleView;
@@ -58,13 +59,9 @@ Route::middleware([
     'auth:sanctum', config('jetstream.auth_session'), 'verified'
 ])->group(function () {
 
-    Route::get('/', function () {
-        return view('dashboard');
-    });
+    Route::get('/', Dashboard::class);
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
     Route::get('/patients', PatientsList::class)->name('patients.list');
     Route::get('/patients/register', PatientRegister::class)->name('patients.new');

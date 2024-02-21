@@ -2,13 +2,14 @@
 
 namespace App\Providers;
 
+use App\Actions\Jetstream\DeleteUser;
+use App\Models\Pharmacy\Drugs\ConsumptionLogDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\ServiceProvider;
 use Laravel\Fortify\Fortify;
 use Laravel\Jetstream\Jetstream;
-use Illuminate\Support\Facades\Hash;
-use App\Actions\Jetstream\DeleteUser;
-use Illuminate\Support\ServiceProvider;
 
 class JetstreamServiceProvider extends ServiceProvider
 {
@@ -45,6 +46,17 @@ class JetstreamServiceProvider extends ServiceProvider
                 session(['employeeid' => $user->employeeid]);
                 session(['pharm_location_id' => $user->pharm_location_id]);
                 session(['pharm_location_name' => $user->location->description]);
+
+                $active_consumption = ConsumptionLogDetail::where('status', 'A')
+                    ->where('loc_code', $user->pharm_location_id)
+                    ->first();
+
+                if ($active_consumption) {
+                    session(['active_consumption' => $active_consumption->id]);
+                } else {
+                    session(['active_consumption' => null]);
+                }
+
                 return $user;
             }
         });

@@ -19,6 +19,8 @@ class DrugStockLog extends Model
     protected $table = 'hospital.dbo.pharm_drug_stock_logs';
 
     protected $fillable = [
+        'consumption_id',
+
         'counter_id',
         'loc_code',
         'dmdcomb',

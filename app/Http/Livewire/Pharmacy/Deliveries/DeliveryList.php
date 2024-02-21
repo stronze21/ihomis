@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Pharmacy\Deliveries;
 
 use App\Models\Pharmacy\DeliveryDetail;
+use App\Models\Pharmacy\Drugs\ConsumptionLogDetail;
 use App\Models\References\ChargeCode;
 use App\Models\References\Supplier;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +29,7 @@ class DeliveryList extends Component
 
     public function render()
     {
+
         $deliveries = DeliveryDetail::with('supplier')->with('items')->with('charge')->latest()->paginate(15);
         $suppliers = Supplier::all();
         $charges = ChargeCode::where('bentypcod', 'DRUME')

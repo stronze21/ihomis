@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Pharmacy\Drugs\ConsumptionLogDetail;
 use App\Models\Pharmacy\Drugs\DrugStockCard;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
 use Carbon\Carbon;

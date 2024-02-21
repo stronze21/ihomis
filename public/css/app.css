@@ -4367,6 +4367,9 @@ html {
   font-size: 0.75rem !important;
   line-height: 1rem !important;
 }
+.font-black {
+  font-weight: 900 !important;
+}
 .font-bold {
   font-weight: 700 !important;
 }
