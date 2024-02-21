@@ -92,6 +92,7 @@ class Dashboard extends Component
                         'unit_cost' => $stock->current_price ? $stock->current_price->acquisition_cost : 0,
                         'unit_price' => $stock->retail_price,
                         'beg_bal' => $stock->stock_bal,
+                        'consumption_id' => $active_consumption->id,
                     ]);
                     $log->time_logged = now();
                     $log->save();

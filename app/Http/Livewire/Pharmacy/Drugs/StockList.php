@@ -188,7 +188,7 @@ class StockList extends Component
         $stock->dmdprdte = $dmdprdte;
 
         $stock->save();
-        LogDrugTransaction::dispatch(session('pharm_location_id'), $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty, $stock->id, $stock->exp_date, $drug->drug_concat(), date('Y-m-d'));
+        LogDrugTransaction::dispatch(session('pharm_location_id'), $stock->dmdcomb, $stock->dmdctr, $stock->chrgcode, date('Y-m-d'), $dmdprdte, $unit_cost, $retail_price, $this->qty, $stock->id, $stock->exp_date, $drug->drug_concat(), date('Y-m-d'), session('active_consumption'));
 
         $this->resetExcept('location_id', 'drugs', 'locations', 'charge_codes');
         $this->alert('success', 'Item beginning balance has been saved!');
@@ -288,6 +288,7 @@ class StockList extends Component
             'dmdprdte' => $new_price->dmdprdte,
             'unit_cost' => $unit_cost,
             'unit_price' => $retail_price,
+            'consumption_id' => session('active_consumption'),
         ]);
         $log->time_logged = now();
         $log->beg_bal += $this->qty;
@@ -363,6 +364,7 @@ class StockList extends Component
             'dmdprdte' => $dmdprdte,
             'unit_cost' => $dmduprice,
             'unit_price' => $dmselprice,
+            'consumption_id' => session('active_consumption'),
         ]);
         $log->time_logged = now();
         $log->beg_bal += $this->qty;

@@ -338,7 +338,7 @@ class EncounterTransactionView extends Component
                         $drug_concat = '';
                         $drug_concat = implode("", explode('_', $stock->drug_concat));
 
-                        LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price, $drug_concat, date('Y-m-d'), now());
+                        LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price, $drug_concat, date('Y-m-d'), now(), session('active_consumption'));
                     }
                 }
             } else {
@@ -606,6 +606,7 @@ class EncounterTransactionView extends Component
                 'date_logged' => $date,
                 'dmdprdte' => $stock_issued->stock->dmdprdte,
                 'unit_price' => $stock_issued->stock->retail_price,
+                'consumption_id' => session('active_consumption'),
             ]);
             $log->time_logged = now();
             $log->return_qty += $returned_qty;

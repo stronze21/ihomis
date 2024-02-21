@@ -176,6 +176,7 @@ class EmergencyPurchases extends Component
             'dmdprdte' => $purchase->dmdprdte,
             'unit_cost' => $purchase->unit_price,
             'unit_price' => $purchase->retail_price,
+            'consumption_id' => session('active_consumption'),
         ]);
         $log->time_logged = now();
         $log->purchased += $purchase->qty;

@@ -215,6 +215,7 @@ class IoTransList extends Component
                 'date_logged' => $date,
                 'dmdprdte' => $from_stock->dmdprdte,
                 'unit_price' => $from_stock->retail_price,
+                'consumption_id' => session('active_consumption'),
             ]);
             $log->time_logged = now();
             $log->transferred -= $item->qty;

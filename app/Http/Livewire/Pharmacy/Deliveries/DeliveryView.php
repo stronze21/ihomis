@@ -259,6 +259,7 @@ class DeliveryView extends Component
                 'dmdprdte' => $item->dmdprdte,
                 'unit_cost' => $item->unit_price,
                 'unit_price' => $item->retail_price,
+                'consumption_id' => session('active_consumption'),
             ]);
             $log->time_logged = now();
             $log->purchased += $item->qty;

@@ -145,6 +145,7 @@ class DispenseIssueProcess implements ShouldQueue
                         'date_logged' => $date,
                         'dmdprdte' => $stock->dmdprdte,
                         'unit_price' => $stock->retail_price,
+                        'consumption_id' => session('active_consumption'),
                     ]);
                     $log->time_logged = now();
                     $log->issue_qty += $trans_qty;
