@@ -2,22 +2,23 @@
 
 namespace App\Http\Livewire\Pharmacy\Drugs;
 
-use Carbon\Carbon;
-use Livewire\Component;
-use Livewire\WithPagination;
-use App\Models\Pharmacy\Drug;
-use App\Models\Pharmacy\DrugPrice;
-use Illuminate\Support\Facades\DB;
 use App\Events\IoTransRequestIssued;
-use Illuminate\Support\Facades\Auth;
 use App\Events\IoTransRequestUpdated;
 use App\Jobs\LogIoTransIssue;
-use App\Models\Pharmacy\PharmLocation;
+use App\Models\Pharmacy\Drug;
+use App\Models\Pharmacy\DrugPrice;
 use App\Models\Pharmacy\Drugs\DrugStock;
+use App\Models\Pharmacy\Drugs\DrugStockCard;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
 use App\Models\Pharmacy\Drugs\InOutTransaction;
 use App\Models\Pharmacy\Drugs\InOutTransactionItem;
+use App\Models\Pharmacy\PharmLocation;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Livewire\Component;
+use Livewire\WithPagination;
 
 class IoTransList extends Component
 {
@@ -190,45 +191,45 @@ class IoTransList extends Component
         $this->dispatchBrowserEvent('toggleIssue');
     }
 
-    public function cancel_issued(InOutTransaction $txn)
-    {
-        $trans_id = $txn->id;
+    // public function cancel_issued(InOutTransaction $txn)
+    // {
+    //     $trans_id = $txn->id;
 
-        $issued_items = InOutTransactionItem::where('iotrans_id', $trans_id)
-            ->where('status', 'Pending')
-            ->latest('exp_date')
-            ->get();
-        foreach ($issued_items as $item) {
-            $from_stock = $item->from_stock;
-            $from_stock->stock_bal += $item->qty;
-            $from_stock->save();
+    //     $issued_items = InOutTransactionItem::where('iotrans_id', $trans_id)
+    //         ->where('status', 'Pending')
+    //         ->latest('exp_date')
+    //         ->get();
+    //     foreach ($issued_items as $item) {
+    //         $from_stock = $item->from_stock;
+    //         $from_stock->stock_bal += $item->qty;
+    //         $from_stock->save();
 
-            $item->status = 'Cancelled';
-            $item->save();
-            $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
+    //         $item->status = 'Cancelled';
+    //         $item->save();
+    //         $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
 
-            $log = DrugStockLog::firstOrNew([
-                'loc_code' => $from_stock->loc_code,
-                'dmdcomb' => $item->dmdcomb,
-                'dmdctr' => $item->dmdctr,
-                'chrgcode' => $item->chrgcode,
-                'date_logged' => $date,
-                'dmdprdte' => $from_stock->dmdprdte,
-                'unit_price' => $from_stock->retail_price,
-                'consumption_id' => session('active_consumption'),
-            ]);
-            $log->time_logged = now();
-            $log->transferred -= $item->qty;
+    //         $log = DrugStockLog::firstOrNew([
+    //             'loc_code' => $from_stock->loc_code,
+    //             'dmdcomb' => $item->dmdcomb,
+    //             'dmdctr' => $item->dmdctr,
+    //             'chrgcode' => $item->chrgcode,
+    //             'date_logged' => $date,
+    //             'dmdprdte' => $from_stock->dmdprdte,
+    //             'unit_price' => $from_stock->retail_price,
+    //             'consumption_id' => session('active_consumption'),
+    //         ]);
+    //         $log->time_logged = now();
+    //         $log->transferred -= $item->qty;
 
-            $log->save();
-        }
+    //         $log->save();
+    //     }
 
-        $txn->issued_qty = 0;
-        $txn->trans_stat = 'Cancelled';
-        $txn->save();
-        $this->alert('success', 'Issued items successfully recalled!');
-        $this->reset();
-    }
+    //     $txn->issued_qty = 0;
+    //     $txn->trans_stat = 'Cancelled';
+    //     $txn->save();
+    //     $this->alert('success', 'Issued items successfully recalled!');
+    //     $this->reset();
+    // }
 
     public function view_trans($trans_no)
     {
@@ -238,5 +239,53 @@ class IoTransList extends Component
     public function view_trans_date($date)
     {
         return $this->redirect(route('iotrans.view_date', ['date' => $date]));
+    }
+
+    public function cancel_issued($iotrans_id)
+    {
+        $items = InOutTransactionItem::where('iotrans_id', $iotrans_id)->where('status', 'Pending')->get();
+        foreach ($items as $item) {
+            $stock = DrugStock::find($item->stock_id);
+            $stock->stock_bal += $item->qty;
+            $stock->save();
+
+            $item->status = 'Returned';
+            $item->save();
+
+            $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
+            $log = DrugStockLog::firstOrNew([
+                'loc_code' => session('pharm_location_id'),
+                'dmdcomb' => $stock->dmdcomb,
+                'dmdctr' => $stock->dmdctr,
+                'chrgcode' => $stock->chrgcode,
+                'date_logged' => $date,
+                'unit_price' => $stock->retail_price,
+                'dmdprdte' => $stock->dmdprdte,
+                'consumption_id' => session('active_consumption'),
+            ]);
+            $log->time_logged = now();
+            $log->transferred -= $item->qty;
+            $log->save();
+
+            $card = DrugStockCard::firstOrNew([
+                'chrgcode' => $item->chrgcode,
+                'loc_code' => $item->to,
+                'dmdcomb' => $item->dmdcomb,
+                'dmdctr' => $item->dmdctr,
+                'exp_date' => $item->exp_date,
+                'stock_date' => $date,
+                'drug_concat' => $stock->drug_concat,
+            ]);
+            $card->rec += $item->qty;
+            $card->bal += $item->qty;
+
+            $card->save();
+        }
+        $trans = InOutTransaction::find($iotrans_id);
+        $trans->trans_stat = 'Cancelled';
+        $trans->save();
+
+        $this->alert('success', 'Issued items successfully recalled!');
+        $this->reset();
     }
 }

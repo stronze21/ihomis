@@ -37,6 +37,7 @@
                     <th class="w-6/12">Item Requested</th>
                     <th class="w-1/12">Requested QTY</th>
                     <th class="w-1/12">Issued QTY</th>
+                    <th class="w-1/12">Fund Source</th>
                     <th class="w-1/12">Updated At</th>
                     <th>Remarks</th>
                 </tr>
@@ -55,12 +56,19 @@
                         <td class="text-xs">{{ $tran->location->description }}</td>
                         <td class="text-xs">{{ $tran->from_location ? $tran->from_location->description : '' }}</td>
                         <td @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
-                            @if ($tran->trans_stat == 'Issued' and session('pharm_location_name') != 'Warehouse') onclick="cancel_issued({{ $tran->id }})" @endif>
+                            @if ($tran->trans_stat == 'Issued' and $tran->loc_code == session('pharm_location_id')) onclick="cancel_issued({{ $tran->id }})" @endif>
                             <span class="text-blue-500"><i class="las la-lg la-hand-pointer"></i>
                                 {{ $tran->drug->drug_concat() }}</span>
                         </td>
                         <td>{{ number_format($tran->requested_qty) }}</td>
                         <td>{{ number_format($tran->issued_qty < 1 ? '0' : $tran->issued_qty) }}</td>
+                        <td class="text-xs">
+                            @php
+                                if ($tran->trans_stat == 'Issued' or $tran->trans_stat == 'Received') {
+                                    echo $tran->items->first()->charge->chrgdesc;
+                                }
+                            @endphp
+                        </td>
                         <td>{!! $tran->updated_at() !!}</td>
                         <td>
                             {{ $tran->remarks_request }}
