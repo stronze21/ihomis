@@ -48,7 +48,24 @@ class Dashboard extends Component
                     }
                 }
 
-                DB::update("UPDATE hospital.dbo.pharm_drug_stock_logs SET consumption_id = ? WHERE consumption_id IS NULL", [$active_consumption->id]);
+                $date = Carbon::parse(now())->format('Y-m-d');
+                $stocks = DrugStock::select('id', 'stock_bal', 'dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode', 'loc_code', 'dmdprdte', 'retail_price')->with('current_price')->where('loc_code', $pharm_location_id)->where('stock_bal', '>', 0)->get();
+                foreach ($stocks as $stock) {
+                    $log = DrugStockLog::firstOrNew([
+                        'loc_code' => $stock->loc_code,
+                        'dmdcomb' => $stock->dmdcomb,
+                        'dmdctr' => $stock->dmdctr,
+                        'chrgcode' => $stock->chrgcode,
+                        'date_logged' => $date,
+                        'dmdprdte' => $stock->dmdprdte,
+                        'unit_cost' => $stock->current_price ? $stock->current_price->acquisition_cost : 0,
+                        'unit_price' => $stock->retail_price,
+                        'beg_bal' => $stock->stock_bal,
+                        'consumption_id' => $active_consumption->id,
+                    ]);
+                    $log->time_logged = now();
+                    $log->save();
+                }
 
                 session(['active_consumption' => $active_consumption->id]);
 
@@ -78,24 +95,6 @@ class Dashboard extends Component
                     foreach ($sessions as $session) {
                         $session->delete();
                     }
-                }
-                $date = Carbon::parse(now())->format('Y-m-d');
-                $stocks = DrugStock::select('id', 'stock_bal', 'dmdcomb', 'dmdctr', 'exp_date', 'drug_concat', 'chrgcode', 'loc_code', 'dmdprdte', 'retail_price')->with('current_price')->where('loc_code', $pharm_location_id)->where('stock_bal', '>', 0)->get();
-                foreach ($stocks as $stock) {
-                    $log = DrugStockLog::firstOrNew([
-                        'loc_code' => $stock->loc_code,
-                        'dmdcomb' => $stock->dmdcomb,
-                        'dmdctr' => $stock->dmdctr,
-                        'chrgcode' => $stock->chrgcode,
-                        'date_logged' => $date,
-                        'dmdprdte' => $stock->dmdprdte,
-                        'unit_cost' => $stock->current_price ? $stock->current_price->acquisition_cost : 0,
-                        'unit_price' => $stock->retail_price,
-                        'beg_bal' => $stock->stock_bal,
-                        'consumption_id' => $active_consumption->id,
-                    ]);
-                    $log->time_logged = now();
-                    $log->save();
                 }
                 //
                 $this->alert('success', 'Drug Consumption Logger has been successfully stopped on ' . now());
