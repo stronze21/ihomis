@@ -65,8 +65,8 @@ class ConssumptionReport extends Component
                                     INNER JOIN hform as frm ON drug.formcode = frm.formcode
                                     INNER JOIN hdmhdrprice as price ON pdsl.dmdprdte = price.dmdprdte
                                     INNER JOIN pharm_locations as loc ON pdsl.loc_code = loc.id
-                                    WHERE [chrgcode] = ? and [date_logged] = ? and loc_code = ? and consumption_id = ?
-                                    ORDER BY gen.gendesc ASC', [$filter_charge[0], $date_from, session('pharm_location_id'), $this->report_id]);
+                                    WHERE [chrgcode] = ? and loc_code = ? and consumption_id = ?
+                                    ORDER BY gen.gendesc ASC', [$filter_charge[0], session('pharm_location_id'), $this->report_id]);
 
         $locations = PharmLocation::all();
 

@@ -33,13 +33,13 @@
                 <div class="form-control">
                     <label class="input-group">
                         <span>Reports</span>
-                        <select class="select select-bordered select-sm" wire:model="filter_charge">
+                        <select class="select select-bordered select-sm" wire:model="report_id">
                             <option></option>
                             @foreach ($cons as $con)
                                 <option value="{{ $con->id }}">
                                     {{ $loop->iteration }}
                                     [{{ date('Y-m-d g:i A', strtotime($con->consumption_from)) }}] -
-                                    [{{ date('Y-m-d g:i A', strtotime($con->consumption_to)) }}]
+                                    [{{ $con->consumption_to ? date('Y-m-d g:i A', strtotime($con->consumption_to)) : 'Ongoing' }}]
                                 </option>
                             @endforeach
                         </select>
