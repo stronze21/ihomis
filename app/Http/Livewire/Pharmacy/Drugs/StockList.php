@@ -10,6 +10,7 @@ use App\Models\Pharmacy\Drugs\DrugStockLog;
 use App\Models\Pharmacy\PharmLocation;
 use App\Models\References\ChargeCode;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Component;
@@ -374,5 +375,11 @@ class StockList extends Component
 
         $this->resetExcept('location_id', 'drugs', 'locations', 'charge_codes');
         $this->alert('success', 'Item beginning balance has been saved!');
+    }
+
+    public function sync_items()
+    {
+        Artisan::call('init:drugconcat');
+        $this->alert('success', 'Items in sync');
     }
 }

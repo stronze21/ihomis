@@ -48,6 +48,10 @@
                     </select>
                 </div>
             @endcan
+            <div class="mt-auto">
+                <button class="btn btn-sm btn-info" wire:click="sync_items" wire:loading.attr="disabled"><i
+                        class="mr-1 las la-lg la-sync"></i>Sync</button>
+            </div>
             <div class="form-control">
                 <label class="label">
                     <span class="label-text">Seach generic name</span>
