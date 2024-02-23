@@ -9,6 +9,7 @@ use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
 use App\Models\Pharmacy\PharmLocation;
 use App\Models\References\ChargeCode;
+use App\Models\StockAdjustment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ class StockList extends Component
     use LivewireAlert;
     use WithPagination;
 
-    protected $listeners = ['add_item', 'refresh' => '$refresh', 'add_item_new', 'update_item_new'];
+    protected $listeners = ['add_item', 'refresh' => '$refresh', 'add_item_new', 'update_item_new', 'adjust_qty'];
 
     public $search;
     public $location_id;
@@ -381,5 +382,24 @@ class StockList extends Component
     {
         Artisan::call('init:drugconcat');
         $this->alert('success', 'Items in sync');
+    }
+
+    public function adjust_qty($stock_id, $qty)
+    {
+        $stock = DrugStock::find($stock_id);
+
+        $current_bal = $stock->stock_bal;
+
+        $stock->stock_bal = $qty;
+        $stock->save();
+
+        StockAdjustment::create([
+            'stock_id' => $stock_id,
+            'user_id' => session('user_id'),
+            'from_qty' => $current_bal,
+            'to_qty' => $qty,
+        ]);
+
+        return $this->alert('success', 'Success!');
     }
 }

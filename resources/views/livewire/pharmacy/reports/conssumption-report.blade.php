@@ -19,7 +19,7 @@
 @endpush
 
 <div class="max-w-screen">
-    <div class="flex flex-col px-2 py-5">
+    <div class="flex flex-col w-full px-2 py-5">
         <div class="flex justify-end my-2">
             <div class="ml-2">
                 <button onclick="ExportToExcel('xlsx')" class="btn btn-sm btn-info"><i
@@ -32,9 +32,17 @@
             <div class="ml-2">
                 <div class="form-control">
                     <label class="input-group">
-                        <span class="whitespace-nowrap">Month & Year</span>
-                        <input type="month" class="w-full input input-sm input-bordered"
-                            wire:model.lazy="date_from" />
+                        <span>Reports</span>
+                        <select class="select select-bordered select-sm" wire:model="filter_charge">
+                            <option></option>
+                            @foreach ($cons as $con)
+                                <option value="{{ $con->id }}">
+                                    {{ $loop->iteration }}
+                                    [{{ date('Y-m-d g:i A', strtotime($con->consumption_from)) }}] -
+                                    [{{ date('Y-m-d g:i A', strtotime($con->consumption_to)) }}]
+                                </option>
+                            @endforeach
+                        </select>
                     </label>
                 </div>
             </div>
@@ -53,8 +61,8 @@
                 </div>
             </div>
         </div>
-        <div id="print">
-            <table class="text-xs bg-white shadow-md table-fixed table-compact" id="table">
+        <div id="print" class="w-full">
+            <table class="w-full text-xs bg-white shadow-md table-fixed table-compact" id="table">
                 <thead class="font-bold bg-gray-200">
                     <tr class="text-center uppercase">
                         <td class="w-2/12 text-xs border border-black">Source of Fund</td>
@@ -173,7 +181,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="25" class="font-bold text-center uppercase bg-red-400 border border-black">
+                            <td colspan="26" class="font-bold text-center uppercase bg-red-400 border border-black">
                                 No
                                 record found!</td>
                         </tr>

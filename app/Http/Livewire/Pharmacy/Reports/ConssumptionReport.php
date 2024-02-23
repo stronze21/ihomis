@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire\Pharmacy\Reports;
 
+use App\Models\Pharmacy\Drugs\ConsumptionLogDetail;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
@@ -17,6 +18,7 @@ class ConssumptionReport extends Component
     public $month, $filter_charge = 'DRUME,Drugs and Medicines (Regular)';
     public $date_from, $date_to;
     public $location_id;
+    public $report_id;
 
     public function render()
     {
@@ -29,6 +31,8 @@ class ConssumptionReport extends Component
             ->get();
 
         $filter_charge = explode(',', $this->filter_charge);
+
+        $cons = ConsumptionLogDetail::where('loc_code', session('pharm_location_id'))->latest()->get();
 
         $drugs_issued = DB::select('SELECT pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
                                         pdsl.loc_code,
@@ -61,8 +65,8 @@ class ConssumptionReport extends Component
                                     INNER JOIN hform as frm ON drug.formcode = frm.formcode
                                     INNER JOIN hdmhdrprice as price ON pdsl.dmdprdte = price.dmdprdte
                                     INNER JOIN pharm_locations as loc ON pdsl.loc_code = loc.id
-                                    WHERE [chrgcode] = ? and [date_logged] = ?
-                                    ORDER BY gen.gendesc ASC', [$filter_charge[0], $date_from]);
+                                    WHERE [chrgcode] = ? and [date_logged] = ? and loc_code = ? and consumption_id = ?
+                                    ORDER BY gen.gendesc ASC', [$filter_charge[0], $date_from, session('pharm_location_id'), $this->report_id]);
 
         $locations = PharmLocation::all();
 
@@ -72,6 +76,7 @@ class ConssumptionReport extends Component
             'current_charge' => $filter_charge[1],
             'drugs_issued' => $drugs_issued,
             'locations' => $locations,
+            'cons' => $cons,
         ]);
     }
 

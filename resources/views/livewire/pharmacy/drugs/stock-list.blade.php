@@ -64,42 +64,51 @@
             </div>
         </div>
     </div>
-    <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
-        <table class="table w-full table-compact">
+    <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto bg-white">
+        <table class="w-full border table-compact">
             <thead>
                 <tr>
-                    <th>Source of Fund</th>
-                    <th>Location</th>
-                    <th>Balance as of</th>
-                    <th>Generic</th>
+                    <th class="border">Source of Fund</th>
+                    <th class="border">Location</th>
+                    <th class="border">Balance as of</th>
+                    <th class="border">Generic</th>
                     @role('warehouse')
-                        <th>Cost</th>
+                        <th class="border">Cost</th>
                     @endrole
-                    <th>Price</th>
-                    <th>Stock Balance</th>
-                    <th>Expiry Date</th>
+                    <th class="border">Price</th>
+                    <th class="border">Stock Balance</th>
+                    <th class="border">Expiry Date</th>
+                    <th class="border">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($stocks as $stk)
-                    <tr class="hover"
-                        @can('update-stock-item')
-                            onclick="update_item({{ $stk->id }}, `{{ $stk->drug_concat() }}`, '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}', '{{ $stk->dmduprice }}', '{{ $stk->has_compounding }}', '{{ $stk->compounding_fee }}')"
-                        @endcan>
-                        <th>{{ $stk->chrgdesc }}</th>
-                        <td>{{ $stk->description }}</td>
-                        <td>{{ $stk->updated_at }}</td>
-                        <td class="font-bold">{{ $stk->drug_concat() }}</td>
+                    <tr>
+                        <th class="text-xs border">{{ $stk->chrgdesc }}</th>
+                        <td class="text-xs border">{{ $stk->description }}</td>
+                        <td class="text-xs border">{{ $stk->updated_at }}</td>
+                        <td class="text-xs font-bold border">{{ $stk->drug_concat() }}</td>
                         @role('warehouse')
-                            <th>{{ $stk->dmduprice }}</th>
+                            <th class="text-xs border">{{ $stk->dmduprice }}</th>
                         @endrole
-                        <td>{{ $stk->dmselprice }}</td>
-                        <td>{{ number_format($stk->stock_bal) }}</td>
-                        <td>{!! $stk->expiry() !!}</td>
+                        <td class="text-xs border">{{ $stk->dmselprice }}</td>
+                        <td class="text-xs border">{{ number_format($stk->stock_bal) }}</td>
+                        <td class="text-xs border">{!! $stk->expiry() !!}</td>
+                        <td class="text-xs border">
+                            <div class="flex space-x-2">
+                                @can('update-stock-item')
+                                    <button class="btn btn-warning btn-xs"
+                                        onclick="update_item({{ $stk->id }}, `{{ $stk->drug_concat() }}`, '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}', '{{ $stk->dmduprice }}', '{{ $stk->has_compounding }}', '{{ $stk->compounding_fee }}')">Update</button>
+                                    <button class="btn btn-info btn-xs"
+                                        onclick="adjust_qty({{ $stk->id }}, `{{ $stk->drug_concat() }}`, '{{ $stk->chrgdesc }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}')">Adjust
+                                        QTY</button>
+                                @endcan
+                            </div>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <th class="text-center" colspan="10">No record found!</th>
+                        <th class="text-center border" colspan="10">No record found!</th>
                     </tr>
                 @endforelse
             </tbody>
@@ -300,6 +309,33 @@
                     @this.set('compounding_fee', update_compounding_fee.value);
 
                     Livewire.emit('update_item_new', stk_id);
+                }
+            });
+        }
+
+        function adjust_qty(stk_id, stk_drug_name, stk_chrgcode, stk_expiry_date, stk_balance) {
+            Swal.fire({
+                html: `
+                        <span class="text-xl font-bold"> Update Item ` + stk_drug_name + `<small>(` + stk_expiry_date + `)</small></span><br>
+                        <small>(` + stk_chrgcode + `)</small>
+                        <div class="w-full px-2 form-control">
+                            <label class="label" for="adjusted_qty">
+                                <span class="label-text">QTY</span>
+                            </label>
+                            <input id="adjusted_qty" type="number" value="1" class="w-full input input-bordered" />
+                        </div>`,
+                showCancelButton: true,
+                confirmButtonText: `Save`,
+                didOpen: () => {
+                    const adjusted_qty = Swal.getHtmlContainer().querySelector('#adjusted_qty');
+
+                    adjusted_qty.value = stk_balance;
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+
+                    Livewire.emit('adjust_qty', stk_id, adjusted_qty.value);
                 }
             });
         }
