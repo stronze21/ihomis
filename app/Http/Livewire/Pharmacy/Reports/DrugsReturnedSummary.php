@@ -41,7 +41,7 @@ class DrugsReturnedSummary extends Component
         $drugs_returned = DB::select('SELECT SUM(ret.qty) as qty, drug_concat
                                         FROM hrxoreturn as ret
                                         INNER JOIN hrxo ON ret.docointkey = hrxo.docointkey
-                                        INNER JOIN pharm_drug_stocks as stock ON ret.dmdcomb = stock.dmdcomb AND ret.dmdctr = stock.dmdctr
+                                        INNER JOIN hdmhdr as stock ON ret.dmdcomb = stock.dmdcomb AND ret.dmdctr = stock.dmdctr
                                         WHERE ret.returnfrom = ? AND ret.returndate BETWEEN ? AND ? AND hrxo.loc_code = ?
                                         GROUP BY ret.dmdcomb, ret.dmdctr, stock.drug_concat, hrxo.loc_code
                                         ORDER BY stock.drug_concat
