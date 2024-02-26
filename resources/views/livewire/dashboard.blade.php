@@ -15,21 +15,23 @@
     <div class="h-screen mx-auto max-w-screen-2xl sm:px-6 lg:px-8">
         <div class="h-screen overflow-hidden">
             <div class="flex space-x-3">
-                <div class="shadow-xl card w-96 bg-base-100">
-                    <div class="card-body">
-                        <h2 class="text-center card-title">Drug Consumption Logger</h2>
-                        <p class="text-xl text-center">{!! session('active_consumption')
-                            ? '<span class="p-3 text-xl font-bold uppercase badge badge-success">Active</span>'
-                            : '<span class="p-3 text-xl font-bold uppercase badge badge-error">Inactive</span>' !!}</p>
-                        <div class="justify-end card-actions">
-                            @if (session('active_consumption'))
-                                <button class="btn btn-sm btn-error" onclick="stop_log()">Stop</button>
-                            @else
-                                <button class="btn btn-sm btn-primary" onclick="start_log()">Start</button>
-                            @endif
+                @can('manage-logger')
+                    <div class="shadow-xl card w-96 bg-base-100">
+                        <div class="card-body">
+                            <h2 class="text-center card-title">Drug Consumption Logger</h2>
+                            <p class="text-xl text-center">{!! session('active_consumption')
+                                ? '<span class="p-3 text-xl font-bold uppercase badge badge-success">Active</span>'
+                                : '<span class="p-3 text-xl font-bold uppercase badge badge-error">Inactive</span>' !!}</p>
+                            <div class="justify-end card-actions">
+                                @if (session('active_consumption'))
+                                    <button class="btn btn-sm btn-error" onclick="stop_log()">Stop</button>
+                                @else
+                                    <button class="btn btn-sm btn-primary" onclick="start_log()">Start</button>
+                                @endif
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endcan
             </div>
         </div>
     </div>
