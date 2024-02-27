@@ -10,6 +10,7 @@ use App\Models\Pharmacy\Dispensing\DrugOrder;
 use App\Models\Pharmacy\Dispensing\DrugOrderIssue;
 use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
 use App\Models\Pharmacy\Dispensing\OrderChargeCode;
+use App\Models\Pharmacy\Drug;
 use App\Models\Pharmacy\Drugs\DrugStock;
 use App\Models\Pharmacy\Drugs\DrugStockIssue;
 use App\Models\Pharmacy\Drugs\DrugStockLog;
@@ -341,19 +342,27 @@ class EncounterTransactionView extends Component
                         LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price, $drug_concat, date('Y-m-d'), now(), session('active_consumption'));
                     }
                 }
+                if ($cnt == 1) {
+                    $cnt = DB::update(
+                        "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND (estatus = 'P' OR pchrgup = 0)",
+                        [$rxo->pchrgqty, $rxo->docointkey]
+                    );
+                    LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id, now());
+                }
             } else {
-                return $this->alert('error', 'Insufficient Stock Balance.');
+                $insuf = Drug::select('drug_concat')->where('dmdcomb', $rxo->dmdcomb)->where('dmdctr', $rxo->dmdctr)->first();
+                return $this->alert('error', 'Insufficient Stock Balance. ' . $insuf->drug_concat);
             }
         }
 
         if ($cnt == 1) {
-            foreach ($rxos as $row2) {
-                $cnt = DB::update(
-                    "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND (estatus = 'P' OR pchrgup = 0)",
-                    [$row2->pchrgqty, $row2->docointkey]
-                );
-                LogDrugOrderIssue::dispatch($row2->docointkey, $row2->enccode, $row2->hpercode, $row2->dmdcomb, $row2->dmdctr, $row2->pchrgqty, session('employeeid'), $row2->orderfrom, $row2->pcchrgcod, $row2->pchrgup, $row2->ris, $row2->prescription_data_id, now());
-            }
+            // foreach ($rxos as $row2) {
+            //     $cnt = DB::update(
+            //         "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND (estatus = 'P' OR pchrgup = 0)",
+            //         [$row2->pchrgqty, $row2->docointkey]
+            //     );
+            //     LogDrugOrderIssue::dispatch($row2->docointkey, $row2->enccode, $row2->hpercode, $row2->dmdcomb, $row2->dmdctr, $row2->pchrgqty, session('employeeid'), $row2->orderfrom, $row2->pcchrgcod, $row2->pchrgup, $row2->ris, $row2->prescription_data_id, now());
+            // }
             $this->alert('success', 'Order issued successfully.');
         } else {
             $this->alert('error', 'No item to issue.');
