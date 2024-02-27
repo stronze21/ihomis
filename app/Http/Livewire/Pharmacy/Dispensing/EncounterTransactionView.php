@@ -291,11 +291,6 @@ class EncounterTransactionView extends Component
                 $this->type = 'service';
             }
 
-            DB::update(
-                "UPDATE hospital.dbo.hrxo SET tx_type = ? WHERE docointkey = ?",
-                [$this->type, $rxo->docointkey]
-            );
-
             $this->type = $temp_type;
 
             $stocks = DB::select(
@@ -344,8 +339,8 @@ class EncounterTransactionView extends Component
                 }
                 if ($cnt == 1) {
                     $cnt = DB::update(
-                        "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND (estatus = 'P' OR pchrgup = 0)",
-                        [$rxo->pchrgqty, $rxo->docointkey]
+                        "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ?, tx_type = ? WHERE docointkey = ? AND (estatus = 'P' OR pchrgup = 0)",
+                        [$rxo->pchrgqty, $this->type, $rxo->docointkey]
                     );
                     LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id, now());
                 }
