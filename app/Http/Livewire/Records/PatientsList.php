@@ -81,57 +81,14 @@ class PatientsList extends Component
 
     public function select_patient($hpercode)
     {
-
-        // $encounter = EncounterLog::where('hpercode', $hpercode)
-        //     ->where('encstat', 'A')
-        //     ->where('toecode', '<>', 'WALKN')
-        //     ->where('toecode', '<>', '32')
-        //     ->where('enclock', 'N')
-        //     ->latest('encdate')
-        //     ->first();
-
-        // $this->enc_list = EncounterLog::where('hpercode', $hpercode)
-        //     ->where('toecode', '<>', 'WALKN')
-        //     ->where('toecode', '<>', '32')
-        //     ->where('enclock', 'N')
-        //     ->latest('encdate')
-        //     ->get();
-
         $this->enc_list = DB::select("SELECT enctr.enccode, enctr.encstat, enctr.toecode, diag.diagtext, enctr.encdate
                                     FROM henctr enctr
                                     LEFT JOIN hencdiag diag ON enctr.enccode = diag.enccode
-                                    WHERE enctr.toecode <> 'WALKN' AND enctr.toecode <> '32' AND enctr.enclock = 'N' AND enctr.hpercode = ?
+                                    WHERE enctr.toecode <> 'WALKN' AND enctr.toecode <> '32' AND enctr.hpercode = ?
                                     ORDER BY enctr.encdate DESC
                                 ", [$hpercode]);
 
         $this->hpercode = $hpercode;
-        // if ($encounter) {
-        //     $this->enccode = $encounter->enccode;
-        //     $this->alert('info', 'Active ' . $encounter->enctr_type() . ' encounter dated ' . date('F j, Y G:i A', strtotime($encounter->encdate)) . ' found!', [
-        //         'toast' => false,
-        //         'position' => 'center',
-        //         'showConfirmButton' => true,
-        //         'confirmButtonText' => $encounter->enctr_type(),
-        //         'onConfirmed' => 'view_enctr',
-        //         'showDenyButton' => true,
-        //         'denyButtonText' => 'Walk-in',
-        //         'onDenied' => 'walk_in',
-        //         'showCancelButton' => true,
-        //         'reverseButtons' => true,
-        //         'timer' => false,
-        //     ]);
-        // } else {
-        //     $this->alert('error', 'No active encounter found! Continue as walk in?', [
-        //         'toast' => false,
-        //         'position' => 'center',
-        //         'showConfirmButton' => true,
-        //         'confirmButtonText' => 'Continue',
-        //         'onConfirmed' => 'walk_in',
-        //         'showCancelButton' => true,
-        //         'reverseButtons' => true,
-        //         'timer' => false,
-        //     ]);
-        // }
     }
 
     public function view_enctr($code = null)
