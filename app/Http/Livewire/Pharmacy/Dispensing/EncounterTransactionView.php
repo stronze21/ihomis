@@ -204,7 +204,7 @@ class EncounterTransactionView extends Component
         foreach ($this->selected_items as $docointkey) {
 
             $cnt = DB::update(
-                "UPDATE hospital.dbo.hrxo SET pcchrgcod = '" . $pcchrgcod . "', estatus = 'P' WHERE docointkey = '" . $docointkey . "' AND (estatus = 'U' OR pchrgup = 0)"
+                "UPDATE hospital.dbo.hrxo SET pcchrgcod = '" . $pcchrgcod . "', estatus = 'P' WHERE docointkey = " . $docointkey . " AND (estatus = 'U' OR pchrgup = 0)"
             );
         }
 
