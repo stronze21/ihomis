@@ -161,7 +161,7 @@
                                     <input type="checkbox"
                                         class="checkbox{{ '-' . ($rxo->pcchrgcod ?? 'blank') }}{{ date('mdY', strtotime($rxo->dodate)) }}"
                                         wire:model.defer="selected_items" wire:key="item-{{ $rxo->docointkey }}"
-                                        name="docointkey" value="{{ $rxo->docointkey }}" />
+                                        name="docointkey" value="'{{ $rxo->docointkey }}'" />
                                 </td>
                                 <td class="whitespace-nowrap w-min" title="View Charge Slip">
                                     <div class="flex flex-col align-center">

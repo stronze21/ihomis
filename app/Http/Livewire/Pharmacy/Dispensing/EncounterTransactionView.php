@@ -110,7 +110,7 @@ class EncounterTransactionView extends Component
 
         $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
 
-        $encounter = collect(DB::select('SELECT TOP 1 enctr.hpercode, enctr.toecode, enctr.enccode, enctr.encdate, diag.diagtext, pat.patlast, pat.patfirst, pat.patmiddle,
+        $encounter = collect(DB::select("SELECT TOP 1 enctr.hpercode, enctr.toecode, enctr.enccode, enctr.encdate, diag.diagtext, pat.patlast, pat.patfirst, pat.patmiddle,
                                                 mss.mssikey, ward.wardname, room.rmname
                                 FROM henctr as enctr
                                 LEFT JOIN hencdiag as diag ON enctr.enccode = diag.enccode
@@ -119,9 +119,9 @@ class EncounterTransactionView extends Component
                                 LEFT JOIN hpatroom as patroom ON enctr.enccode = patroom.enccode
                                 LEFT JOIN hward as ward ON patroom.wardcode = ward.wardcode
                                 LEFT JOIN hroom as room ON patroom.rmintkey = room.rmintkey
-                                WHERE enctr.enccode = ?
+                                WHERE enctr.enccode = '" . $enccode . "'
                                 ORDER BY patroom.hprdate DESC
-                                ', [$enccode]))->first();
+                                "))->first();
 
         // dd($this->encounter);
         // $this->mss = PatientMss::where('enccode', $enccode)->first();
@@ -204,8 +204,7 @@ class EncounterTransactionView extends Component
         foreach ($this->selected_items as $docointkey) {
 
             $cnt = DB::update(
-                "UPDATE hospital.dbo.hrxo SET pcchrgcod = ?, estatus = 'P' WHERE docointkey = ? AND (estatus = 'U' OR pchrgup = 0)",
-                [$pcchrgcod, $docointkey]
+                "UPDATE hospital.dbo.hrxo SET pcchrgcod = '" . $pcchrgcod . "', estatus = 'P' WHERE docointkey = '" . $docointkey . "' AND (estatus = 'U' OR pchrgup = 0)"
             );
         }
 
@@ -221,12 +220,15 @@ class EncounterTransactionView extends Component
         $enccode = str_replace('--', ' ', Crypt::decrypt($this->enccode));
         $cnt = 0;
 
-        $rxos = DB::table('hospital.dbo.hrxo')->whereIn('docointkey', $this->selected_items)
-            ->where(function ($query) {
-                $query->where('estatus', 'P')
-                    ->orWhere('pchrgup', 0);
-            })
-            ->get();
+        // $rxos = DB::table('hospital.dbo.hrxo')->whereIn('docointkey', $this->selected_items)
+        //     ->where(function ($query) {
+        //         $query->where('estatus', 'P')
+        //             ->orWhere('pchrgup', 0);
+        //     })
+        //     ->get();
+        // dd($rxos);
+        $selected_items = implode(',', $this->selected_items);
+        $rxos = collect(DB::select("SELECT * FROM hrxo WHERE docointkey IN (" . $selected_items . ") AND (estatus = 'P' OR pchrgup = 0)"))->all();
         if ($this->toecode == 'ADM' or $this->toecode == 'OPDAD' or $this->toecode == 'ERADM') {
             switch ($this->mssikey) {
                 case 'MSSA11111999':
@@ -295,9 +297,8 @@ class EncounterTransactionView extends Component
 
             $stocks = DB::select(
                 "SELECT * FROM pharm_drug_stocks
-                            WHERE dmdcomb = ? AND dmdctr = ? AND chrgcode = ? AND loc_code = ? AND exp_date > ? AND stock_bal > 0
-                            ORDER BY exp_date ASC",
-                [$rxo->dmdcomb, $rxo->dmdctr, $rxo->orderfrom, session('pharm_location_id'), date('Y-m-d')]
+                            WHERE dmdcomb = '" . $rxo->dmdcomb . "' AND dmdctr = '" . $rxo->dmdctr . "' AND chrgcode = '" . $rxo->orderfrom . "' AND loc_code = '" . session('pharm_location_id') . "' AND exp_date > '" . date('Y-m-d') . "' AND stock_bal > 0
+                            ORDER BY exp_date ASC"
             );
             if ($stocks) {
                 $total_deduct = $rxo->pchrgqty;
@@ -325,8 +326,7 @@ class EncounterTransactionView extends Component
                                 $total_deduct = 0;
                             }
                             $cnt = DB::update(
-                                "UPDATE hospital.dbo.pharm_drug_stocks SET stock_bal = ? WHERE id = ?",
-                                [$stock_bal, $stock->id]
+                                "UPDATE hospital.dbo.pharm_drug_stocks SET stock_bal = '" . $stock_bal . "' WHERE id = '" . $stock->id . "'"
                             );
                         } else {
                             $total_deduct = 0;
@@ -339,8 +339,7 @@ class EncounterTransactionView extends Component
                 }
                 if ($cnt == 1) {
                     $cnt = DB::update(
-                        "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ?, tx_type = ? WHERE docointkey = ? AND (estatus = 'P' OR pchrgup = 0)",
-                        [$rxo->pchrgqty, $this->type, $rxo->docointkey]
+                        "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = '" . $rxo->pchrgqty . "', tx_type = '" . $this->type . "' WHERE docointkey = '" . $rxo->docointkey . "' AND (estatus = 'P' OR pchrgup = 0)"
                     );
                     LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id, now());
                 }
