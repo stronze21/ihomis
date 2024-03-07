@@ -528,7 +528,7 @@ class EncounterTransactionView extends Component
         $options = array("UID" => env('DB_USERNAME'), "PWD" => env('DB_PASSWORD'), "Database" => env('DB_DATABASE'));
         $conn = sqlsrv_connect(env('DB_HOST'), $options);
         foreach ($this->selected_items as $docointkey) {
-            $query = "DELETE FROM hrxo WHERE docointkey = '" . $docointkey . "' AND (estatus = 'U' OR pcchrgcod IS NULL)";
+            $query = "DELETE FROM hrxo WHERE docointkey = " . $docointkey . " AND (estatus = 'U' OR pcchrgcod IS NULL)";
             $query_run = sqlsrv_query($conn, $query);
         }
         // $items = DrugOrder::whereIn('docointkey', $this->selected_items)
