@@ -74,13 +74,13 @@
                                     <button type="button"
                                         class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 border border-transparent rounded-md focus:outline-none">
                                         <i class="las la-lg la-file-excel"></i>
-                                        Reports
+                                        {{-- Reports
                                         <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd"
                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                                                 clip-rule="evenodd" />
-                                        </svg>
+                                        </svg> --}}
                                     </button>
                                 </span>
                             </x-slot>
@@ -149,13 +149,13 @@
                                     <button type="button"
                                         class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 border border-transparent rounded-md focus:outline-none">
                                         <i class="las la-lg la-cog"></i>
-                                        Settings
+                                        {{-- Settings
                                         <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd"
                                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                                                 clip-rule="evenodd" />
-                                        </svg>
+                                        </svg> --}}
                                     </button>
                                 </span>
                             </x-slot>
@@ -198,9 +198,18 @@
                         <x-slot name="trigger">
                             <span class="inline-flex rounded-md">
                                 <button type="button"
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition bg-white border border-transparent rounded-md hover:text-gray-700 focus:outline-none">
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-500 uppercase transition bg-white border border-transparent rounded-md hover:text-gray-700 focus:outline-none">
                                     <i class="las la-lg la-user"></i>
-                                    {{ session('user_name') }}
+                                    @php
+                                        $words = preg_split('/[\s,_-]+/', session('user_name'));
+                                        $acronym = '';
+
+                                        foreach ($words as $w) {
+                                            $acronym .= mb_substr($w, 0, 1);
+                                        }
+                                        echo $acronym;
+                                    @endphp
+                                    {{-- {{ session('user_name') }} --}}
 
                                     <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 20 20" fill="currentColor">
