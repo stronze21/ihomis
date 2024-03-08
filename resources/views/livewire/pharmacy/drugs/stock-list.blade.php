@@ -12,14 +12,7 @@
 </x-slot>
 
 <div class="flex flex-col px-5 py-5 mx-auto max-w-screen">
-    <div class="flex justify-between">
-        <div class="flex justify-end mt-auto">
-            <small class="mr-2">Expiry: </small>
-            <span class="mr-1 shadow-md badge badge-sm badge-ghost">Out of Stock</span>
-            <span class="mr-1 shadow-md badge badge-sm badge-success">>=6 Months till Expiry</span>
-            <span class="mr-1 shadow-md badge badge-sm badge-warning">Below 6 Months till expiry</span>
-            <span class="mr-1 shadow-md badge badge-sm badge-error">Expired</span>
-        </div>
+    <div class="flex justify-end">
         {{-- <div>
             <button class="btn btn-sm btn-primary" onclick="">Add Delivery</button>
         </div> --}}
@@ -63,6 +56,13 @@
                 </label>
             </div>
         </div>
+    </div>
+    <div class="flex mt-auto">
+        <small class="mr-2">Expiry: </small>
+        <span class="mr-1 shadow-md badge badge-sm badge-ghost">Out of Stock</span>
+        <span class="mr-1 shadow-md badge badge-sm badge-success">>=6 Months till Expiry</span>
+        <span class="mr-1 shadow-md badge badge-sm badge-warning">Below 6 Months till expiry</span>
+        <span class="mr-1 shadow-md badge badge-sm badge-error">Expired</span>
     </div>
     <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto bg-white">
         <table class="w-full border table-compact">
