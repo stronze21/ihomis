@@ -28,6 +28,7 @@ module.exports = {
         'textarea-ghost',
         'input-bordered',
         'toggle-success',
+        'text-nowrap',
         'py-auto',
         'align-middle'
     ],

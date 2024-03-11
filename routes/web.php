@@ -34,6 +34,7 @@ use App\Http\Livewire\Pharmacy\Reports\DrugsIssuedDepartments;
 use App\Http\Livewire\Pharmacy\Dispensing\EncounterTransactionView;
 use App\Http\Livewire\Pharmacy\Dispensing\PendingOrders;
 use App\Http\Livewire\Pharmacy\Drugs\StockPullOutList;
+use App\Http\Livewire\Pharmacy\Drugs\StockSummary;
 use App\Http\Livewire\Pharmacy\Drugs\ViewIotrans;
 use App\Http\Livewire\Pharmacy\Drugs\ViewIoTransDate;
 use App\Http\Livewire\Pharmacy\References\PndfGenerics;
@@ -42,6 +43,7 @@ use App\Http\Livewire\Pharmacy\Reports\DeliverySummary;
 use App\Http\Livewire\Pharmacy\Reports\DrugsReturnedSummary;
 use App\Http\Livewire\Pharmacy\Reports\TotalDrugsIssued;
 use App\Http\Livewire\Records\PatientRegister;
+use App\Http\Livewire\References\ListRisWards;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +77,7 @@ Route::middleware([
 
     Route::name('dmd.')->prefix('drugsandmedicine')->group(function () {
         Route::get('/stocks', StockList::class)->name('stk');
+        Route::get('/stocks/summary', StockSummary::class)->name('stk.sum');
         Route::get('/stocks/for-pull-out', StockPullOutList::class)->name('stk.pullout');
     });
 
@@ -98,6 +101,7 @@ Route::middleware([
     });
 
     Route::name('ref.')->prefix('/reference')->group(function () {
+        Route::get('/wards', ListRisWards::class)->name('wards');
         Route::get('/location', ListLocation::class)->name('location');
         Route::get('/drugsandmedicine', ListDrugHomis::class)->name('dmd');
         Route::get('/PNDF-Generics', PndfGenerics::class)->name('pndf');

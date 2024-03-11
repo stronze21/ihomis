@@ -17,23 +17,27 @@
             <button class="btn btn-sm btn-primary" onclick="">Add Delivery</button>
         </div> --}}
         <div class="flex space-x-3">
+            <div class="mt-auto">
+                <a class="btn btn-xs bg-secondary" href="{{ route('dmd.stk.sum') }}"><i
+                        class="mr-1 las la-lg la-list"></i>Summary</a>
+            </div>
             @can('pull-out-items')
                 <div class="mt-auto">
-                    <a href="{{ route('dmd.stk.pullout') }}" class="btn btn-sm btn-secondary"><i
+                    <a href="{{ route('dmd.stk.pullout') }}" class="btn btn-xs bg-secondary"><i
                             class="mr-1 las la-lg la-file"></i> For Pull Out List</a>
                 </div>
             @endcan
             <div class="mt-auto">
-                <button class="btn btn-sm btn-primary" onclick="add_item()" wire:loading.attr="disabled"><i
+                <button class="btn btn-xs bg-primary" onclick="add_item()" wire:loading.attr="disabled"><i
                         class="mr-1 las la-lg la-plus"></i>Add
                     Item</button>
             </div>
             @can('filter-stocks-location')
-                <div class="form-control">
+                <div class="mt-auto form-control">
                     <label class="label">
                         <span class="label-text">Current Location</span>
                     </label>
-                    <select class="w-full max-w-xs text-sm select select-bordered select-sm select-success"
+                    <select class="w-full max-w-xs text-xs select select-bordered select-xs select-success"
                         wire:model="location_id">
                         @foreach ($locations as $loc)
                             <option value="{{ $loc->id }}">{{ $loc->description }}</option>
@@ -42,16 +46,16 @@
                 </div>
             @endcan
             <div class="mt-auto">
-                <button class="btn btn-sm btn-info" wire:click="sync_items" wire:loading.attr="disabled"><i
+                <button class="btn btn-xs bg-info" wire:click="sync_items" wire:loading.attr="disabled"><i
                         class="mr-1 las la-lg la-sync"></i>Sync</button>
             </div>
             <div class="form-control">
                 <label class="label">
                     <span class="label-text">Seach generic name</span>
                 </label>
-                <label class="input-group input-group-sm">
+                <label class="input-group input-group-xs">
                     <span><i class="las la-search"></i></span>
-                    <input type="text" placeholder="Search" class="input input-bordered input-sm"
+                    <input type="text" placeholder="Search" class="input input-bordered input-xs"
                         wire:model.lazy="search" />
                 </label>
             </div>
@@ -65,41 +69,39 @@
         <span class="mr-1 shadow-md badge badge-sm badge-error">Expired</span>
     </div>
     <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto bg-white">
-        <table class="w-full border table-compact">
+        <table class="w-full border">
             <thead>
-                <tr>
-                    <th class="border">Source of Fund</th>
-                    <th class="border">Location</th>
-                    <th class="border">Balance as of</th>
-                    <th class="border">Generic</th>
+                <tr class="text-white bg-slate-500">
+                    <th class="px-1 border">Source of Fund</th>
+                    <th class="px-1 border">Balance as of</th>
+                    <th class="px-1 border">Generic</th>
                     @role('warehouse')
-                        <th class="border">Cost</th>
+                        <th class="px-1 border">Cost</th>
                     @endrole
-                    <th class="border">Price</th>
-                    <th class="border">Stock Balance</th>
-                    <th class="border">Expiry Date</th>
-                    <th class="border">Actions</th>
+                    <th class="px-1 border text-end">Price</th>
+                    <th class="px-1 border text-end">Stock Balance</th>
+                    <th class="px-1 text-center border">Expiry Date</th>
+                    <th class="px-1 border">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse ($stocks as $stk)
                     <tr>
-                        <th class="text-xs border">{{ $stk->chrgdesc }}</th>
-                        <td class="text-xs border">{{ $stk->description }}</td>
-                        <td class="text-xs border">{{ $stk->updated_at }}</td>
-                        <td class="text-xs font-bold border">{{ $stk->drug_concat() }}</td>
+                        <th class="px-1 text-xs border">{{ $stk->chrgdesc }}</th>
+                        <td class="px-1 text-xs border">{{ $stk->updated_at }}</td>
+                        <td class="px-1 text-xs font-bold border">{{ $stk->drug_concat() }}</td>
                         @role('warehouse')
-                            <th class="text-xs border">{{ $stk->dmduprice }}</th>
+                            <th class="px-1 text-xs border">{{ $stk->dmduprice }}</th>
                         @endrole
-                        <td class="text-xs border">{{ $stk->dmselprice }}</td>
-                        <td class="text-xs border">{{ number_format($stk->stock_bal) }}</td>
-                        <td class="text-xs border">{!! $stk->expiry() !!}</td>
-                        <td class="text-xs border">
+                        <td class="px-1 text-xs border text-end">{{ $stk->dmselprice }}</td>
+                        <td class="px-1 text-xs border text-end">{{ number_format($stk->stock_bal) }}</td>
+                        <td class="px-1 text-xs text-center border">{!! $stk->expiry() !!}</td>
+                        <td class="px-1 text-xs border">
                             <div class="flex space-x-2">
                                 @can('update-stock-item')
-                                    <button class="btn btn-warning btn-xs"
+                                    <button class="text-xs btn bg-warning btn-xs"
                                         onclick="update_item({{ $stk->id }}, `{{ $stk->drug_concat() }}`, '{{ $stk->chrgcode }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}', '{{ $stk->dmduprice }}', '{{ $stk->has_compounding }}', '{{ $stk->compounding_fee }}')">Update</button>
-                                    <button class="btn btn-info btn-xs"
+                                    <button class="text-xs btn bg-info btn-xs"
                                         onclick="adjust_qty({{ $stk->id }}, `{{ $stk->drug_concat() }}`, '{{ $stk->chrgdesc }}', '{{ $stk->exp_date }}', '{{ $stk->stock_bal }}')">Adjust
                                         QTY</button>
                                 @endcan
@@ -108,7 +110,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <th class="text-center border" colspan="10">No record found!</th>
+                        <th class="px-1 text-center border" colspan="10">No record found!</th>
                     </tr>
                 @endforelse
             </tbody>

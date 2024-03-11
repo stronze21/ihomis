@@ -986,6 +986,11 @@ html {
   font-size: 0.875rem;
   line-height: 2rem;
 }
+.input-group-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  line-height: 1.625;
+}
 .input-group :where(span) {
   display: flex;
   align-items: center;
@@ -2808,6 +2813,14 @@ html {
   min-height: 1.875rem;
   font-size: 0.875rem;
 }
+.input-xs {
+  height: 1.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  line-height: 1.625;
+}
 .input-sm {
   height: 2rem;
   padding-left: 0.75rem;
@@ -2838,6 +2851,19 @@ html {
 }
 [dir="rtl"] .select-sm {
   padding-right: 0.75rem;
+  padding-left: 2rem;
+}
+.select-xs {
+  height: 1.5rem;
+  padding-left: 0.5rem;
+  padding-right: 2rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  line-height: 1.625;
+  min-height: 1.5rem;
+}
+[dir="rtl"] .select-xs {
+  padding-right: 0.5rem;
   padding-left: 2rem;
 }
 .steps-horizontal .step {
@@ -4163,6 +4189,22 @@ html {
 .bg-white {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity)) !important;
+}
+.bg-info {
+  --tw-bg-opacity: 1 !important;
+  background-color: hsl(var(--in) / var(--tw-bg-opacity)) !important;
+}
+.bg-warning {
+  --tw-bg-opacity: 1 !important;
+  background-color: hsl(var(--wa) / var(--tw-bg-opacity)) !important;
+}
+.bg-primary {
+  --tw-bg-opacity: 1 !important;
+  background-color: hsl(var(--p) / var(--tw-bg-opacity)) !important;
+}
+.bg-secondary {
+  --tw-bg-opacity: 1 !important;
+  background-color: hsl(var(--s) / var(--tw-bg-opacity)) !important;
 }
 .bg-opacity-25 {
   --tw-bg-opacity: 0.25 !important;
