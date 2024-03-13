@@ -190,7 +190,7 @@
                                 <td class="w-20 text-right whitespace-nowrap">
                                     @if (!$rxo->pcchrgcod)
                                         <span class="cursor-pointer tooltip" data-tip="Update"
-                                            onclick="update_qty('{{ $rxo->docointkey }}', {{ $rxo->pchrgqty }}, {{ $rxo->pchrgup }}, {{ $rxo->pcchrgamt }}, '{{ $concat[0] }} <br>{{ $concat[1] }}')">
+                                            onclick="update_qty('{{ $rxo->docointkey }}', {{ $rxo->pchrgqty }}, {{ $rxo->pchrgup }}, {{ $rxo->pcchrgamt }}, `{{ $concat[0] }} <br>{{ $concat[1] }}`)">
                                             <i class="las la-lg la-edit"></i>
                                             {{ number_format($rxo->pchrgqty) }}
                                         </span>
@@ -201,7 +201,7 @@
                                 <td class="w-20 text-right whitespace-nowrap">
                                     @if ($rxo->estatus == 'S' and $rxo->qtyissued > 0)
                                         <span class="cursor-pointer tooltip" data-tip="Return"
-                                            onclick="return_issued('{{ $rxo->docointkey }}', '{{ $concat[0] }} <br>{{ $concat[1] }}', {{ $rxo->pchrgup }}, {{ $rxo->qtyissued }})">
+                                            onclick="return_issued('{{ $rxo->docointkey }}', `{{ $concat[0] }} <br>{{ $concat[1] }}`, {{ $rxo->pchrgup }}, {{ $rxo->qtyissued }})">
                                             <i class="text-red-600 las la-lg la-undo-alt"></i>
                                             {{ number_format($rxo->qtyissued) }}
                                         </span>
