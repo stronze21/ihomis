@@ -37,6 +37,7 @@ use App\Http\Livewire\Pharmacy\Drugs\StockPullOutList;
 use App\Http\Livewire\Pharmacy\Drugs\StockSummary;
 use App\Http\Livewire\Pharmacy\Drugs\ViewIotrans;
 use App\Http\Livewire\Pharmacy\Drugs\ViewIoTransDate;
+use App\Http\Livewire\Pharmacy\Drugs\WardRisTrans;
 use App\Http\Livewire\Pharmacy\References\PndfGenerics;
 use App\Http\Livewire\Pharmacy\Reports\DailyStockCard;
 use App\Http\Livewire\Pharmacy\Reports\DeliverySummary;
@@ -79,6 +80,7 @@ Route::middleware([
         Route::get('/stocks', StockList::class)->name('stk');
         Route::get('/stocks/summary', StockSummary::class)->name('stk.sum');
         Route::get('/stocks/for-pull-out', StockPullOutList::class)->name('stk.pullout');
+        Route::get('/stocks/ris', WardRisTrans::class)->name('stk.ris');
     });
 
     Route::name('iotrans.')->prefix('iotrans')->group(function () {

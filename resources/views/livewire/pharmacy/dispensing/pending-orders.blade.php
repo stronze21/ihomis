@@ -5,7 +5,7 @@
                 <i class="mr-1 las la-map-marked la-lg"></i> {{ session('pharm_location_name') }}
             </li>
             <li class="font-bold">
-                <i class="mr-1 las la-truck la-lg"></i> Drugs and Medicine Dispensing
+                <i class="mr-1 las la-file-prescription la-lg"></i> Rx/Orders
             </li>
             <li>
                 <i class="mr-1 las la-file-invoice la-lg"></i> Pending Orders

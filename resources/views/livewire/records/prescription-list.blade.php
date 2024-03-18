@@ -5,7 +5,7 @@
                 <i class="mr-1 las la-map-marked la-lg"></i> {{ session('pharm_location_name') }}
             </li>
             <li>
-                <i class="mr-1 las la-prescription-alt la-lg"></i> Prescriptions
+                <i class="mr-1 las la-file-prescription la-lg"></i> Rx/Orders
             </li>
         </ul>
     </div>

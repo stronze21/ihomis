@@ -2,7 +2,7 @@
 
 namespace App\Http\Livewire\References;
 
-use App\Models\RisWards;
+use App\Models\RisWard;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -19,7 +19,7 @@ class ListRisWards extends Component
 
     public function render()
     {
-        $locations = RisWards::where('ward_name', 'LIKE', '%' . $this->search . '%');
+        $locations = RisWard::where('ward_name', 'LIKE', '%' . $this->search . '%');
 
         return view('livewire.references.list-ris-wards', [
             'locations' => $locations->paginate(10),
@@ -36,11 +36,11 @@ class ListRisWards extends Component
         $this->validate(['ward_name' => ['required', 'string']]);
 
         if ($loc_id) {
-            $location = RisWards::find($loc_id);
+            $location = RisWard::find($loc_id);
             $location->ward_name = $this->ward_name;
             $location->save();
         } else {
-            RisWards::create(['ward_name' => $this->ward_name]);
+            RisWard::create(['ward_name' => $this->ward_name]);
         }
         $this->resetExcept('search');
         $this->alert('success', 'Saved!');
