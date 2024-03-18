@@ -1,4 +1,4 @@
-<div class="text-sm navbar bg-base-100">
+{{-- <div class="text-sm navbar bg-base-100">
     <div class="navbar-start">
         <div class="dropdown">
             <label tabindex="0" class="btn btn-ghost lg:hidden">
@@ -265,9 +265,9 @@
             </x-jet-dropdown>
         </div>
     </div>
-</div>
+</div> --}}
 
-{{-- <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="px-4 mx-auto sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -564,4 +564,4 @@
             </div>
         </div>
     </div>
-</nav> --}}
+</nav>
