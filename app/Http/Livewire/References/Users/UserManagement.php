@@ -20,7 +20,7 @@ class UserManagement extends Component
 
     public function render()
     {
-        $users = User::with('location');
+        $users = User::with('location')->where('email', 'LIKE', '%' . $this->search . '%');
         $roles = Role::where('name', '<>', 'Super Admin')->get();
 
         return view('livewire.references.users.user-management', [
@@ -33,8 +33,8 @@ class UserManagement extends Component
     {
         // $user->assignRole($this->role_name);
 
-        if($user->syncRoles($this->role_name)){
-            $this->alert('success', $this->role_name . ' role assigned to user '. $user->name);
+        if ($user->syncRoles($this->role_name)) {
+            $this->alert('success', $this->role_name . ' role assigned to user ' . $user->name);
             $this->reset();
         }
     }

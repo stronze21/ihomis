@@ -16,7 +16,7 @@
         <div class="flex space-x-2">
             @can('view-ris')
                 <label class="btn btn-sm btn-primary" for="issueModal">Issue RIS</label>
-                <button class="btn btn-sm btn-secondary" onclick="issue_more_ris()">Add To Last Request</button>
+                {{-- <button class="btn btn-sm btn-secondary" onclick="issue_more_ris()">Add To Last Request</button> --}}
             @endcan
         </div>
         <div>
@@ -114,11 +114,11 @@
                     <span class="text-sm text-red-600">{{ $message }}</span>
                 @enderror
             </div>
-            <div class="w-full h-56 form-control">
+            <div class="w-full form-control">
                 <label class="label" for="stock_id">
                     <span class="label-text">Drug/Medicine</span>
                 </label>
-                <label class="h-48 input-group input-group-vertical">
+                <label class="input-group input-group-vertical">
                     <input type="text" placeholder="Type here to search" class="input input-sm input-bordered"
                         wire:model.lazy="search_drug">
                     <select class="h-full select select-bordered" wire:model.lazy="stock_id" size="5">
@@ -129,7 +129,7 @@
                     </select>
                 </label>
             </div>
-            <div class="w-full h-56 form-control">
+            <div class="w-full form-control">
                 <label class="label" for="stock_id">
                     <span class="label-text">QTY to issue</span>
                 </label>
