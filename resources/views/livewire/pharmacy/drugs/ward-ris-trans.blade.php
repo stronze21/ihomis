@@ -13,18 +13,12 @@
 
 <div class="flex flex-col p-5 mx-auto">
     <div class="flex justify-between">
-        @can('request-drugs')
-            <div class="flex space-x-2">
-                <label class="btn btn-sm btn-primary" for="issueModal">Add Request</label>
+        <div class="flex space-x-2">
+            @can('view-ris')
+                <label class="btn btn-sm btn-primary" for="issueModal">Issue RIS</label>
                 <button class="btn btn-sm btn-secondary" onclick="issue_more_ris()">Add To Last Request</button>
-            </div>
-        @endcan
-        {{-- <div>
-            <button class="btn btn-sm btn-primary" wire:click="notify_request()">notify_request</button>
+            @endcan
         </div>
-        <div>
-            <button class="btn btn-sm btn-primary" wire:click="notify_user()">notify_user</button>
-        </div> --}}
         <div>
             <div class="form-control">
                 <label class="input-group input-group-sm">

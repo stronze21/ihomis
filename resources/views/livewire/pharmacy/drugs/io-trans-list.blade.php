@@ -55,7 +55,8 @@
                         </td>
                         <td class="text-xs">{{ $tran->location->description }}</td>
                         <td class="text-xs">{{ $tran->from_location ? $tran->from_location->description : '' }}</td>
-                        <td @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
+                        <td class="text-xs"
+                            @if ($tran->trans_stat == 'Requested' and $tran->request_from == session('pharm_location_id')) @can('issue-requested-drugs') wire:click="select_request({{ $tran->id }})" @endcan @endif
                             @if ($tran->trans_stat == 'Issued' and $tran->loc_code == session('pharm_location_id')) onclick="cancel_issued({{ $tran->id }})" @endif>
                             <span class="text-blue-500"><i class="las la-lg la-hand-pointer"></i>
                                 {{ $tran->drug->drug_concat() }}</span>

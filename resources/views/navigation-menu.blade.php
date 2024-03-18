@@ -1,4 +1,4 @@
-{{-- <div class="text-sm navbar bg-base-100">
+<div class="text-sm navbar bg-base-100">
     <div class="navbar-start">
         <div class="dropdown">
             <label tabindex="0" class="btn btn-ghost lg:hidden">
@@ -35,29 +35,33 @@
                         <i class="las la-lg la-tachometer-alt"></i> {{ __('Dashboard') }}
                     </x-jet-nav-link>
                 </li>
-                <li class="mt-2 dropdown">
-                    <x-jet-nav-link href="{{ route('patients.list') }}" :active="request()->routeIs('patients.*')">
-                        <i class="las la-lg la-user-alt"></i> {{ __('Patients') }}
-                    </x-jet-nav-link>
-                </li>
-                <li tabindex="0" class="mt-2 dropdown">
-                    <x-jet-nav-link :active="request()->routeIs('rx.*') || request()->routeIs('dispensing.rxo.pending')">
-                        <i class="las la-lg la-file-prescription"></i> Rx/Orders
-                        <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            viewBox="0 0 24 24">
-                            <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
-                        </svg>
-                    </x-jet-nav-link>
-                    <ul
-                        class="overflow-y-auto shadow-2xl dropdown-content bg-base-100 text-base-content rounded-t-box rounded-b-box">
-                        <li><a href="{{ route('rx.opd') }}">OPD Rx</a></li>
-                        <li><a href="{{ route('rx.ward') }}">Ward Rx</a></li>
-                        <li><a href="{{ route('rx.er') }}">ER Rx</a></li>
-                        <li>
-                            <a href="{{ route('dispensing.rxo.pending') }}">Pending Orders</a>
-                        </li>
-                    </ul>
-                </li>
+                @can('view-patients')
+                    <li class="mt-2 dropdown">
+                        <x-jet-nav-link href="{{ route('patients.list') }}" :active="request()->routeIs('patients.*')">
+                            <i class="las la-lg la-user-alt"></i> {{ __('Patients') }}
+                        </x-jet-nav-link>
+                    </li>
+                @endcan
+                @can('view-prescriptions')
+                    <li tabindex="0" class="mt-2 dropdown">
+                        <x-jet-nav-link :active="request()->routeIs('rx.*') || request()->routeIs('dispensing.rxo.pending')">
+                            <i class="las la-lg la-file-prescription"></i> Rx/Orders
+                            <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24">
+                                <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                            </svg>
+                        </x-jet-nav-link>
+                        <ul
+                            class="overflow-y-auto shadow-2xl dropdown-content bg-base-100 text-base-content rounded-t-box rounded-b-box">
+                            <li><a href="{{ route('rx.opd') }}">OPD Rx</a></li>
+                            <li><a href="{{ route('rx.ward') }}">Ward Rx</a></li>
+                            <li><a href="{{ route('rx.er') }}">ER Rx</a></li>
+                            <li>
+                                <a href="{{ route('dispensing.rxo.pending') }}">Pending Orders</a>
+                            </li>
+                        </ul>
+                    </li>
+                @endcan
                 <li tabindex="0" class="mt-2 dropdown">
                     <x-jet-nav-link :active="request()->routeIs('dmd.stk') || request()->routeIs('iotrans.*')">
                         <i class="las la-lg la-pills"></i> Drugs & Meds
@@ -68,26 +72,40 @@
                     </x-jet-nav-link>
                     <ul
                         class="overflow-y-auto shadow-2xl dropdown-content bg-base-100 text-base-content rounded-t-box rounded-b-box">
-                        <li><a href="{{ route('dmd.stk') }}">Stocks</a></li>
-                        <li><a href="{{ route('iotrans.list') }}">IO Trans</a></li>
-                        <li><a href="{{ route('iotrans.requests') }}">IO Trans Requests</a></li>
-                        <li><a href="{{ route('dmd.stk.ris') }}">Ward RIS</a></li>
+                        @can('view-stocks')
+                            <li><a href="{{ route('dmd.stk') }}">Stocks</a></li>
+                        @endcan
+                        @can('view-iotrans')
+                            <li><a href="{{ route('iotrans.list') }}">IO Trans</a></li>
+                        @endcan
+                        @can('view-iotrans-limited')
+                            <li><a href="{{ route('iotrans.requests') }}">IO Trans Requests</a></li>
+                        @endcan
+                        @can('view-ris')
+                            <li><a href="{{ route('dmd.stk.ris') }}">Ward RIS</a></li>
+                        @endcan
                     </ul>
                 </li>
-                <li tabindex="0" class="mt-2 dropdown">
-                    <x-jet-nav-link :active="request()->routeIs('delivery.*')">
-                        <i class="las la-lg la-truck-loading"></i> Purchases
-                        <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                            viewBox="0 0 24 24">
-                            <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
-                        </svg>
-                    </x-jet-nav-link>
-                    <ul
-                        class="overflow-y-auto shadow-2xl dropdown-content bg-base-100 text-base-content rounded-t-box rounded-b-box">
-                        <li><a href="{{ route('delivery.list') }}">Deliveries</a></li>
-                        <li><a href="{{ route('delivery.ep') }}">Emergency Purchase</a></li>
-                    </ul>
-                </li>
+                @canany('view-deliveries', 'view-eps')
+                    <li tabindex="0" class="mt-2 dropdown">
+                        <x-jet-nav-link :active="request()->routeIs('delivery.*')">
+                            <i class="las la-lg la-truck-loading"></i> Purchases
+                            <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                viewBox="0 0 24 24">
+                                <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                            </svg>
+                        </x-jet-nav-link>
+                        <ul
+                            class="overflow-y-auto shadow-2xl dropdown-content bg-base-100 text-base-content rounded-t-box rounded-b-box">
+                            @can('view-deliveries')
+                                <li><a href="{{ route('delivery.list') }}">Deliveries</a></li>
+                            @endcan
+                            @can('view-eps')
+                                <li><a href="{{ route('delivery.ep') }}">Emergency Purchase</a></li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
             </ul>
         </div>
     </div>
@@ -265,9 +283,9 @@
             </x-jet-dropdown>
         </div>
     </div>
-</div> --}}
+</div>
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+{{-- <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="px-4 mx-auto sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -564,4 +582,4 @@
             </div>
         </div>
     </div>
-</nav>
+</nav> --}}
