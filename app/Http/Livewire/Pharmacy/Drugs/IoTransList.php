@@ -166,7 +166,7 @@ class IoTransList extends Component
                         'dmdprdte' => $stock->dmdprdte,
                     ]);
                     $stock->save();
-                    LogIoTransIssue::dispatch($location_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty, $stock->exp_date, $stock->drug_concat(), session('active_consumption'));
+                    LogIoTransIssue::dispatch($location_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty, $stock->exp_date, $stock->drug_concat(), session('active_consumption'), $stock->current_price ? $stock->current_price->acquisition_cost : 0);
                 }
             }
             $this->selected_request->issued_qty = $issued_qty;
@@ -190,46 +190,6 @@ class IoTransList extends Component
         $this->available_drugs = $txn->warehouse_stock_charges->all();
         $this->dispatchBrowserEvent('toggleIssue');
     }
-
-    // public function cancel_issued(InOutTransaction $txn)
-    // {
-    //     $trans_id = $txn->id;
-
-    //     $issued_items = InOutTransactionItem::where('iotrans_id', $trans_id)
-    //         ->where('status', 'Pending')
-    //         ->latest('exp_date')
-    //         ->get();
-    //     foreach ($issued_items as $item) {
-    //         $from_stock = $item->from_stock;
-    //         $from_stock->stock_bal += $item->qty;
-    //         $from_stock->save();
-
-    //         $item->status = 'Cancelled';
-    //         $item->save();
-    //         $date = Carbon::parse(now())->startOfMonth()->format('Y-m-d');
-
-    //         $log = DrugStockLog::firstOrNew([
-    //             'loc_code' => $from_stock->loc_code,
-    //             'dmdcomb' => $item->dmdcomb,
-    //             'dmdctr' => $item->dmdctr,
-    //             'chrgcode' => $item->chrgcode,
-    //             'date_logged' => $date,
-    //             'dmdprdte' => $from_stock->dmdprdte,
-    //             'unit_price' => $from_stock->retail_price,
-    //             'consumption_id' => session('active_consumption'),
-    //         ]);
-    //         $log->time_logged = now();
-    //         $log->transferred -= $item->qty;
-
-    //         $log->save();
-    //     }
-
-    //     $txn->issued_qty = 0;
-    //     $txn->trans_stat = 'Cancelled';
-    //     $txn->save();
-    //     $this->alert('success', 'Issued items successfully recalled!');
-    //     $this->reset();
-    // }
 
     public function view_trans($trans_no)
     {
@@ -259,8 +219,8 @@ class IoTransList extends Component
                 'dmdctr' => $stock->dmdctr,
                 'chrgcode' => $stock->chrgcode,
                 'date_logged' => $date,
+                'unit_cost' => $stock->current_price ? $stock->current_price->acquisition_cost : 0,
                 'unit_price' => $stock->retail_price,
-                'dmdprdte' => $stock->dmdprdte,
                 'consumption_id' => session('active_consumption'),
             ]);
             $log->time_logged = now();

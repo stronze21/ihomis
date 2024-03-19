@@ -34,39 +34,39 @@ class ConssumptionReport extends Component
 
         $cons = ConsumptionLogDetail::where('loc_code', session('pharm_location_id'))->latest()->get();
 
-        $drugs_issued = DB::select('SELECT pdsl.dmdcomb, pdsl.dmdctr, pdsl.dmdprdte,
+        $drugs_issued = DB::select("SELECT pdsl.dmdcomb, pdsl.dmdctr,
                                         pdsl.loc_code,
-                                        pdsl.purchased as purchased,
-                                        pdsl.beg_bal as beg_bal,
-                                        pdsl.ems as ems,
-                                        pdsl.maip as maip,
-                                        pdsl.wholesale as wholesale,
-                                        pdsl.opdpay as opdpay,
-                                        pdsl.pay as pay,
-                                        pdsl.service as service,
-                                        pdsl.konsulta as konsulta,
-                                        pdsl.pcso as pcso,
-                                        pdsl.phic as phic,
-                                        pdsl.caf as caf,
-                                        pdsl.issue_qty as issue_qty,
-                                        pdsl.return_qty as return_qty,
-                                        stre.stredesc,
-                                        frm.formdesc,
-                                        gen.gendesc,
-                                        drug.dmdnost,
-                                        price.acquisition_cost,
-                                        price.dmselprice,
-                                        loc.description as location
+                                        SUM(pdsl.purchased) as purchased,
+                                        SUM(pdsl.received) as received_iotrans,
+                                        SUM(pdsl.transferred) as transferred_iotrans,
+                                        SUM(pdsl.beg_bal) as beg_bal,
+                                        SUM(pdsl.ems) as ems,
+                                        SUM(pdsl.maip) as maip,
+                                        SUM(pdsl.wholesale) as wholesale,
+                                        SUM(pdsl.opdpay) as opdpay,
+                                        SUM(pdsl.pay) as pay,
+                                        SUM(pdsl.service) as service,
+                                        SUM(pdsl.konsulta) as konsulta,
+                                        SUM(pdsl.pcso) as pcso,
+                                        SUM(pdsl.phic) as phic,
+                                        SUM(pdsl.caf) as caf,
+                                        SUM(pdsl.issue_qty) as issue_qty,
+                                        SUM(pdsl.return_qty) as return_qty,
+                                        MAX(pdsl.unit_cost) as acquisition_cost,
+                                        pdsl.unit_price as dmselprice,
+                                        loc.description as location,
+                                        drug.drug_concat
                                     FROM [pharm_drug_stock_logs] as [pdsl]
                                     INNER JOIN hdmhdr as drug ON pdsl.dmdcomb = drug.dmdcomb AND pdsl.dmdctr = drug.dmdctr
-                                    INNER JOIN hdruggrp as grp ON drug.grpcode = grp.grpcode
-                                    INNER JOIN hgen as gen ON grp.gencode = gen.gencode
-                                    INNER JOIN hstre as stre ON drug.strecode = stre.strecode
-                                    INNER JOIN hform as frm ON drug.formcode = frm.formcode
                                     INNER JOIN hdmhdrprice as price ON pdsl.dmdprdte = price.dmdprdte
                                     INNER JOIN pharm_locations as loc ON pdsl.loc_code = loc.id
-                                    WHERE [chrgcode] = ? and loc_code = ? and consumption_id = ?
-                                    ORDER BY gen.gendesc ASC', [$filter_charge[0], session('pharm_location_id'), $this->report_id]);
+                                    WHERE [chrgcode] = '" . $filter_charge[0] . "' and loc_code = '" . session('pharm_location_id') . "' and consumption_id = '" . $this->report_id . "'
+                                    GROUP BY pdsl.dmdcomb, pdsl.dmdctr,
+                                    pdsl.loc_code,
+                                    pdsl.unit_price,
+                                    loc.description,
+                                    drug.drug_concat
+                                    ORDER BY drug.drug_concat ASC");
 
         $locations = PharmLocation::all();
 

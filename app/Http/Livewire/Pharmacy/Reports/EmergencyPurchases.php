@@ -173,7 +173,6 @@ class EmergencyPurchases extends Component
             'dmdctr' => $add_to->dmdctr,
             'chrgcode' => $add_to->chrgcode,
             'date_logged' => $date,
-            'dmdprdte' => $purchase->dmdprdte,
             'unit_cost' => $purchase->unit_price,
             'unit_price' => $purchase->retail_price,
             'consumption_id' => session('active_consumption'),

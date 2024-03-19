@@ -26,6 +26,18 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="ml-3 form-control">
+                    <label class="label">
+                        <span class="label-text">Fund Source</span>
+                    </label>
+                    <select class="text-sm select select-bordered select-sm" wire:model="selected_fund">
+                        <option value="">All</option>
+                        @foreach ($charges as $charge)
+                            <option value="{{ $charge->chrgcode }},{{ $charge->chrgdesc }}">
+                                {{ $charge->chrgdesc }}</option>
+                        @endforeach
+                    </select>
+                </div>
             @endcan
             <div class="ml-3 form-control">
                 <label class="label">
@@ -46,6 +58,7 @@
                     <th>Source of Fund</th>
                     <th>Generic</th>
                     <th class="text-end">Remaining</th>
+                    <th class="text-end">Reorder Point</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,6 +67,12 @@
                         <th>{{ $stk->chrgdesc }}</th>
                         <td class="font-bold">{{ $stk->drug_concat }}</td>
                         <td class="text-end">{{ number_format($stk->stock_bal, 0) }}</td>
+                        <td class="text-end">
+                            <button class="btn btn-ghost btn-sm text-primary tooltip" data-tip="update point"
+                                onclick="update_reorder(`{{ $stk->dmdcomb }}`, `{{ $stk->dmdctr }}`, `{{ $stk->chrgcode }}`, `{{ $stk->reorder_point ?? 0 }}`)">
+                                <i class="las la-edit"></i>
+                            </button>{{ $stk->reorder_point ?? 'Not Set' }}
+                        </td>
                     </tr>
                 @empty
                     <tr>
@@ -64,3 +83,30 @@
         </table>
     </div>
 </div>
+
+@push('scripts')
+    <script>
+        function update_reorder(dmdcomb, dmdctr, chrgcode, reorder_point) {
+            Swal.fire({
+                html: `
+                    <span class="text-xl font-bold"> Update Reorder Point</span>
+                    <div class="w-full px-2 form-control">
+                        <label class="label" for="reorder_qty">
+                            <span class="label-text">Beginning Balance</span>
+                        </label>
+                        <input id="reorder_qty" type="number" value="` + reorder_point + `" class="w-full input input-bordered" />
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: `Save`,
+                didOpen: () => {
+                    const reorder_qty = Swal.getHtmlContainer().querySelector('#reorder_qty');
+                }
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    Livewire.emit('update_reorder', dmdcomb, dmdctr, chrgcode, reorder_qty.value);
+                }
+            });
+        }
+    </script>
+@endpush

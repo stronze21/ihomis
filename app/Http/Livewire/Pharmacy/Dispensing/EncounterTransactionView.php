@@ -296,9 +296,16 @@ class EncounterTransactionView extends Component
             $this->type = $temp_type;
 
             $stocks = DB::select(
-                "SELECT * FROM pharm_drug_stocks
-                            WHERE dmdcomb = '" . $rxo->dmdcomb . "' AND dmdctr = '" . $rxo->dmdctr . "' AND chrgcode = '" . $rxo->orderfrom . "' AND loc_code = '" . session('pharm_location_id') . "' AND exp_date > '" . date('Y-m-d') . "' AND stock_bal > 0
-                            ORDER BY exp_date ASC"
+                "SELECT pharm_drug_stocks.*, hdmhdrprice.dmduprice
+                    FROM pharm_drug_stocks
+                    JOIN hdmhdrprice ON pharm_drug_stocks.dmdprdte = hdmhdrprice.dmdprdte
+                WHERE pharm_drug_stocks.dmdcomb = '" . $rxo->dmdcomb . "'
+                    AND pharm_drug_stocks.dmdctr = '" . $rxo->dmdctr . "'
+                    AND pharm_drug_stocks.chrgcode = '" . $rxo->orderfrom . "'
+                    AND pharm_drug_stocks.loc_code = '" . session('pharm_location_id') . "'
+                    AND pharm_drug_stocks.exp_date > '" . date('Y-m-d') . "'
+                    AND pharm_drug_stocks.stock_bal > 0
+                ORDER BY pharm_drug_stocks.exp_date ASC"
             );
             if ($stocks) {
                 $total_deduct = $rxo->pchrgqty;
@@ -334,14 +341,15 @@ class EncounterTransactionView extends Component
                         $drug_concat = '';
                         $drug_concat = implode("", explode('_', $stock->drug_concat));
 
-                        LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price, $drug_concat, date('Y-m-d'), now(), session('active_consumption'));
+                        LogDrugStockIssue::dispatch($stock->id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $stock->exp_date, $trans_qty, $unit_price, $pcchrgamt, session('user_id'), $rxo->hpercode, $rxo->enccode, $this->toecode, $pcchrgcod, $tag, $rxo->ris, $stock->dmdprdte, $stock->retail_price, $drug_concat, date('Y-m-d'), now(), session('active_consumption'), $stock->dmduprice);
                     }
                 }
                 if ($cnt == 1) {
                     $cnt = DB::update(
                         "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = '" . $rxo->pchrgqty . "', tx_type = '" . $this->type . "' WHERE docointkey = '" . $rxo->docointkey . "' AND (estatus = 'P' OR pchrgup = 0)"
                     );
-                    LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id, now());
+                    // LogDrugOrderIssue::dispatch($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id, now());
+                    $this->log_hrxoissue($rxo->docointkey, $rxo->enccode, $rxo->hpercode, $rxo->dmdcomb, $rxo->dmdctr, $rxo->pchrgqty, session('employeeid'), $rxo->orderfrom, $rxo->pcchrgcod, $rxo->pchrgup, $rxo->ris, $rxo->prescription_data_id, now());
                 }
             } else {
                 $insuf = Drug::select('drug_concat')->where('dmdcomb', $rxo->dmdcomb)->where('dmdctr', $rxo->dmdctr)->first();
@@ -350,17 +358,75 @@ class EncounterTransactionView extends Component
         }
 
         if ($cnt == 1) {
-            // foreach ($rxos as $row2) {
-            //     $cnt = DB::update(
-            //         "UPDATE hospital.dbo.hrxo SET estatus = 'S', qtyissued = ? WHERE docointkey = ? AND (estatus = 'P' OR pchrgup = 0)",
-            //         [$row2->pchrgqty, $row2->docointkey]
-            //     );
-            //     LogDrugOrderIssue::dispatch($row2->docointkey, $row2->enccode, $row2->hpercode, $row2->dmdcomb, $row2->dmdctr, $row2->pchrgqty, session('employeeid'), $row2->orderfrom, $row2->pcchrgcod, $row2->pchrgup, $row2->ris, $row2->prescription_data_id, now());
-            // }
             $this->alert('success', 'Order issued successfully.');
         } else {
             $this->alert('error', 'No item to issue.');
         }
+    }
+
+    public function log_hrxoissue($docointkey, $enccode, $hpercode, $dmdcomb, $dmdctr, $pchrgqty, $employeeid, $orderfrom, $pcchrgcod, $pchrgup, $ris, $prescription_data_id, $date)
+    {
+        if ($prescription_data_id) {
+            PrescriptionDataIssued::create([
+                'presc_data_id' => $prescription_data_id,
+                'docointkey' => $docointkey,
+                'qtyissued' => $pchrgqty,
+            ]);
+        } else {
+            $rx_header = Prescription::where('enccode', $enccode)
+                ->with('data_active')
+                ->get();
+            if ($rx_header) {
+                foreach ($rx_header as $rxh) {
+                    $rx_data = $rxh->data_active()
+                        ->where('dmdcomb', $dmdcomb)
+                        ->where('dmdctr', $dmdctr)
+                        ->first();
+                    if ($rx_data) {
+                        PrescriptionDataIssued::create([
+                            'presc_data_id' => $rx_data->id,
+                            'docointkey' => $docointkey,
+                            'qtyissued' => $pchrgqty,
+                        ]);
+
+                        DB::update(
+                            "UPDATE hospital.dbo.hrxo SET prescription_data_id = ?, prescribed_by = ? WHERE docointkey = ?",
+                            [$rx_data->id, $rx_data->entry_by, $docointkey]
+                        );
+
+                        $rx_data->stat = 'I';
+                        $rx_data->save();
+                    }
+                }
+            }
+        }
+
+
+        DrugOrderIssue::updateOrCreate([
+            'docointkey' => $docointkey,
+            'enccode' => $enccode,
+            'hpercode' => $hpercode,
+            'dmdcomb' => $dmdcomb,
+            'dmdctr' => $dmdctr,
+        ], [
+            'issuedte' => $date,
+            'issuetme' => $date,
+            'qty' => $pchrgqty,
+            'issuedby' => $employeeid,
+            'status' => 'A', //A
+            'rxolock' => 'N', //N
+            'updsw' => 'N', //N
+            'confdl' => 'N', //N
+            'entryby' => $employeeid,
+            'locacode' => 'PHARM', //PHARM
+            'dmdprdte' => $date,
+            'issuedfrom' => $orderfrom,
+            'pcchrgcod' => $pcchrgcod,
+            'chrgcode' => $orderfrom,
+            'pchrgup' => $pchrgup,
+            'issuetype' => 'c', //c
+            'ris' =>  $ris ? true : false,
+        ]);
     }
 
     public function reset_order()
@@ -607,7 +673,7 @@ class EncounterTransactionView extends Component
                 'dmdctr' => $stock_issued->stock->dmdctr,
                 'chrgcode' => $stock_issued->stock->chrgcode,
                 'date_logged' => $date,
-                'dmdprdte' => $stock_issued->stock->dmdprdte,
+                'unit_cost' => $stock_issued->stock->current_price ? $stock_issued->stock->current_price->acquisition_cost : 0,
                 'unit_price' => $stock_issued->stock->retail_price,
                 'consumption_id' => session('active_consumption'),
             ]);

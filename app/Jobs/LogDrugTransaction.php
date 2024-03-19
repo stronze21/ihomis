@@ -65,7 +65,6 @@ class LogDrugTransaction implements ShouldQueue
             'dmdctr' => $this->dmdctr,
             'chrgcode' => $this->chrgcode,
             'date_logged' => $date,
-            'dmdprdte' => $this->dmdprdte,
             'unit_cost' => $this->unit_cost,
             'unit_price' => $this->retail_price,
             'consumption_id' => $this->active_consumption,

@@ -57,7 +57,6 @@ class Dashboard extends Component
                         'dmdctr' => $stock->dmdctr,
                         'chrgcode' => $stock->chrgcode,
                         'date_logged' => $date,
-                        'dmdprdte' => $stock->dmdprdte,
                         'unit_cost' => $stock->current_price ? $stock->current_price->acquisition_cost : 0,
                         'unit_price' => $stock->retail_price,
                         'beg_bal' => $stock->stock_bal,

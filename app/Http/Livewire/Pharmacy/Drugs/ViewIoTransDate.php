@@ -221,7 +221,7 @@ class ViewIoTransDate extends Component
 
                 $stock->save();
                 $item->save();
-                LogIoTransReceive::dispatch($item->to, $item->dmdcomb, $item->dmdctr, $item->chrgcode, date('Y-m-d'), $item->dmdprdte, $item->retail_price, now(), $item->qty, $stock->id, $stock->exp_date, $stock->drug_concat(), session('active_consumption'));
+                LogIoTransReceive::dispatch($item->to, $item->dmdcomb, $item->dmdctr, $item->chrgcode, date('Y-m-d'), $item->dmdprdte, $item->retail_price, now(), $item->qty, $stock->id, $stock->exp_date, $stock->drug_concat(), session('active_consumption'), $stock->current_price ? $stock->current_price->acquisition_cost : 0);
             }
         }
 
@@ -295,7 +295,7 @@ class ViewIoTransDate extends Component
                         'dmdprdte' => $stock->dmdprdte,
                     ]);
                     $stock->save();
-                    LogIoTransIssue::dispatch($location_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty, $stock->exp_date, $stock->drug_concat(), session('active_consumption'));
+                    LogIoTransIssue::dispatch($location_id, $trans_item->dmdcomb, $trans_item->dmdctr, $trans_item->chrgcode, date('Y-m-d'), $stock->retail_price, $stock->dmdprdte, now(), $trans_item->qty, $stock->exp_date, $stock->drug_concat(), session('active_consumption'), $stock->current_price ? $stock->current_price->acquisition_cost : 0);
                 }
             }
             $this->selected_request->issued_qty = $issued_qty;

@@ -256,7 +256,6 @@ class DeliveryView extends Component
                 'dmdctr' => $add_to->dmdctr,
                 'chrgcode' => $add_to->chrgcode,
                 'date_logged' => $date,
-                'dmdprdte' => $item->dmdprdte,
                 'unit_cost' => $item->unit_price,
                 'unit_price' => $item->retail_price,
                 'consumption_id' => session('active_consumption'),

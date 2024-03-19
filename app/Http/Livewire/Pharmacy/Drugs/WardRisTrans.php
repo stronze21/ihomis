@@ -125,8 +125,8 @@ class WardRisTrans extends Component
                         'dmdctr' => $dmdctr,
                         'chrgcode' => $this->chrgcode,
                         'date_logged' => $date,
+                        'unit_cost' => $stock->current_price ? $stock->current_price->acquisition_cost : 0,
                         'unit_price' => $stock->retail_price,
-                        'dmdprdte' => $stock->dmdprdte,
                         'consumption_id' => session('active_consumption'),
                     ]);
                     $log->time_logged = now();

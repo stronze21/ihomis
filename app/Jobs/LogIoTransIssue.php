@@ -18,7 +18,7 @@ class LogIoTransIssue implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 
-    protected $warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date, $drug_concat, $active_consumption = null;
+    protected $warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date, $drug_concat, $active_consumption = null, $unit_cost;
 
 
     public function middleware(): array
@@ -31,7 +31,7 @@ class LogIoTransIssue implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date, $drug_concat, $active_consumption = null)
+    public function __construct($warehouse_id, $dmdcomb, $dmdctr, $chrgcode, $trans_date, $retail_price, $dmdprdte, $trans_time, $qty, $exp_date, $drug_concat, $active_consumption = null, $unit_cost)
     {
         $this->onQueue('iotx');
         $this->warehouse_id = $warehouse_id;
@@ -46,6 +46,7 @@ class LogIoTransIssue implements ShouldQueue
         $this->exp_date = $exp_date;
         $this->drug_concat = $drug_concat;
         $this->active_consumption = $active_consumption;
+        $this->unit_cost = $unit_cost;
     }
 
     /**
@@ -62,8 +63,8 @@ class LogIoTransIssue implements ShouldQueue
             'dmdctr' => $this->dmdctr,
             'chrgcode' => $this->chrgcode,
             'date_logged' => $date,
+            'unit_cost' => $this->unit_cost,
             'unit_price' => $this->retail_price,
-            'dmdprdte' => $this->dmdprdte,
             'consumption_id' => $this->active_consumption,
         ]);
         $log->time_logged = $this->trans_time;

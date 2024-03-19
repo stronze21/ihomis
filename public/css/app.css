@@ -1580,12 +1580,26 @@ html {
   --tw-text-opacity: 1;
   color: hsl(var(--s) / var(--tw-text-opacity));
 }
+.btn-outline.btn-accent .badge-outline {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--a) / var(--tw-border-opacity));
+  background-color: transparent;
+  --tw-text-opacity: 1;
+  color: hsl(var(--a) / var(--tw-text-opacity));
+}
 .btn-outline.btn-info .badge-outline {
   --tw-border-opacity: 1;
   border-color: hsl(var(--in) / var(--tw-border-opacity));
   background-color: transparent;
   --tw-text-opacity: 1;
   color: hsl(var(--in) / var(--tw-text-opacity));
+}
+.btn-outline.btn-success .badge-outline {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--su) / var(--tw-border-opacity));
+  background-color: transparent;
+  --tw-text-opacity: 1;
+  color: hsl(var(--su) / var(--tw-text-opacity));
 }
 .btn-outline.btn-warning .badge-outline {
   --tw-border-opacity: 1;
@@ -1841,6 +1855,21 @@ html {
 .btn-ghost:focus-visible {
   outline: 2px solid currentColor;
 }
+.btn-outline {
+  border-color: currentColor;
+  background-color: transparent;
+  --tw-text-opacity: 1;
+  color: hsl(var(--bc) / var(--tw-text-opacity));
+}
+.btn-outline:hover,
+    .btn-outline.btn-active {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--bc) / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--bc) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--b1) / var(--tw-text-opacity));
+}
 .btn-outline.btn-primary {
   --tw-text-opacity: 1;
   color: hsl(var(--p) / var(--tw-text-opacity));
@@ -1866,6 +1895,32 @@ html {
   background-color: hsl(var(--sf, var(--s)) / var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: hsl(var(--sc) / var(--tw-text-opacity));
+}
+.btn-outline.btn-accent {
+  --tw-text-opacity: 1;
+  color: hsl(var(--a) / var(--tw-text-opacity));
+}
+.btn-outline.btn-accent:hover,
+      .btn-outline.btn-accent.btn-active {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--af, var(--a)) / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--af, var(--a)) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--ac) / var(--tw-text-opacity));
+}
+.btn-outline.btn-success {
+  --tw-text-opacity: 1;
+  color: hsl(var(--su) / var(--tw-text-opacity));
+}
+.btn-outline.btn-success:hover,
+      .btn-outline.btn-success.btn-active {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--su) / var(--tw-border-opacity));
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--su) / var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--suc, var(--nc)) / var(--tw-text-opacity));
 }
 .btn-outline.btn-info {
   --tw-text-opacity: 1;
@@ -2142,6 +2197,13 @@ html {
 .input:focus {
   outline: 2px solid hsla(var(--bc) / 0.2);
   outline-offset: 2px;
+}
+.input-error {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--er) / var(--tw-border-opacity));
+}
+.input-error:focus {
+  outline: 2px solid hsl(var(--er));
 }
 .input-disabled,
   .input[disabled] {
@@ -3866,6 +3928,10 @@ html {
   width: -moz-min-content !important;
   width: min-content !important;
 }
+.w-fit {
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+}
 .min-w-0 {
   min-width: 0px !important;
 }
@@ -4655,6 +4721,10 @@ html {
 .text-white {
   --tw-text-opacity: 1 !important;
   color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
+}
+.text-primary {
+  --tw-text-opacity: 1 !important;
+  color: hsl(var(--p) / var(--tw-text-opacity)) !important;
 }
 .underline {
   text-decoration-line: underline !important;

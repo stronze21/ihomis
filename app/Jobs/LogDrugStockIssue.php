@@ -19,7 +19,7 @@ class LogDrugStockIssue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date, $date, $active_consumption = null;
+    public $stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date, $date, $active_consumption = null, $unit_cost;
 
 
     public function middleware(): array
@@ -32,7 +32,7 @@ class LogDrugStockIssue implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date, $date, $active_consumption = null)
+    public function __construct($stock_id, $docointkey, $dmdcomb, $dmdctr, $loc_code, $chrgcode, $exp_date, $trans_qty, $unit_price, $pcchrgamt, $user_id, $hpercode, $enccode, $toecode, $pcchrgcod, $tag, $ris, $dmdprdte, $retail_price, $concat, $stock_date, $date, $active_consumption = null, $unit_cost)
     {
         $this->onQueue('rx_issue_logger');
         $this->stock_id = $stock_id;
@@ -58,6 +58,7 @@ class LogDrugStockIssue implements ShouldQueue
         $this->stock_date = $stock_date;
         $this->date = $date;
         $this->active_consumption = $active_consumption;
+        $this->unit_cost = $unit_cost;
     }
 
     /**
@@ -109,7 +110,7 @@ class LogDrugStockIssue implements ShouldQueue
             'dmdctr' => $this->dmdctr,
             'chrgcode' => $this->chrgcode,
             'date_logged' => $date,
-            'dmdprdte' => $this->dmdprdte,
+            'unit_cost' => $this->unit_cost,
             'unit_price' => $this->retail_price,
             'consumption_id' => $this->active_consumption,
         ]);

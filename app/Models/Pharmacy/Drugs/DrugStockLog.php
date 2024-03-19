@@ -69,6 +69,11 @@ class DrugStockLog extends Model
         return $this->belongsTo(PharmLocation::class, 'loc_code', 'id');
     }
 
+    public function stock()
+    {
+        return $this->belongsTo(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr']);
+    }
+
     public function drug()
     {
         return $this->belongsTo(Drug::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr'])
