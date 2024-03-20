@@ -17,21 +17,33 @@
 
 <div class="flex flex-col p-5 mx-auto">
     <div class="flex justify-between">
-        <div class="ml-2">
+        <div class="flex space-x-2">
             <button onclick="ExportToExcel('xlsx')" class="btn btn-sm btn-info"><i class="las la-lg la-file-excel"></i>
                 Export</button>
-        </div>
-        <div class="ml-2">
             <button onclick="printMe()" class="btn btn-sm btn-primary"><i class="las la-lg la-print"></i>
                 Print</button>
         </div>
-        <div class="ml-2">
+        <div class="flex space-x-2">
             <div class="form-control">
-                <label class="input-group input-group-sm">
-                    <span><i class="las la-search"></i></span>
-                    <input type="text" placeholder="Search" class="input input-bordered input-sm"
-                        wire:model.lazy="search" />
+                <label class="input-group">
+                    <span>From</span>
+                    <input type="date" class="w-full input input-sm input-bordered" wire:model.lazy="from" />
                 </label>
+            </div>
+            <div class="form-control">
+                <label class="input-group">
+                    <span>To</span>
+                    <input type="date" class="w-full input input-sm input-bordered" wire:model.lazy="to" />
+                </label>
+            </div>
+            <div>
+                <div class="form-control">
+                    <label class="input-group input-group-sm">
+                        <span><i class="las la-search"></i></span>
+                        <input type="text" placeholder="Search" class="input input-bordered input-sm"
+                            wire:model.lazy="search" />
+                    </label>
+                </div>
             </div>
         </div>
     </div>
@@ -64,7 +76,6 @@
                 </tbody>
             </table>
         </div>
-        {{ $trans->links() }}
     </div>
 </div>
 

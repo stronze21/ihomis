@@ -29,7 +29,7 @@
             </div>
         </div>
     </div>
-    <div class="flex justify-center w-full mt-2 overflow-x-auto">
+    <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
         <table class="table w-full">
             <thead>
                 <tr>
