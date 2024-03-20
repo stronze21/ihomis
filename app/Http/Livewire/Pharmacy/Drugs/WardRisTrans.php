@@ -25,7 +25,9 @@ class WardRisTrans extends Component
 
     public $search, $location_id, $locations, $wards;
 
-    public $ward_id, $stock_id, $issue_qty, $chrgcode, $charge_codes, $search_drug;
+    public $reference_no, $ward_id, $stock_id, $issue_qty, $chrgcode, $charge_codes, $search_drug;
+
+    public $issueMoreModal = false, $issueModal = false;
 
     public function render()
     {
@@ -61,8 +63,12 @@ class WardRisTrans extends Component
             ->get();
     }
 
-    public function issue_ris()
+    public function issue_ris($more = null)
     {
+        if (!$this->reference) {
+            $this->reference_no = Carbon::now()->format('y-m-') . (sprintf("%04d", count(WardRisRequest::select(DB::raw('COUNT(trans_no)'))->groupBy('trans_no')->get()) + 1));
+        }
+
         $item_code = explode(',', $this->stock_id);
         $dmdcomb = $item_code[0];
         $dmdctr = $item_code[1];
@@ -78,7 +84,6 @@ class WardRisTrans extends Component
         $issue_qty = $this->issue_qty;
 
         if ($available_qty >= $issue_qty) {
-            $reference_no = Carbon::now()->format('y-m-') . (sprintf("%04d", count(WardRisRequest::select(DB::raw('COUNT(trans_no)'))->groupBy('trans_no')->get()) + 1));
 
             $stocks = DrugStock::where('dmdcomb', $dmdcomb)
                 ->where('dmdctr', $dmdctr)
@@ -105,7 +110,7 @@ class WardRisTrans extends Component
                     $issued_qty += $trans_qty;
 
                     WardRisRequest::create([
-                        'trans_no' => $reference_no,
+                        'trans_no' => $this->reference_no,
                         'stock_id' => $stock->id,
                         'ris_location_id' => $this->ward_id,
                         'dmdcomb' => $dmdcomb,
@@ -147,7 +152,24 @@ class WardRisTrans extends Component
                     $card->save();
                 }
             }
-            $this->alert('success', 'Request issued successfully!');
+
+            if ($more) {
+                $this->alert('success', 'Issued successfully and append to reference no: ' . $this->reference_no);
+                $this->reset('stock_id', 'issue_qty', 'chrgcode');
+                $this->issueModal = false;
+                $this->issueMoreModal = true;
+            } else {
+                $this->alert('success', 'Request issued successfully!');
+                $this->reset('reference_no', 'ward_id', 'stock_id', 'issue_qty', 'chrgcode');
+            }
+        } else {
+            $this->alert('error', 'Stock balance insufficient!');
         }
+    }
+
+    public function append()
+    {
+        $this->reference_no = Carbon::now()->format('y-m-') . (sprintf("%04d", count(WardRisRequest::select(DB::raw('COUNT(trans_no)'))->groupBy('trans_no')->get())));
+        $this->issueMoreModal = true;
     }
 }
