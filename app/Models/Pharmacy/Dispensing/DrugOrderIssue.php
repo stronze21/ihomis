@@ -2,9 +2,11 @@
 
 namespace App\Models\Pharmacy\Dispensing;
 
+use App\Models\User;
 use App\Models\Pharmacy\Drug;
 use App\Models\Hospital\Employee;
 use Awobaz\Compoships\Compoships;
+use App\Models\Pharmacy\DrugPrice;
 use App\Models\References\ChargeCode;
 use App\Models\Record\Patients\Patient;
 use Illuminate\Database\Eloquent\Model;
@@ -12,7 +14,6 @@ use App\Models\Record\Admission\PatientRoom;
 use App\Models\Record\Encounters\AdmissionLog;
 use App\Models\Record\Encounters\EncounterLog;
 use App\Models\Pharmacy\Dispensing\DrugOrderReturn;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class DrugOrderIssue extends Model
@@ -57,6 +58,11 @@ class DrugOrderIssue extends Model
         'prescription_data_id',
         'prescribed_by',
     ];
+
+    public function current_price()
+    {
+        return $this->belongsTo(DrugPrice::class, 'dmdprdte', 'dmdprdte');
+    }
 
     public function dm()
     {
