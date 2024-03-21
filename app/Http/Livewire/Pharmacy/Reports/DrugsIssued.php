@@ -50,13 +50,6 @@ class DrugsIssued extends Component
 
         $filter_charge = explode(',', $this->filter_charge);
 
-        // $drugs_issued = DrugOrderIssue::with('dm')->with('patient')->with('issuer')->with('adm_pat_room')->with('encounter')
-        //     ->where('issuedfrom', $filter_charge[0])
-        //     ->whereRelation('main_order', 'loc_code', $this->location_id)
-        //     ->whereBetween('issuedte', [$date_from, $date_to])
-        //     ->latest('issuedte')
-        //     ->get();
-
         $drugs_issued = DB::select("SELECT rxi.enccode, rxi.qty, rxi.hpercode, rxi.pcchrgcod, rxi.issuedte, hdr.drug_concat, ward.wardname, room.rmname, pat.patlast, pat.patfirst, pat.patmiddle, emp2.name, emp.firstname, emp.lastname, emp.middlename
         FROM hrxoissue rxi
         INNER JOIN hrxo rxo ON rxi.docointkey = rxo.docointkey
