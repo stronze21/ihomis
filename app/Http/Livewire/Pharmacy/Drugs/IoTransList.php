@@ -178,7 +178,7 @@ class IoTransList extends Component
             IoTransRequestUpdated::dispatch($this->selected_request, 'A requested drugs/medicine has been issued from the warehouse.');
             $this->dispatchBrowserEvent('toggleIssue');
             $this->alert('success', 'Request issued successfully!');
-            $this->reset();
+            $this->reset('selected_request', 'issue_qty', 'available_drugs');
         } else {
             $this->alert('error', 'Failed to issue medicine. Selected fund source insufficient stock!');
         }
@@ -246,6 +246,5 @@ class IoTransList extends Component
         $trans->save();
 
         $this->alert('success', 'Issued items successfully recalled!');
-        $this->reset();
     }
 }
