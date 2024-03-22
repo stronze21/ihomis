@@ -130,4 +130,9 @@ class InOutTransaction extends Model
     {
         return $this->hasMany(InOutTransactionItem::class, 'iotrans_id', 'id');
     }
+
+    public function item()
+    {
+        return $this->hasOne(InOutTransactionItem::class, 'iotrans_id', 'id');
+    }
 }

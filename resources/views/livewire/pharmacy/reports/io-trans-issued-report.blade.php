@@ -26,6 +26,18 @@
         <div class="flex space-x-2">
             <div class="form-control">
                 <label class="input-group">
+                    <span>Fund Source</span>
+                    <select class="select select-bordered select-sm" wire:model="filter_charge">
+                        <option></option>
+                        @foreach ($charge_codes as $charge)
+                            <option value="{{ $charge->chrgcode }}">
+                                {{ $charge->chrgdesc }}</option>
+                        @endforeach
+                    </select>
+                </label>
+            </div>
+            <div class="form-control">
+                <label class="input-group">
                     <span>From</span>
                     <input type="date" class="w-full input input-sm input-bordered" wire:model.lazy="from" />
                 </label>
