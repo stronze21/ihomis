@@ -21,20 +21,29 @@ class DrugsIssuedWards extends Component
         $date_from = Carbon::parse($this->date_from)->format('Y-m-d H:i:s');
         $date_to = Carbon::parse($this->date_to)->format('Y-m-d H:i:s');
 
+        if (!$this->wardcode) {
+            $this->wardcode = '%%';
+        }
+
+        if (!$this->filter_charge) {
+            $this->filter_charge = '%%';
+        }
+
         $drugs_issued = DB::select("SELECT ward.wardname, drug.drug_concat, charge.chrgdesc, SUM(rxo.qty) as qty
                                     FROM hospital.dbo.hrxoissue rxo
+                                    INNER JOIN hospital.dbo.hrxo ON rxo.docointkey = hrxo.docointkey
                                     INNER JOIN hospital.dbo.hpatroom pat_room ON rxo.enccode = pat_room.enccode
                                     INNER JOIN webapp.dbo.prescription_data_issued rx_i ON rxo.docointkey = rx_i.docointkey
                                     INNER JOIN hospital.dbo.hward ward ON pat_room.wardcode = ward.wardcode
                                     INNER JOIN hospital.dbo.hdmhdr drug ON rxo.dmdcomb = drug.dmdcomb AND rxo.dmdctr = drug.dmdctr
                                     INNER JOIN hospital.dbo.hcharge charge ON rxo.chrgcode = charge.chrgcode
-                                    WHERE rxo.issuedte BETWEEN ? AND ?
-                                    AND ward.wardcode LIKE ?
-                                    AND rxo.chrgcode LIKE ?
-                                    AND rxo.loc_code = ?
+                                    WHERE rxo.issuedte BETWEEN '" . $date_from . "' AND '" . $date_to . "'
+                                    AND ward.wardcode LIKE '" . $this->wardcode . "'
+                                    AND rxo.chrgcode LIKE '" . $this->filter_charge . "'
+                                    AND hrxo.loc_code = '" . session('pharm_location_id') . "'
                                     GROUP BY ward.wardname, drug.drug_concat, charge.chrgdesc
                                     ORDER BY ward.wardname ASC, drug.drug_concat ASC
-                                    ", [$date_from, $date_to, $this->wardcode ?? '%%', $this->filter_charge ?? '%%', session('pharm_location_id')]);
+                                    ");
 
         return view('livewire.pharmacy.reports.drugs-issued-wards', compact(
             'drugs_issued',
