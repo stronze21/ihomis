@@ -169,7 +169,13 @@ class WardRisTrans extends Component
 
     public function append()
     {
-        $this->reference_no = Carbon::now()->format('y-m-') . (sprintf("%04d", count(WardRisRequest::select(DB::raw('COUNT(trans_no)'))->groupBy('trans_no')->get())));
-        $this->issueMoreModal = true;
+        $ris = WardRisRequest::where('loc_code', $this->location_id)->latest()->first();
+        if ($ris) {
+            $this->reference_no = $ris->trans_no;
+            $this->ward_id = $ris->ris_location_id;
+            $this->issueMoreModal = true;
+        } else {
+            $this->alert('error', 'No RIS found!');
+        }
     }
 }
