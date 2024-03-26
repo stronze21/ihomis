@@ -26,25 +26,29 @@ class IoTransIssuedReport extends Component
             ->get();
 
 
-        $trans = InOutTransaction::where(function ($query) {
-            $query->where('trans_stat', 'Issued')
-                ->orWhere('trans_stat', 'Received');
-        })->where('request_from', session('pharm_location_id'))
-            ->whereHas('item', function ($query) {
-                $query->where('chrgcode', $this->filter_charge);
-            })
-            ->whereBetween('updated_at', [$from, $to])
-            ->with('drug')
-            ->with('location')
-            ->get();
+        // $trans = InOutTransaction::where(function ($query) {
+        //     $query->where('trans_stat', 'Issued')
+        //         ->orWhere('trans_stat', 'Received');
+        // })->where('request_from', session('pharm_location_id'))
+        //     ->whereHas('item', function ($query) {
+        //         $query->where('chrgcode', $this->filter_charge);
+        //     })
+        //     ->whereBetween('updated_at', [$from, $to])
+        //     ->with('drug')
+        //     ->with('location')
+        //     ->get();
 
-        // $trans = DB::select("
-        //     SELECT io.trans_no, io.created_at, loc.description, drug.drug_concat, io.issued_qty
-        //     FROM pharm_io_trans io
-        //     JOIN pharm_locations loc ON io.request_from = loc.id
-        //     JOIN hdmhdr drug ON io.dmdcomb = drug.dmdcomb AND io.dmdctr = drug.dmdctr
-        //     WHERE io.request_from = '" . session('pharm_location_id') . "' AND io.updated_at BETWEEN '" . $from . "' AND '" . $to . "' AND (io.trans_stat = 'Issued' OR io.trans_stat = 'Received')
-        // ");
+
+        $trans = DB::select("SELECT pit.trans_no, loc.description, pit.updated_at, pit.created_at, pit.issued_by, pit.issued_qty,
+            (SELECT drug_concat FROM hdmhdr WHERE hdmhdr.dmdcomb = pit.dmdcomb AND hdmhdr.dmdctr = pit.dmdctr) drug_concat
+                FROM pharm_io_trans pit
+                JOIN pharm_locations loc ON pit.loc_code = loc.id
+                WHERE (pit.trans_stat = 'Issued' or pit.trans_stat = 'Received')  AND pit.request_from = '" . session('pharm_location_id') . "'
+                    AND EXISTS (SELECT * FROM pharm_io_trans_items WHERE pit.id = pharm_io_trans_items.iotrans_id AND chrgcode = '" . $this->filter_charge . "')
+                    AND pit.updated_at between '" . $from . "' and '" . $to . "'
+                ORDER BY drug_concat
+                ");
+
 
         return view('livewire.pharmacy.reports.io-trans-issued-report', [
             'trans' => $trans,

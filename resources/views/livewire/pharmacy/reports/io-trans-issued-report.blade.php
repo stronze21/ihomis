@@ -61,24 +61,27 @@
     </div>
     <div class="flex flex-col justify-center w-full mt-2 overflow-x-auto">
         <div id="print" class="w-full">
-            <table class="table w-full bg-white shadow-md table-sm" id="table">
+            <table class="table w-full bg-white shadow-md table-sm table-compact" id="table">
                 <thead>
                     <tr>
                         <th class="w-1/12">Reference</th>
                         <th class="w-1/12">Date Requested</th>
                         <th class="w-1/12">Issued to</th>
                         <th class="w-6/12">Item Issued</th>
-                        <th class="w-1/12">Issued QTY</th>
+                        <th class="w-1/12 text-end">Issued QTY</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($trans as $tran)
-                        <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}">
+                        @php
+                            $drug_concat = implode(',', explode('_,', $tran->drug_concat));
+                        @endphp
+                        <tr class="cursor-pointer hover">
                             <th>{{ $tran->trans_no }}</th>
-                            <td>{{ $tran->created_at() }}</td>
-                            <td>{{ $tran->location->description }}</td>
-                            <td>{{ $tran->drug->drug_concat() }}</td>
-                            <td>{{ $tran->issued_qty < 1 ? '0' : $tran->issued_qty }}</td>
+                            <td>{{ \Carbon\Carbon::parse($tran->created_at)->format('M d, Y G:i A') }}</td>
+                            <td>{{ $tran->description }}</td>
+                            <td>{{ $drug_concat }}</td>
+                            <td class="text-end">{{ $tran->issued_qty < 1 ? '0' : $tran->issued_qty }}</td>
                         </tr>
                     @empty
                         <tr>

@@ -5,6 +5,7 @@ namespace App\Http\Livewire\Pharmacy\Reports;
 use App\Models\Pharmacy\Drugs\InOutTransaction;
 use App\Models\References\ChargeCode;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,15 +26,15 @@ class IoTransReceivedReport extends Component
             ->whereIn('chrgcode', array('DRUMA', 'DRUMB', 'DRUMC', 'DRUME', 'DRUMK', 'DRUMAA', 'DRUMAB', 'DRUMR', 'DRUMS', 'DRUMAD', 'DRUMAE', 'DRUMAF', 'DRUMAG'))
             ->get();
 
-        $trans = InOutTransaction::where('trans_stat', 'Received')
-            ->where('loc_code', session('pharm_location_id'))
-            ->whereBetween('updated_at', [$from, $to])
-            ->whereHas('item', function ($query) {
-                $query->where('chrgcode', $this->filter_charge);
-            })
-            ->with('drug')
-            ->with('location')
-            ->get();
+        $trans = DB::select("SELECT pit.trans_no, loc.description, pit.updated_at, pit.created_at, pit.issued_by, pit.issued_qty,
+                                (SELECT drug_concat FROM hdmhdr WHERE hdmhdr.dmdcomb = pit.dmdcomb AND hdmhdr.dmdctr = pit.dmdctr) drug_concat
+                            FROM pharm_io_trans pit
+                            JOIN pharm_locations loc ON pit.request_from = loc.id
+                            WHERE pit.trans_stat = 'Received' AND pit.loc_code = '" . session('pharm_location_id') . "'
+                                AND EXISTS (SELECT * FROM pharm_io_trans_items WHERE pit.id = pharm_io_trans_items.iotrans_id AND chrgcode = '" . $this->filter_charge . "')
+                                AND pit.updated_at between '" . $from . "' and '" . $to . "'
+                            ORDER BY drug_concat
+                            ");
 
         return view('livewire.pharmacy.reports.io-trans-received-report', [
             'trans' => $trans,

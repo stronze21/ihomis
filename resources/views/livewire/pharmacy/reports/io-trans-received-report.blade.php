@@ -69,18 +69,21 @@
                         <th class="w-1/12">Date Received</th>
                         <th class="w-1/12">Issued by</th>
                         <th class="w-6/12">Item Issued</th>
-                        <th class="w-1/12">Issued QTY</th>
+                        <th class="w-1/12 text-end">Issued QTY</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($trans as $tran)
-                        <tr class="cursor-pointer hover" wire:key="select-txt-{{ $loop->iteration . $tran->id }}">
+                        @php
+                            $drug_concat = implode(',', explode('_,', $tran->drug_concat));
+                        @endphp
+                        <tr class="cursor-pointer hover">
                             <th>{{ $tran->trans_no }}</th>
-                            <td>{{ $tran->created_at() }}</td>
+                            <td>{{ \Carbon\Carbon::parse($tran->created_at)->format('M d, Y G:i A') }}</td>
                             <td>{{ date('M d, Y h:i A', strtotime($tran->updated_at)) }}</td>
-                            <td>{{ $tran->issued_by }}</td>
-                            <td>{{ $tran->drug->drug_concat() }}</td>
-                            <td>{{ $tran->issued_qty < 1 ? '0' : $tran->issued_qty }}</td>
+                            <td>{{ $tran->description }}</td>
+                            <td>{{ $drug_concat }}</td>
+                            <td class="text-end">{{ $tran->issued_qty < 1 ? '0' : $tran->issued_qty }}</td>
                         </tr>
                     @empty
                         <tr>
