@@ -65,7 +65,7 @@ class WardRisTrans extends Component
 
     public function issue_ris($more = null)
     {
-        if (!$this->reference) {
+        if (!$this->reference_no) {
             $this->reference_no = Carbon::now()->format('y-m-') . (sprintf("%04d", count(WardRisRequest::select(DB::raw('COUNT(trans_no)'))->groupBy('trans_no')->get()) + 1));
         }
 
