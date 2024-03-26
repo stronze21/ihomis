@@ -198,13 +198,11 @@ class EncounterTransactionView extends Component
         $charge_code = OrderChargeCode::create([
             'charge_desc' => 'a',
         ]);
-
         $pcchrgcod = 'P' . date('y') . '-' . sprintf('%07d', $charge_code->id);
         $cnt = 0;
         foreach ($this->selected_items as $docointkey) {
-
             $cnt = DB::update(
-                "UPDATE hospital.dbo.hrxo SET pcchrgcod = '" . $pcchrgcod . "', estatus = 'P' WHERE docointkey = " . $docointkey . " AND (estatus = 'U' OR pchrgup = 0)"
+                "UPDATE hospital.dbo.hrxo SET pcchrgcod = '" . $pcchrgcod . "', estatus = 'P' WHERE docointkey = " . $docointkey . " AND (estatus = 'U' OR orderfrom = 'DRUMK')"
             );
         }
 
