@@ -49,6 +49,7 @@ class ViewIoTransDate extends Component
 
         $drugs = Drug::where('dmdstat', 'A')
             ->whereNotNull('drug_concat')
+            ->has('stock')
             ->has('generic')->orderBy('drug_concat', 'ASC')
             ->get();
 

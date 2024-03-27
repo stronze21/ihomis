@@ -46,7 +46,7 @@ class IoTransList extends Component
             });
 
         $drugs = DrugStock::with('drug')->select(DB::raw('MAX(id) as id'), 'dmdcomb', 'dmdctr', DB::raw('SUM(stock_bal) as "avail"'))
-            ->whereRelation('location', 'description', 'LIKE', '%Warehouse%')
+            ->where('loc_code', session('pharm_location_id'))
             ->where('stock_bal', '>', '0')->where('exp_date', '>', now())
             ->groupBy('dmdcomb', 'dmdctr');
 

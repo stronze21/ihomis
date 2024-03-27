@@ -2,6 +2,7 @@
 
 namespace App\Models\Pharmacy;
 
+use App\Models\Pharmacy\Drugs\DrugStock;
 use Awobaz\Compoships\Compoships;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -64,5 +65,10 @@ class Drug extends Model
         $concat = explode('_', $this->drug_concat);
 
         return implode("", $concat);
+    }
+
+    public function stock()
+    {
+        return $this->hasOne(DrugStock::class, ['dmdcomb', 'dmdctr'], ['dmdcomb', 'dmdctr']);
     }
 }
